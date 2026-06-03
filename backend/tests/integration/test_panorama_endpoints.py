@@ -1,0 +1,1 @@
+﻿# test_panorama_endpoints — SkillStat

@@ -1,0 +1,1 @@
+﻿# skills_extraction_service — SkillStat

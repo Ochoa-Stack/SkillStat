@@ -1,0 +1,1 @@
+﻿/* alertas.js — SkillStat */
