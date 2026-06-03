@@ -1,0 +1,1 @@
+﻿# test_market_trends — SkillStat

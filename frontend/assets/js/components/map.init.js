@@ -1,0 +1,1 @@
+﻿/* map.init.js — SkillStat */
