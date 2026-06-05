@@ -1,1 +1,36 @@
-﻿ 
+# Framework principal
+Flask>=3.1,<4.0
+Flask-SQLAlchemy>=3.1,<4.0
+Flask-JWT-Extended>=4.7,<5.0
+Flask-CORS>=5.0,<6.0
+Flask-Migrate>=4.0,<5.0
+
+# Conexión con PostgreSQL
+psycopg2-binary>=2.9,<3.0
+
+# Variables de entorno
+python-dotenv>=1.0,<2.0
+
+# Cifrado de contraseñas
+bcrypt>=4.2,<5.0
+
+# Validación de datos de entrada
+marshmallow>=3.23,<4.0
+
+# Programación de tareas automáticas
+APScheduler>=3.10,<4.0
+
+# Peticiones HTTP a APIs externas
+requests>=2.32,<3.0
+
+# Procesamiento de lenguaje natural
+spacy>=3.8,<4.0
+
+# Procesamiento y análisis de datos
+pandas>=2.2,<3.0
+
+# Envío de correos electrónicos
+sendgrid>=6.11,<7.0
+
+# Servidor WSGI para producción
+gunicorn>=23.0,<24.0
