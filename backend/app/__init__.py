@@ -11,8 +11,7 @@ from app.extensions import db, jwt, cors, migrate
 def create_app(env: str = None) -> Flask:
     """Crea y configura una instancia de la aplicación Flask"""
 
-    # Cargamos las variables de entorno antes de leer cualquier configuración
-    # para que estén disponibles cuando se instancian las clases de config
+    # Cargamos las variables de entorno antes de leer cualquier configuración para que estén disponibles cuando se instancian las clases de config
     load_dotenv()
 
     app = Flask(__name__, instance_relative_config=False)
@@ -21,6 +20,14 @@ def create_app(env: str = None) -> Flask:
     env = env or os.environ.get("FLASK_ENV", "development")
     config_class = config_map.get(env, config_map["development"])
     app.config.from_object(config_class)
+
+    # Verificamos que la base de datos esté configurada antes de continuar
+    # Hacemos esta validación aquí y no en la clase de configuración para que ocurra en tiempo de ejecución real y solo cuando el entorno es producción
+    if env == "production" and not app.config.get("SQLALCHEMY_DATABASE_URI"):
+        raise RuntimeError(
+            "DATABASE_URL no está definida. "
+            "La aplicación no puede iniciar en producción sin una base de datos configurada."
+        )
 
     _init_extensions(app)
     _register_blueprints(app)

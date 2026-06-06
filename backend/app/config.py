@@ -68,13 +68,6 @@ class ProductionConfig(BaseConfig):
 
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
-    if not SQLALCHEMY_DATABASE_URI:
-        raise RuntimeError(
-            "DATABASE_URL no está definida. "
-            "La aplicación no puede iniciar en producción "
-            "sin una base de datos configurada."
-        )
-
     SQLALCHEMY_ENGINE_OPTIONS = {
         **BaseConfig.SQLALCHEMY_ENGINE_OPTIONS,
         "pool_size": 10,
