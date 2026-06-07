@@ -182,4 +182,3 @@ def _register_health_check(app: Flask) -> None:
             "status": "ok",
             "service": "SkillStat API",
         }), 200
-        
