@@ -30,6 +30,10 @@ def create_app(env: str = None) -> Flask:
         )
 
     _init_extensions(app)
+
+    # Importamos los modelos para que SQLAlchemy registre sus tablas en el metadata antes de que Alembic las lea durante la generación de migraciones
+    from app import models as _models  # noqa: F401
+
     _register_blueprints(app)
     _register_error_handlers(app)
     _register_health_check(app)
