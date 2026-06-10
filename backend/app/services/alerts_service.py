@@ -1,1 +1,0 @@
-﻿# alerts_service — SkillStat

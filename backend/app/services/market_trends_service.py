@@ -1,1 +1,0 @@
-﻿# market_trends_service — SkillStat

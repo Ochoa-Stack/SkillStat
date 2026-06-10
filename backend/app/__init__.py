@@ -9,19 +9,16 @@ from app.extensions import db, jwt, cors, migrate
 
 
 def create_app(env: str = None) -> Flask:
-    """Crea y configura una instancia de la aplicación Flask"""
 
     # Cargamos las variables de entorno antes de leer cualquier configuración para que estén disponibles cuando se instancian las clases de config
     load_dotenv()
 
     app = Flask(__name__, instance_relative_config=False)
 
-    # Seleccionamos la configuración según el entorno
     env = env or os.environ.get("FLASK_ENV", "development")
     config_class = config_map.get(env, config_map["development"])
     app.config.from_object(config_class)
 
-    # Verificamos que la base de datos esté configurada antes de continuar
     # Hacemos esta validación aquí y no en la clase de configuración para que ocurra en tiempo de ejecución real y solo cuando el entorno es producción
     if env == "production" and not app.config.get("SQLALCHEMY_DATABASE_URI"):
         raise RuntimeError(
@@ -42,7 +39,6 @@ def create_app(env: str = None) -> Flask:
 
 
 def _init_extensions(app: Flask) -> None:
-    """Conecta las extensiones con la instancia de la aplicación"""
     db.init_app(app)
     jwt.init_app(app)
     cors.init_app(
@@ -233,7 +229,6 @@ def _register_error_handlers(app: Flask) -> None:
 
 
 def _register_health_check(app: Flask) -> None:
-    """Registra el endpoint de salud para verificar que el servicio está activo"""
 
     @app.route("/api/health")
     def health_check():

@@ -1,1 +1,0 @@
-﻿# skill_schema — SkillStat
