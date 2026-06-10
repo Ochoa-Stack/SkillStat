@@ -9,13 +9,13 @@ from .trend_snapshot_repository import TrendSnapshotRepository
 from .backup_repository import BackupRepository
 
 __all__ = [
-    'CategoryRepository',
-    'CityRepository',
-    'SkillRepository',
-    'JobRepository',
-    'JobSkillRepository',
-    'UserRepository',
-    'AlertRepository',
-    'TrendSnapshotRepository',
-    'BackupRepository',
+    "CategoryRepository",
+    "CityRepository",
+    "SkillRepository",
+    "JobRepository",
+    "JobSkillRepository",
+    "UserRepository",
+    "AlertRepository",
+    "TrendSnapshotRepository",
+    "BackupRepository",
 ]

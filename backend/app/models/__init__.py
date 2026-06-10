@@ -9,13 +9,13 @@ from .trend_snapshot import TrendSnapshot
 from .backup import Backup
 
 __all__ = [
-    'Category',
-    'City',
-    'Skill',
-    'Job',
-    'JobSkill',
-    'User',
-    'Alert',
-    'TrendSnapshot',
-    'Backup'
+    "Category",
+    "City",
+    "Skill",
+    "Job",
+    "JobSkill",
+    "User",
+    "Alert",
+    "TrendSnapshot",
+    "Backup",
 ]
