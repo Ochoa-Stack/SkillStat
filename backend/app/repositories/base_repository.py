@@ -1,47 +1,42 @@
 from app.extensions import db
 
-
 class BaseRepository:
-    def __init__(self, model):
-        self.model = model
+    # Repositorio genérico que implementa operaciones CRUD estándar
+    # para cualquier modelo SQLAlchemy. Utiliza classmethods para evitar
+    # la sobrecarga de instanciación en la capa de servicios.
+    
+    model = None
 
-    def get_all(self):
-        return db.session.query(self.model).all()
+    @classmethod
+    def create(cls, data: dict):
+        # Transforma un diccionario DTO en una entidad SQLAlchemy y la persiste.
+        # Evita que la capa de Servicios tenga que importar los Modelos de la BD.
+        entity = cls.model(**data)
+        return cls.save(entity)
 
-    def get_by_id(self, id):
-        return db.session.get(self.model, id)
-
-    def create(self, data):
-        # Protegemos la transacción con un bloque de manejo de errores para garantizar que una falla en la escritura no deje bloqueada la sesión de la base de datos
+    @classmethod
+    def save(cls, entity):
+        db.session.add(entity)
         try:
-            instance = self.model(**data)
-            db.session.add(instance)
             db.session.commit()
-            return instance
-        except Exception as e:
+            return entity
+        except Exception:
             db.session.rollback()
-            raise e
+            return None
 
-    def update(self, id, data):
-        try:
-            instance = self.get_by_id(id)
-            if instance:
-                for key, value in data.items():
-                    setattr(instance, key, value)
-                db.session.commit()
-            return instance
-        except Exception as e:
-            db.session.rollback()
-            raise e
+    @classmethod
+    def get_by_id(cls, entity_id: int):
+        return db.session.get(cls.model, entity_id)
 
-    def delete(self, id):
-        try:
-            instance = self.get_by_id(id)
-            if instance:
-                db.session.delete(instance)
-                db.session.commit()
-                return True
-            return False
-        except Exception as e:
-            db.session.rollback()
-            raise e
+    @classmethod
+    def get_all(cls):
+        return db.session.execute(db.select(cls.model)).scalars().all()
+
+    @classmethod
+    def delete(cls, entity_id: int) -> bool:
+        entity = cls.get_by_id(entity_id)
+        if entity:
+            db.session.delete(entity)
+            db.session.commit()
+            return True
+        return False
