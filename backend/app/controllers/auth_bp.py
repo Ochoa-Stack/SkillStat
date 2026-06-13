@@ -12,23 +12,21 @@ auth_bp = Blueprint("auth_bp", __name__)
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
-    # Validación de Entrada
     try:
         data = UserRegistrationSchema().load(request.get_json() or {})
     except ValidationError as err:
         return error_response(code="VALIDATION_ERROR", message=err.messages, status_code=422)
 
-    # Verificación de conflictos
     if UserRepository.get_by_email(data["email"]):
         return error_response(code="CONFLICT", message="El correo ya está registrado.", status_code=409)
 
-    # Preparación y persistencia
-    data["password"] = hash_password(data["password"])
+    # Traducimos el DTO de entrada al modelo de dominio.
+    # Extraemos 'password' y lo inyectamos como 'password_hash' para que SQLAlchemy lo acepte.
+    data["password_hash"] = hash_password(data.pop("password"))
     data["role"] = "REGISTERED"
     
     user = UserRepository.create(data)
 
-    # Validación de Salida
     result = UserResponseSchema().dump(user)
     return success_response(data=result, status_code=201)
 
@@ -40,17 +38,17 @@ def login():
         return error_response(code="VALIDATION_ERROR", message=err.messages, status_code=422)
 
     user = UserRepository.get_by_email(data["email"])
-    if not user or not verify_password(data["password"], user.password):
+    
+    # Comparamos contra el atributo real del modelo de base de datos (password_hash)
+    if not user or not verify_password(data["password"], user.password_hash):
         return error_response(code="UNAUTHORIZED", message="Credenciales incorrectas.", status_code=401)
 
-    # Generación de token JWT con rol inyectado
     tokens = generate_tokens(user_id=user.id, role=user.role)
     return success_response(data=tokens, status_code=200)
 
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
 def get_profile():
-    # Extraemos el ID del usuario del token JWT validado por la extensión
     user_id = get_jwt_identity()
     user = UserRepository.get_by_id(int(user_id))
     
