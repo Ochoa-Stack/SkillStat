@@ -1,17 +1,19 @@
+from sqlalchemy import inspect
 from app.extensions import db
 
 class BaseRepository:
-    # Repositorio genérico que implementa operaciones CRUD estándar
-    # para cualquier modelo SQLAlchemy. Utiliza classmethods para evitar
-    # la sobrecarga de instanciación en la capa de servicios.
-    
+    # Repositorio genérico con soporte de instanciación dinámica y segura.
     model = None
 
     @classmethod
     def create(cls, data: dict):
-        # Transforma un diccionario DTO en una entidad SQLAlchemy y la persiste.
-        # Evita que la capa de Servicios tenga que importar los Modelos de la BD.
-        entity = cls.model(**data)
+        # Extraemos solo las llaves que corresponden a columnas reales en la base de datos, ignorando cualquier metadato extra proveniente de APIs externas o DTOs mal alineados.
+        mapper = inspect(cls.model)
+        valid_keys = mapper.columns.keys()
+        
+        filtered_data = {k: v for k, v in data.items() if k in valid_keys}
+        
+        entity = cls.model(**filtered_data)
         return cls.save(entity)
 
     @classmethod
