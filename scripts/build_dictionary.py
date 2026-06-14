@@ -1,39 +1,42 @@
 import json
 import os
 
-# Resoluciones de rutas absolutas para garantizar que el script pueda 
-# ejecutarse desde cualquier directorio sin romper los paths relativos.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DICT_DIR = os.path.join(BASE_DIR, "data", "dictionaries")
 OUTPUT_FILE = os.path.join(DICT_DIR, "skills_esco.jsonl")
 
-# Semilla de conocimientos tecnológicos
 CORE_SKILLS = [
-    "Python", "JavaScript", "Java", "C++", "C#", "Ruby", "PHP", "Go", "Swift", "Kotlin",
-    "TypeScript", "Rust", "SQL", "NoSQL", "PostgreSQL", "MySQL", "MongoDB", "Redis",
-    "React", "Angular", "Vue", "Node.js", "Express", "Django", "Flask", "FastAPI",
-    "Spring Boot", "Laravel", "Docker", "Kubernetes", "AWS", "Azure", "GCP",
-    "Google Cloud", "Linux", "Git", "CI/CD", "Jenkins", "Terraform", "Ansible",
-    "Machine Learning", "Data Science", "Artificial Intelligence", "Deep Learning",
-    "NLP", "TensorFlow", "PyTorch", "Pandas", "NumPy", "Scikit-learn",
-    "HTML", "CSS", "Tailwind", "Bootstrap", "Sass", "GraphQL", "REST API",
-    "Microservices", "Agile", "Scrum", "Kanban"
+    "Python", "JavaScript", "TypeScript", "Java", "C#", "C++", "Ruby",
+    "PHP", "Go", "Rust", "Swift", "Kotlin",
+    "React", "Angular", "Vue.js", "Node.js", "Express", "Django", "Flask",
+    "FastAPI", "Spring Boot", ".NET",
+    "SQL", "MySQL", "PostgreSQL", "MongoDB", "SQLite", "NoSQL", "Redis",
+    "Cassandra", "Elasticsearch",
+    "AWS", "Azure", "Google Cloud", "GCP", "Docker", "Kubernetes",
+    "Terraform", "Jenkins", "CI/CD", "Linux",
+    "Machine Learning", "Data Science", "Artificial Intelligence", "NLP",
+    "Deep Learning", "TensorFlow", "PyTorch", "Pandas", "NumPy",
+    "Scikit-learn",
+    "Git", "GitHub", "GitLab", "Bitbucket",
+    "Agile", "Scrum", "Jira", "Figma",
+    "HTML", "CSS", "Sass", "Tailwind", "Bootstrap",
+    "GraphQL", "REST API", "Microservices",
 ]
+
 
 def build_dictionary():
     os.makedirs(DICT_DIR, exist_ok=True)
-    print(f"Construyendo diccionario de conocimientos NLP en: {OUTPUT_FILE}")
-    
+    print(f"Construyendo diccionario NLP en: {OUTPUT_FILE}")
+
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         for skill in CORE_SKILLS:
-            # Formateamos estrictamente bajo el estándar JSONL que spaCy requiere para inyectar reglas deterministas en el EntityRuler.
-            entry = {
-                "label": "SKILL",
-                "pattern": skill
-            }
+            # Formateamos bajo el estandar JSONL que spaCy requiere para
+            # inyectar reglas deterministicas en el EntityRuler.
+            entry = {"label": "SKILL", "pattern": skill}
             f.write(json.dumps(entry) + "\n")
-            
-    print(f"Éxito: {len(CORE_SKILLS)} habilidades exportadas y listas para EntityRuler.")
+
+    print(f"Exito: {len(CORE_SKILLS)} habilidades exportadas.")
+
 
 if __name__ == "__main__":
     build_dictionary()
