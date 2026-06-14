@@ -22,8 +22,9 @@ class BaseRepository:
         try:
             db.session.commit()
             return entity
-        except Exception:
+        except Exception as e:
             db.session.rollback()
+            print(f"\n[ERROR DE PERSISTENCIA] Fallo al guardar en BD: {str(e)}\n")
             return None
 
     @classmethod
