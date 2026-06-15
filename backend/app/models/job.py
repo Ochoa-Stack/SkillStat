@@ -16,7 +16,7 @@ class Job(db.Model):
     raw_description = db.Column(db.Text, nullable=False)
 
     # Guardamos el hash de la descripción para detectar rápidamente si una vacante ya fue procesada o si cambió en su origen
-    description_hash = db.Column(db.String(64), nullable=False)
+    description_hash = db.Column(db.String(64), nullable=False, unique=True)
     processed = db.Column(db.Boolean, default=False, nullable=False)
 
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
