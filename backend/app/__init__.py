@@ -25,7 +25,7 @@ def _init_extensions(app: Flask) -> None:
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
-    # Habilitamos CORS estrictamente para la ruta de la API para permitir el consumo desde el Single Page Application de React en el Frontend.
+    # Restringimos CORS al prefijo de la API para que el frontend pueda consumirla desde su propio origen sin bloqueos del navegador.
     cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", "*")}})
 
 def _register_blueprints(app: Flask) -> None:
