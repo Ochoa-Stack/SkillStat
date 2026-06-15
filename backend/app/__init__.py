@@ -25,7 +25,7 @@ def _init_extensions(app: Flask) -> None:
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
-    # Habilitamos CORS estrictamente para la ruta de la API para permitir el consumo desde el Single Page Application de React en el Frontend.
+    # Restringimos CORS al prefijo de la API para que el frontend pueda consumirla desde su propio origen sin bloqueos del navegador.
     cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", "*")}})
 
 def _register_blueprints(app: Flask) -> None:
@@ -41,16 +41,19 @@ def _register_blueprints(app: Flask) -> None:
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
 
 def _register_schedulers(app: Flask) -> None:
-    # Programación de tareas en segundo plano. Cumple con el requisito de automatización.
-    from app.services.market_trends_service import MarketTrendsService
-    from app.services.alerts_service import AlertsService
+    from scheduler.jobs import daily_pipeline
+    import functools
 
-    def daily_pipeline():
-        with app.app_context():
-            MarketTrendsService.generate_snapshots()
-            AlertsService.evaluate_and_notify()
+    # Vinculamos la instancia concreta de app al job para que APScheduler pueda ejecutarlo en su hilo sin depender del proxy.
+    bound_pipeline = functools.partial(daily_pipeline, app)
 
-    # Si el scheduler no está corriendo, lo iniciamos y programamos el pipeline
     if not scheduler.running:
-        scheduler.add_job(func=daily_pipeline, trigger="cron", hour=0, minute=0, id="daily_pipeline", replace_existing=True)
+        scheduler.add_job(
+            func=bound_pipeline,
+            trigger="cron",
+            hour=0,
+            minute=0,
+            id="daily_pipeline",
+            replace_existing=True,
+        )
         scheduler.start()

@@ -47,13 +47,19 @@ class IngestionService:
         # Guardamos sin location estricta hasta integrar Nominatim, determinando la bandera remote de forma aislada.
         is_remote = "remote" in str(item).lower() or "remoto" in str(item).lower()
 
+        salary_min = item.get("salary_min")
+        salary_max = item.get("salary_max")
+
         job_data = {
             "title": title[:200],
             "company": company[:200],
             "description": description,
             "url": url,
             "description_hash": desc_hash,
-            "remote": is_remote
+            "remote": is_remote,
+            # Capturamos los rangos salariales cuando Adzuna los incluye. Muchas vacantes no los declaran, por eso permitimos nulos.
+            "salary_min": float(salary_min) if salary_min is not None else None,
+            "salary_max": float(salary_max) if salary_max is not None else None,
         }
 
         job = JobRepository.create(job_data)

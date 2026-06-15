@@ -29,11 +29,10 @@ def create_alert():
 @jwt_required()
 def get_alerts():
     user_id = int(get_jwt_identity())
-    
-    # Filtramos en memoria para garantizar que el usuario actual no tenga visibilidad sobre configuraciones ajenas.
-    all_alerts = AlertRepository.get_all()
-    user_alerts = [a for a in all_alerts if a.user_id == user_id]
-    
+
+    # Delegamos el filtro al repositorio para que la consulta ocurra en la base de datos y no en memoria de la aplicación.
+    user_alerts = AlertRepository.get_by_user_id(user_id)
+
     result = AlertResponseSchema(many=True).dump(user_alerts)
     return success_response(data=result, status_code=200)
 
