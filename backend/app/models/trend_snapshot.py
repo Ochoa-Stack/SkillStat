@@ -6,7 +6,7 @@ class TrendSnapshot(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     skill_id = db.Column(db.Integer, db.ForeignKey("skills.id"), nullable=False)
-    city_id = db.Column(db.Integer, db.ForeignKey("cities.id"), nullable=False)
+    city_id = db.Column(db.Integer, db.ForeignKey("cities.id"), nullable=True)
     date = db.Column(db.Date, nullable=False)
     demand_count = db.Column(db.Integer, default=0, nullable=True)
     growth_rate = db.Column(db.Numeric(6, 2), nullable=True)

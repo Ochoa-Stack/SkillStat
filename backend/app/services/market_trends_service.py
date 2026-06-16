@@ -21,8 +21,7 @@ class MarketTrendsService:
             "confidence": item.confidence_score
         } for item in raw_data])
 
-        # Agrupación y conteo vectorial.
-        # Extraemos el volumen de demanda absoluto por habilidad tecnológica.
+        # Agrupación y conteo vectorial. Extraemos el volumen de demanda absoluto por habilidad tecnológica.
         trends = df.groupby("skill_id").size().reset_index(name="demand_count")
         
         today = datetime.now(timezone.utc).date()
@@ -32,7 +31,8 @@ class MarketTrendsService:
             # Volcamos las métricas agregadas a la tabla de snapshots para que el endpoint del Panorama realice lecturas directas en lugar de recalcular.
             snapshot_data = {
                 "skill_id": int(row["skill_id"]),
-                "city_id": None,
+                # Usamos México Nacional como ciudad de agregación global para snapshots sin geolocalización específica.
+                "city_id": 1,
                 "date": today,
                 "demand_count": int(row["demand_count"])
             }

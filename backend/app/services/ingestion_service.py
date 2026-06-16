@@ -10,7 +10,7 @@ class IngestionService:
     # Orquestador central del flujo de datos. Conecta el proveedor externo (Adzuna), el motor analítico (NLP) y la capa de persistencia (Repositorios).
 
     @classmethod
-    def run_ingestion(cls, country: str = "mx", what: str = "IT", pages: int = 1) -> dict:
+    def run_ingestion(cls, country: str = "mx", what: str = "software developer", pages: int = 1) -> dict:
         stats = {"fetched": 0, "processed": 0, "skipped_or_failed": 0}
 
         # Pre-cargamos las habilidades existentes en memoria para evitar consultas SQL (N+1) por cada habilidad encontrada en cada vacante, minimizando latencia de red.
@@ -91,7 +91,9 @@ class IngestionService:
         
         new_skill = SkillRepository.create({
             "name": skill_name,
-            "canonical_name": skill_name.upper()
+            "canonical_name": skill_name.upper(),
+            # Asignamos la categoría General como fallback para habilidades detectadas por el NLP que aún no tienen clasificación formal.
+            "category_id": 1,
         })
         
         if new_skill:

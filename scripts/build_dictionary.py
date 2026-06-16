@@ -28,14 +28,26 @@ def build_dictionary():
     os.makedirs(DICT_DIR, exist_ok=True)
     print(f"Construyendo diccionario NLP en: {OUTPUT_FILE}")
 
+    patterns = []
+    for skill in CORE_SKILLS:
+        skill_lower = skill.lower()
+
+        if " " in skill:
+            # Para skills multipalabra usamos una lista de tokens con LOWER porque el EntityRuler necesita matchear cada token por separado.
+            token_pattern = [{"LOWER": token.lower()} for token in skill.split()]
+            patterns.append({"label": "SKILL", "pattern": token_pattern})
+        else:
+            # Para skills de una sola palabra usamos LOWER directamente para que el matching sea insensible a mayusculas en el texto.
+            patterns.append({
+                "label": "SKILL",
+                "pattern": [{"LOWER": skill_lower}]
+            })
+
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        for skill in CORE_SKILLS:
-            # Formateamos bajo el estandar JSONL que spaCy requiere para
-            # inyectar reglas deterministicas en el EntityRuler.
-            entry = {"label": "SKILL", "pattern": skill}
+        for entry in patterns:
             f.write(json.dumps(entry) + "\n")
 
-    print(f"Exito: {len(CORE_SKILLS)} habilidades exportadas.")
+    print(f"Exito: {len(CORE_SKILLS)} habilidades exportadas como {len(patterns)} patrones LOWER.")
 
 
 if __name__ == "__main__":
