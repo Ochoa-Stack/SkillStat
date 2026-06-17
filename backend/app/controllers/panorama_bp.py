@@ -1,9 +1,13 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from app.repositories.skill_repository import SkillRepository
 from app.repositories.city_repository import CityRepository
 from app.repositories.trend_snapshot_repository import TrendSnapshotRepository
 from app.schemas.skill_schema import SkillResponseSchema
-from app.schemas.panorama_schema import CatalogsResponseSchema, SummaryResponseSchema
+from app.schemas.panorama_schema import (
+    CatalogsResponseSchema,
+    SummaryResponseSchema,
+    SkillTrendSchema,
+)
 from app.utils.response import success_response
 
 panorama_bp = Blueprint("panorama_bp", __name__)
@@ -59,4 +63,30 @@ def get_summary():
     }
 
     result = SummaryResponseSchema().dump(payload)
+    return success_response(data=result, status_code=200)
+
+
+@panorama_bp.route("/skills/top", methods=["GET"])
+def get_top_skills():
+    # Ranking de habilidades por demanda actual. El frontend lo usa
+    # para la grafica de barras principal del Panorama.
+    limit = request.args.get("limit", default=10, type=int)
+    # Acotamos el limite para evitar que un valor arbitrario en la query
+    # fuerce una consulta desproporcionada contra la base de datos.
+    limit = max(1, min(limit, 50))
+
+    snapshots = TrendSnapshotRepository.get_top_skills(limit=limit)
+
+    payload = [
+        {
+            "skill_id": s.skill_id,
+            "name": s.skill.name if s.skill else None,
+            "demand_count": s.demand_count,
+            "growth_rate": s.growth_rate,
+            "avg_salary": s.avg_salary,
+        }
+        for s in snapshots
+    ]
+
+    result = SkillTrendSchema(many=True).dump(payload)
     return success_response(data=result, status_code=200)
