@@ -8,6 +8,7 @@ from app.schemas.panorama_schema import (
     SummaryResponseSchema,
     SkillTrendSchema,
     TrendsResponseSchema,
+    GeoResponseSchema,
 )
 from app.utils.response import success_response, error_response
 
@@ -24,8 +25,7 @@ def get_skills():
 
 @panorama_bp.route("/catalogs", methods=["GET"])
 def get_catalogs():
-    # Endpoint ligero pensado para poblar selectores del frontend.
-    # Devolvemos id+name unicamente, sin metricas, para minimizar el payload en una ruta que probablemente se llama una sola vez por sesion.
+    # Endpoint ligero pensado para poblar selectores del frontend. Devolvemos id+name unicamente, sin metricas, para minimizar el payload en una ruta que probablemente se llama una sola vez por sesion.
     skills = SkillRepository.get_all()
     cities = CityRepository.get_all()
 
@@ -123,4 +123,38 @@ def get_trends():
     }
 
     result = TrendsResponseSchema().dump(payload)
+    return success_response(data=result, status_code=200)
+
+
+@panorama_bp.route("/geo", methods=["GET"])
+def get_geo():
+    # Distribucion geografica de demanda. Si se filtra por skill_id devolvemos la distribucion de esa habilidad especifica, de lo contrario la demanda total agregada por ciudad.
+    skill_id = request.args.get("skill_id", type=int)
+
+    skill = None
+    if skill_id is not None:
+        skill = SkillRepository.get_by_id(skill_id)
+        if not skill:
+            return error_response(
+                code="NOT_FOUND",
+                message="La habilidad solicitada no existe.",
+                status_code=404,
+            )
+
+    rows = TrendSnapshotRepository.get_geo_distribution(skill_id=skill_id)
+
+    payload = {
+        "skill_id": skill.id if skill else None,
+        "skill_name": skill.name if skill else None,
+        "distribution": [
+            {
+                "city_id": row.city_id,
+                "city_name": row.city_name,
+                "demand_count": row.total_demand,
+            }
+            for row in rows
+        ],
+    }
+
+    result = GeoResponseSchema().dump(payload)
     return success_response(data=result, status_code=200)

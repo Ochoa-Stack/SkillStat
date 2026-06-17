@@ -104,3 +104,27 @@ class TrendSnapshotRepository(BaseRepository):
             "top_emerging": top_emerging,
             "top_declining": top_declining,
         }
+
+    @classmethod
+    def get_geo_distribution(cls, skill_id: int = None) -> list:
+        from sqlalchemy import func
+        from app.models.city import City
+
+        # Sumamos demand_count por ciudad. Si se filtra por skill_id
+        # la suma queda acotada a esa habilidad especifica, de lo
+        # contrario agregamos la demanda total de todas las habilidades.
+        query = (
+            db.select(
+                City.id.label("city_id"),
+                City.name.label("city_name"),
+                func.sum(TrendSnapshot.demand_count).label("total_demand"),
+            )
+            .join(City, City.id == TrendSnapshot.city_id)
+            .group_by(City.id, City.name)
+            .order_by(func.sum(TrendSnapshot.demand_count).desc())
+        )
+
+        if skill_id is not None:
+            query = query.filter(TrendSnapshot.skill_id == skill_id)
+
+        return db.session.execute(query).all()
