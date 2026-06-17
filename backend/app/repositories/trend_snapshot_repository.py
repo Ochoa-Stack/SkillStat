@@ -63,3 +63,44 @@ class TrendSnapshotRepository(BaseRepository):
                 func.avg(TrendSnapshot.avg_salary).label("avg_salary")
             ).filter_by(skill_id=skill_id)
         ).scalar_one_or_none()
+
+    @classmethod
+    def get_summary_data(cls):
+        from sqlalchemy import func
+        from app.models.job import Job
+        from app.models.skill import Skill
+
+        total_jobs = db.session.execute(
+            db.select(func.count(Job.id))
+        ).scalar_one()
+
+        total_skills_tracked = db.session.execute(
+            db.select(func.count(func.distinct(TrendSnapshot.skill_id)))
+        ).scalar_one()
+
+        latest_date = db.session.execute(
+            db.select(func.max(TrendSnapshot.date))
+        ).scalar_one_or_none()
+
+        # Traemos el snapshot mas reciente por skill para identificar cual tiene mayor y menor demanda actual.
+        top_emerging = db.session.execute(
+            db.select(TrendSnapshot, Skill.name)
+            .join(Skill, Skill.id == TrendSnapshot.skill_id)
+            .order_by(db.desc(TrendSnapshot.demand_count))
+            .limit(1)
+        ).first()
+
+        top_declining = db.session.execute(
+            db.select(TrendSnapshot, Skill.name)
+            .join(Skill, Skill.id == TrendSnapshot.skill_id)
+            .order_by(TrendSnapshot.demand_count)
+            .limit(1)
+        ).first()
+
+        return {
+            "total_jobs": total_jobs,
+            "total_skills_tracked": total_skills_tracked,
+            "latest_date": latest_date,
+            "top_emerging": top_emerging,
+            "top_declining": top_declining,
+        }
