@@ -10,6 +10,7 @@ from app.schemas.panorama_schema import (
     TrendsResponseSchema,
     GeoResponseSchema,
     SalaryResponseSchema,
+    CompareResponseSchema,
 )
 from app.utils.response import success_response, error_response
 
@@ -192,4 +193,70 @@ def get_salaries():
     }
 
     result = SalaryResponseSchema().dump(payload)
+    return success_response(data=result, status_code=200)
+
+
+@panorama_bp.route("/compare", methods=["GET"])
+def get_compare():
+    # Comparacion lado a lado de multiples habilidades. El frontend la usa para la vista de comparar.html con grafica multi-linea.
+    raw_param = request.args.get("skill_ids", default="", type=str)
+
+    if not raw_param.strip():
+        return error_response(
+            code="VALIDATION_ERROR",
+            message="El parametro skill_ids es obligatorio.",
+            status_code=422,
+        )
+
+    try:
+        skill_ids = [int(s.strip()) for s in raw_param.split(",") if s.strip()]
+    except ValueError:
+        return error_response(
+            code="VALIDATION_ERROR",
+            message="skill_ids debe ser una lista de enteros separados por comas.",
+            status_code=422,
+        )
+
+    # Acotamos entre 2 y 5 habilidades: comparar una sola no tiene sentido funcional, y mas de 5 degrada la lectura de la grafica.
+    if len(skill_ids) < 2 or len(skill_ids) > 5:
+        return error_response(
+            code="VALIDATION_ERROR",
+            message="skill_ids debe contener entre 2 y 5 habilidades.",
+            status_code=422,
+        )
+
+    skills_map = {}
+    missing_ids = []
+    for sid in skill_ids:
+        skill = SkillRepository.get_by_id(sid)
+        if skill:
+            skills_map[sid] = skill
+        else:
+            missing_ids.append(sid)
+
+    if missing_ids:
+        return error_response(
+            code="NOT_FOUND",
+            message=f"Las siguientes habilidades no existen: {missing_ids}.",
+            status_code=404,
+        )
+
+    blocks = []
+    for sid in skill_ids:
+        skill = skills_map[sid]
+        latest = TrendSnapshotRepository.get_latest_by_skill(sid)
+        series_snapshots = TrendSnapshotRepository.get_by_skill_id(sid)
+
+        blocks.append({
+            "skill_id": skill.id,
+            "skill_name": skill.name,
+            "demand_count": latest.demand_count if latest else 0,
+            "avg_salary": latest.avg_salary if latest else None,
+            "series": [
+                {"date": s.date, "demand_count": s.demand_count}
+                for s in series_snapshots
+            ],
+        })
+
+    result = CompareResponseSchema().dump({"skills": blocks})
     return success_response(data=result, status_code=200)
