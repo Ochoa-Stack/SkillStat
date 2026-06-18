@@ -1,1 +1,31 @@
-﻿/* main.css — SkillStat */
+/* Punto de entrada único, todas las páginas HTML referencian únicamente este archivo. El orden de importación es arquitecturalmente obligatorio: tokens -> reset -> tipografía -> componentes -> layouts -> páginas. Cambiar el orden puede causar que tokens no estén disponibles cuando los componentes los necesitan */
+
+/* Instanciamos la base de todo (tokens, reset y tipografía) */
+@import url("base/_variables.css");
+@import url("base/_reset.css");
+@import url("base/_typography.css");
+
+/* Instanciamos los componentes (descomente conforme se crea cada archivo) */
+/* @import url('components/_navbar.css'); */
+/* @import url('components/_buttons.css'); */
+/* @import url('components/_cards.css'); */
+/* @import url('components/_forms.css'); */
+/* @import url('components/_charts.css'); */
+/* @import url('components/_badges.css'); */
+/* @import url('components/_alerts.css'); */
+/* @import url('components/_carousel.css'); */
+/* @import url('components/_footer.css'); */
+/* @import url('components/_theme-toggle.css'); */
+
+/* Instanciamos los layouts (descomente conforme se crea cada archivo) */
+/* @import url('layouts/_containers.css'); */
+/* @import url('layouts/_grid.css'); */
+/* @import url('layouts/_navbar-layout.css'); */
+
+/* Instanciamos las páginas (descomente conforme se crea cada archivo) */
+/* @import url('pages/_index.css'); */
+/* @import url('pages/_panorama.css'); */
+/* @import url('pages/_auth.css'); */
+/* @import url('pages/_alertas.css'); */
+/* @import url('pages/_comparar.css'); */
+/* @import url('pages/_admin.css'); */
