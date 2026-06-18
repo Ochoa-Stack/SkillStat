@@ -10,34 +10,46 @@ class MarketTrendsService:
     @classmethod
     def generate_snapshots(cls) -> int:
         raw_data = JobSkillRepository.get_all()
-        
+
         if not raw_data:
             return 0
 
-        # Transformación a DataFrame para aprovechar las rutinas en C subyacentes de pandas, erradicando la necesidad de bucles for anidados en Python puro.
+        # Incluimos salary_min y salary_max de la vacante asociada para poder calcular el salario promedio por habilidad en el mismo paso que calculamos la demanda, evitando una segunda consulta.
         df = pd.DataFrame([{
             "skill_id": item.skill_id,
             "job_id": item.job_id,
-            "confidence": item.confidence_score
+            "confidence": item.confidence_score,
+            "salary_min": float(item.job.salary_min) if item.job and item.job.salary_min is not None else None,
+            "salary_max": float(item.job.salary_max) if item.job and item.job.salary_max is not None else None,
         } for item in raw_data])
 
-        # Agrupación y conteo vectorial.
-        # Extraemos el volumen de demanda absoluto por habilidad tecnológica.
-        trends = df.groupby("skill_id").size().reset_index(name="demand_count")
-        
+        # Calculamos el punto medio del rango salarial por vacante. mean(axis=1, skipna=True) toma el unico valor disponible si solo uno de los dos extremos esta presente.
+        df["salary_mid"] = df[["salary_min", "salary_max"]].mean(axis=1, skipna=True)
+
+        trends = df.groupby("skill_id").agg(
+            demand_count=("job_id", "size"),
+            avg_salary=("salary_mid", "mean"),
+        ).reset_index()
+
         today = datetime.now(timezone.utc).date()
         snapshots_created = 0
 
         for _, row in trends.iterrows():
-            # Volcamos las métricas agregadas a la tabla de snapshots para que el endpoint del Panorama realice lecturas directas en lugar de recalcular.
+            avg_salary_value = row["avg_salary"]
+            # pandas representa la ausencia de datos como NaN, que no es serializable ni almacenable como None directamente en SQL.
+            if pd.isna(avg_salary_value):
+                avg_salary_value = None
+            else:
+                avg_salary_value = float(avg_salary_value)
+
             snapshot_data = {
                 "skill_id": int(row["skill_id"]),
-                "city_id": None,
+                "city_id": 1,
                 "date": today,
-                "demand_count": int(row["demand_count"])
+                "demand_count": int(row["demand_count"]),
+                "avg_salary": avg_salary_value,
             }
-            
-            # Delegamos al Repositorio el manejo de la restricción UNIQUE(skill_id, city_id, date) mediante los bloques try/except con rollback previamente configurados.
+
             result = TrendSnapshotRepository.create(snapshot_data)
             if result:
                 snapshots_created += 1

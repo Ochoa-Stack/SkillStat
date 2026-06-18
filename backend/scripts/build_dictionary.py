@@ -30,24 +30,16 @@ def build_dictionary():
 
     patterns = []
     for skill in CORE_SKILLS:
-        skill_lower = skill.lower()
-
-        if " " in skill:
-            # Para skills multipalabra usamos una lista de tokens con LOWER porque el EntityRuler necesita matchear cada token por separado.
-            token_pattern = [{"LOWER": token.lower()} for token in skill.split()]
-            patterns.append({"label": "SKILL", "pattern": token_pattern})
-        else:
-            # Para skills de una sola palabra usamos LOWER directamente para que el matching sea insensible a mayusculas en el texto.
-            patterns.append({
-                "label": "SKILL",
-                "pattern": [{"LOWER": skill_lower}]
-            })
+        # Agregamos el patrón original y su variante en minúsculas para que el EntityRuler capture la habilidad sin importar cómo la escriba la bolsa de trabajo en la descripción de la vacante.
+        patterns.append({"label": "SKILL", "pattern": skill})
+        if skill != skill.lower():
+            patterns.append({"label": "SKILL", "pattern": skill.lower()})
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         for entry in patterns:
             f.write(json.dumps(entry) + "\n")
 
-    print(f"Exito: {len(CORE_SKILLS)} habilidades exportadas como {len(patterns)} patrones LOWER.")
+    print(f"Exito: {len(CORE_SKILLS)} habilidades base → {len(patterns)} patrones exportados.")
 
 
 if __name__ == "__main__":
