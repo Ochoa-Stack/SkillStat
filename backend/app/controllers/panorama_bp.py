@@ -9,6 +9,7 @@ from app.schemas.panorama_schema import (
     SkillTrendSchema,
     TrendsResponseSchema,
     GeoResponseSchema,
+    SalaryResponseSchema,
 )
 from app.utils.response import success_response, error_response
 
@@ -157,4 +158,38 @@ def get_geo():
     }
 
     result = GeoResponseSchema().dump(payload)
+    return success_response(data=result, status_code=200)
+
+
+@panorama_bp.route("/salaries", methods=["GET"])
+def get_salaries():
+    # Cruce de habilidad contra rango salarial promedio. Requiere skill_id porque el calculo es por habilidad, no agregable globalmente sin perder sentido.
+    skill_id = request.args.get("skill_id", type=int)
+
+    if not skill_id:
+        return error_response(
+            code="VALIDATION_ERROR",
+            message="El parametro skill_id es obligatorio.",
+            status_code=422,
+        )
+
+    skill = SkillRepository.get_by_id(skill_id)
+    if not skill:
+        return error_response(
+            code="NOT_FOUND",
+            message="La habilidad solicitada no existe.",
+            status_code=404,
+        )
+
+    stats = SkillRepository.get_salary_stats(skill_id)
+
+    payload = {
+        "skill_id": skill.id,
+        "skill_name": skill.name,
+        "avg_salary_min": stats.avg_salary_min if stats else None,
+        "avg_salary_max": stats.avg_salary_max if stats else None,
+        "sample_size": stats.sample_size if stats else 0,
+    }
+
+    result = SalaryResponseSchema().dump(payload)
     return success_response(data=result, status_code=200)
