@@ -8,8 +8,8 @@
 
 /* Instanciamos los componentes (descomente conforme se crea cada archivo) */
 @import url('components/_navbar.css');
-/* @import url('components/_buttons.css'); */
-/* @import url('components/_cards.css'); */
+@import url('components/_buttons.css');
+@import url('components/_cards.css');
 /* @import url('components/_forms.css'); */
 /* @import url('components/_charts.css'); */
 /* @import url('components/_badges.css'); */

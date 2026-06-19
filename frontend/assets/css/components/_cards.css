@@ -1,1 +1,162 @@
-﻿/* _cards.css — SkillStat */
+/* Sistema de tarjetas. Cubre las tarjetas de metrica del carrusel, las tarjetas de propuesta de valor, y el preview del Panorama simulado como ventana de navegador */
+
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent-green);
+  margin-right: var(--space-1);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Metric Card - slides del carrusel */
+
+.metric-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.metric-card__live {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-label);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent-green);
+}
+
+.metric-card__value {
+  margin-bottom: var(--space-2);
+}
+
+.metric-card__detail {
+  color: var(--color-text-secondary);
+}
+
+/* Value Card - propuestas de valor */
+
+.value-props__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 1440px) {
+  .value-props__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.value-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.value-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-accent-green-subtle);
+  color: var(--color-accent-green);
+  margin-bottom: var(--space-4);
+}
+
+.value-card__icon .lucide {
+  width: 24px;
+  height: 24px;
+}
+
+.value-card__title {
+  margin-bottom: var(--space-2);
+}
+
+.value-card__desc {
+  color: var(--color-text-secondary);
+}
+
+/* Browser Chrome - preview simulado del Panorama */
+
+.browser-chrome {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.browser-chrome__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.browser-chrome__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+/* Usamos los colores de marca */
+.browser-chrome__dot:nth-child(1) { background-color: var(--color-accent-orange); }
+.browser-chrome__dot:nth-child(2) { background-color: var(--color-primary-light); }
+.browser-chrome__dot:nth-child(3) { background-color: var(--color-accent-green); }
+
+.browser-chrome__url {
+  margin-left: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.browser-chrome__content {
+  padding: var(--space-6);
+}
+
+.panorama-preview__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.panorama-preview__live {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-accent-green);
+}
+
+.panorama-preview__kpis {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.preview-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}

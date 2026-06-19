@@ -11,6 +11,7 @@
 
   --color-accent-green: #21a675;
   --color-accent-green-light: #29d194;
+  --color-accent-green-subtle: #E3F6EE;
 
   --color-accent-orange: #f3701e;
   --color-accent-orange-light: #f58945;
@@ -79,9 +80,7 @@
   --color-bg-surface: #1a2535;
   --color-bg-elevated: #2e3d52;
   --color-bg-overlay: #3a4d64;
-  /* El roble palido no tiene lugar en dark mode. Si algun componente
-     lo referencia por error, cae de vuelta a la superficie elevada
-     en lugar de romper visualmente con un beige fuera de lugar. */
+  
   --color-bg-warm: var(--color-bg-elevated);
 
   --color-primary: #4b607f;
@@ -90,6 +89,7 @@
 
   --color-accent-green: #21a675;
   --color-accent-green-light: #29d194;
+  --color-accent-green-subtle: #16332A;
 
   --color-accent-orange: #f3701e;
   --color-accent-orange-light: #f58945;
