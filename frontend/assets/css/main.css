@@ -4,9 +4,10 @@
 @import url("base/_variables.css");
 @import url("base/_reset.css");
 @import url("base/_typography.css");
+@import url("base/_utilities.css");
 
 /* Instanciamos los componentes (descomente conforme se crea cada archivo) */
-/* @import url('components/_navbar.css'); */
+@import url('components/_navbar.css');
 /* @import url('components/_buttons.css'); */
 /* @import url('components/_cards.css'); */
 /* @import url('components/_forms.css'); */
@@ -15,10 +16,10 @@
 /* @import url('components/_alerts.css'); */
 /* @import url('components/_carousel.css'); */
 /* @import url('components/_footer.css'); */
-/* @import url('components/_theme-toggle.css'); */
+@import url('components/_theme-toggle.css');
 
 /* Instanciamos los layouts (descomente conforme se crea cada archivo) */
-/* @import url('layouts/_containers.css'); */
+@import url('layouts/_containers.css');
 /* @import url('layouts/_grid.css'); */
 /* @import url('layouts/_navbar-layout.css'); */
 

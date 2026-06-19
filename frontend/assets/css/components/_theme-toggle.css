@@ -1,0 +1,49 @@
+/* Toggle de tema claro/oscuro. El cambio entre iconos sol y luna se anima con una transicion de opacidad y rotacion, nunca con reemplazo abrupto, para que el cambio de tema se sienta como una decision deliberada del usuario, no un parpadeo */
+
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: var(--transition-base);
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-primary-light);
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.theme-toggle__icon--sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  color: var(--color-accent-orange);
+}
+
+.theme-toggle__icon--moon {
+  opacity: 0;
+  transform: scale(0.5) rotate(-90deg);
+  color: var(--color-primary-light);
+}
+
+[data-theme="dark"] .theme-toggle__icon--sun {
+  opacity: 0;
+  transform: scale(0.5) rotate(90deg);
+}
+
+[data-theme="dark"] .theme-toggle__icon--moon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
