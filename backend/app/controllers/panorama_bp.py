@@ -60,6 +60,7 @@ def get_summary():
     payload = {
         "total_jobs": data["total_jobs"],
         "total_skills_tracked": data["total_skills_tracked"],
+        "total_companies": data["total_companies"],
         "top_emerging_skill": build_skill_block(data["top_emerging"]),
         "top_declining_skill": build_skill_block(data["top_declining"]),
         "last_updated": data["latest_date"],
