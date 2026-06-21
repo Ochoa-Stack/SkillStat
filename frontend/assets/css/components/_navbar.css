@@ -35,6 +35,7 @@
 .navbar__logo {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-2);
 }
 
 .navbar__logo-img {

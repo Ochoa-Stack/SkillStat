@@ -1,19 +1,6 @@
 /* Sistema de tarjetas. Cubre las tarjetas de metrica del carrusel, las tarjetas de propuesta de valor, y el preview del Panorama simulado como ventana de navegador */
 
-.live-dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-accent-green);
-  margin-right: var(--space-1);
-  animation: pulse-dot 2s ease-in-out infinite;
-}
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
 
 /* Metric Card - slides del carrusel */
 

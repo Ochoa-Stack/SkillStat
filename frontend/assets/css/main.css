@@ -14,8 +14,9 @@
 /* @import url('components/_charts.css'); */
 /* @import url('components/_badges.css'); */
 /* @import url('components/_alerts.css'); */
+/* @import url('components/_tables.css'); */
 @import url('components/_carousel.css');
-/* @import url('components/_footer.css'); */
+@import url('components/_footer.css');
 @import url('components/_theme-toggle.css');
 
 /* Instanciamos los layouts (descomente conforme se crea cada archivo) */
@@ -24,7 +25,7 @@
 /* @import url('layouts/_navbar-layout.css'); */
 
 /* Instanciamos las páginas (descomente conforme se crea cada archivo) */
-/* @import url('pages/_index.css'); */
+@import url('pages/_index.css');
 /* @import url('pages/_panorama.css'); */
 /* @import url('pages/_auth.css'); */
 /* @import url('pages/_alertas.css'); */
