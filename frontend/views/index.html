@@ -116,11 +116,11 @@
             <div class="carousel__track" data-carousel-track>
               <!-- Skill más demandado (slide 1) -->
               <article
-                class="carousel__slide metric-card"
+                class="carousel__slide metric-card surface"
                 data-carousel-slide
                 aria-label="Skill más demandado"
               >
-                <div class="metric-card__header">
+                <div class="card-header">
                   <span class="metric-card__label text-label"
                     >Skill más demandado</span
                   >
@@ -145,15 +145,15 @@
                 </p>
               </article>
 
-              <!-- Ciudad con más crecimiento (slide 2) -->
+              <!-- Habilidades rastreadas (slide 2) -->
               <article
-                class="carousel__slide metric-card"
+                class="carousel__slide metric-card surface"
                 data-carousel-slide
-                aria-label="Ciudad con más crecimiento"
+                aria-label="Habilidades rastreadas"
               >
-                <div class="metric-card__header">
+                <div class="card-header">
                   <span class="metric-card__label text-label"
-                    >Ciudad con más crecimiento</span
+                    >Habilidades rastreadas</span
                   >
                   <span
                     class="metric-card__live"
@@ -163,14 +163,14 @@
                   </span>
                 </div>
                 <p
-                  class="metric-card__value text-metric text-green"
-                  data-metric="top-city"
+                  class="metric-card__value text-metric"
+                  data-metric="skills-tracked"
                 >
                   —
                 </p>
                 <p
                   class="metric-card__detail text-body-sm"
-                  data-metric="top-city-detail"
+                  data-metric="skills-tracked-detail"
                 >
                   Cargando datos...
                 </p>
@@ -178,11 +178,11 @@
 
               <!-- Vacantes analizadas (slide 3) -->
               <article
-                class="carousel__slide metric-card"
+                class="carousel__slide metric-card surface"
                 data-carousel-slide
                 aria-label="Vacantes analizadas"
               >
-                <div class="metric-card__header">
+                <div class="card-header">
                   <span class="metric-card__label text-label"
                     >Vacantes analizadas</span
                   >
@@ -269,7 +269,7 @@
           </h2>
 
           <div class="value-props__grid">
-            <article class="value-card">
+            <article class="value-card surface">
               <div class="value-card__icon" aria-hidden="true">
                 <i data-lucide="bar-chart-3"></i>
               </div>
@@ -281,7 +281,7 @@
               </p>
             </article>
 
-            <article class="value-card">
+            <article class="value-card surface">
               <div class="value-card__icon" aria-hidden="true">
                 <i data-lucide="trending-up"></i>
               </div>
@@ -293,7 +293,7 @@
               </p>
             </article>
 
-            <article class="value-card">
+            <article class="value-card surface">
               <div class="value-card__icon" aria-hidden="true">
                 <i data-lucide="globe"></i>
               </div>
@@ -316,7 +316,7 @@
           </p>
 
           <div
-            class="browser-chrome"
+            class="browser-chrome surface"
             role="img"
             aria-label="Vista previa del dashboard Panorama"
           >
@@ -329,7 +329,7 @@
               >
             </div>
             <div class="browser-chrome__content">
-              <div class="panorama-preview__header">
+              <div class="card-header">
                 <span class="text-h2">Panorama</span>
                 <span class="panorama-preview__live text-label">
                   Actualizado
@@ -405,6 +405,7 @@
     <script src="../assets/js/utils/formatters.js"></script>
     <script src="../assets/js/api/client.js"></script>
     <script src="../assets/js/api/auth.api.js"></script>
+    <script src="../assets/js/api/panorama.api.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="../assets/js/components/icons.init.js"></script>
     <script src="../assets/js/components/navbar.js"></script>

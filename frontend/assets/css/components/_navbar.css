@@ -32,6 +32,12 @@
   }
 }
 
+@media (min-width: 1920px) {
+  .navbar {
+    max-width: 1600px;
+  }
+}
+
 .navbar__logo {
   display: inline-flex;
   align-items: center;

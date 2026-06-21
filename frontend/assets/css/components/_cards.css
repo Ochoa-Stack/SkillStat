@@ -2,17 +2,21 @@
 
 
 
-/* Metric Card - slides del carrusel */
-
-.metric-card {
+/* Superficie compartida de fondo y borde. Se aplica como clase utilitaria junto a metric-card, value-card y browser-chrome para no repetir las mismas dos declaraciones en cada variante */
+.surface {
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
+}
+
+/* Metric Card - slides del carrusel */
+.metric-card {
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   box-shadow: var(--shadow-sm);
 }
 
-.metric-card__header {
+/* Header compartido: mismo patron flex justify-between aparecia en metric-card__header y panorama-preview__header */
+.card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -39,7 +43,6 @@
 }
 
 /* Value Card - propuestas de valor */
-
 .value-props__grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -53,8 +56,6 @@
 }
 
 .value-card {
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
 }
@@ -85,10 +86,7 @@
 }
 
 /* Browser Chrome - preview simulado del Panorama */
-
 .browser-chrome {
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -121,13 +119,6 @@
 
 .browser-chrome__content {
   padding: var(--space-6);
-}
-
-.panorama-preview__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
 }
 
 .panorama-preview__live {
