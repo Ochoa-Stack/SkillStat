@@ -1,1 +1,106 @@
-﻿/* _typography.css — SkillStat */
+/* Definimos las clases de tipografia reutilizables los cuales se aplican explicitamente via clase HTML, no como estilos globales de elemento, para mantener control exacto sobre donde aparece cada tratamiento tipografico */
+
+/* Headings del Panorama */
+
+.text-hero {
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.1;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.text-h1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.text-h2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.text-h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+/* Texto de cuerpo */
+
+.text-body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+.text-body-sm {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Labels de datos y navegación - Antonio */
+
+.text-label {
+  font-family: var(--font-label);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.text-label-lg {
+  font-family: var(--font-label);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+/* Números del Panorama - KPIs y metricas */
+
+.text-metric {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--color-text-primary);
+  /* tabular-nums fuerza ancho fijo en digitos para que los numeros no salten visualmente cuando cambian sus valores en tiempo real */
+  font-variant-numeric: tabular-nums;
+}
+
+.text-metric-sm {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Utilidades de color de texto */
+
+.text-primary-color { color: var(--color-primary); }
+.text-green { color: var(--color-accent-green); }
+.text-orange { color: var(--color-accent-orange); }
+.text-error { color: var(--color-semantic-error); }
+.text-muted { color: var(--color-text-secondary); }
+.text-disabled { color: var(--color-text-disabled); }

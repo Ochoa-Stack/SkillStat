@@ -1,1 +1,26 @@
-﻿/* _containers.css — SkillStat */
+/* Contenedor base reutilizable. Centra el contenido y aplica padding horizontal consistente segun el breakpoint, evitando que el contenido toque los bordes de la pantalla en mobile o se estire sin limite en desktop */
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-inline: var(--space-6);
+  }
+}
+
+@media (min-width: 1440px) {
+  .container {
+    padding-inline: var(--space-8);
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+  }
+}
