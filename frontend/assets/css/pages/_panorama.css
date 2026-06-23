@@ -69,8 +69,7 @@
   align-items: center;
   justify-content: flex-end;
   height: 100%;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 56px;
 }
 
 .skills-chart__value {
@@ -100,5 +99,10 @@
 @media (min-width: 768px) {
   .skills-chart {
     height: 360px;
+    overflow-x: visible;
+  }
+
+  .skills-chart__column {
+    flex: 1;
   }
 }
