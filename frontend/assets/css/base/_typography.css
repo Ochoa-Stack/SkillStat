@@ -98,9 +98,21 @@
 
 /* Utilidades de color de texto */
 
-.text-primary-color { color: var(--color-primary); }
-.text-green { color: var(--color-accent-green); }
-.text-orange { color: var(--color-accent-orange); }
-.text-error { color: var(--color-semantic-error); }
-.text-muted { color: var(--color-text-secondary); }
-.text-disabled { color: var(--color-text-disabled); }
+.text-primary-color {
+  color: var(--color-primary);
+}
+.text-green {
+  color: var(--color-accent-green);
+}
+.text-orange {
+  color: var(--color-accent-orange);
+}
+.text-error {
+  color: var(--color-semantic-error);
+}
+.text-muted {
+  color: var(--color-text-secondary);
+}
+.text-disabled {
+  color: var(--color-text-disabled);
+}

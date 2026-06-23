@@ -1,16 +1,16 @@
 async function loadSkillsChart(limit) {
   const skills = await getTopSkills(limit);
-  const chartContainer = document.querySelector('[data-skills-chart]');
+  const chartContainer = document.querySelector("[data-skills-chart]");
   renderSkillsChart(chartContainer, skills);
 }
 
 function bindSkillsFilters() {
-  document.querySelectorAll('[data-skills-limit]').forEach((button) => {
-    button.addEventListener('click', async () => {
+  document.querySelectorAll("[data-skills-limit]").forEach((button) => {
+    button.addEventListener("click", async () => {
       document
-        .querySelectorAll('[data-skills-limit]')
-        .forEach((btn) => btn.classList.remove('pill--active'));
-      button.classList.add('pill--active');
+        .querySelectorAll("[data-skills-limit]")
+        .forEach((btn) => btn.classList.remove("pill--active"));
+      button.classList.add("pill--active");
 
       const limit = Number(button.dataset.skillsLimit);
       await loadSkillsChart(limit);
@@ -29,13 +29,15 @@ async function initPanoramaPage() {
 
     document.querySelector('[data-metric="active-companies"]').textContent =
       formatNumber(summary.total_companies);
-    document.querySelector('[data-metric="active-companies-detail"]').textContent =
-      "Empresas únicas registradas";
-
-    document.querySelector('[data-metric="skills-tracked-panorama"]').textContent =
-      formatNumber(summary.total_skills_tracked);
     document.querySelector(
-      '[data-metric="skills-tracked-panorama-detail"]'
+      '[data-metric="active-companies-detail"]',
+    ).textContent = "Empresas únicas registradas";
+
+    document.querySelector(
+      '[data-metric="skills-tracked-panorama"]',
+    ).textContent = formatNumber(summary.total_skills_tracked);
+    document.querySelector(
+      '[data-metric="skills-tracked-panorama-detail"]',
     ).textContent = "Catalogadas y actualizadas a diario";
 
     await loadSkillsChart(5);
