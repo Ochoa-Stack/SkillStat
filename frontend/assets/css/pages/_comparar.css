@@ -1,1 +1,65 @@
-/* _comparar.css — SkillStat */
+.comparar-header {
+  padding-block: var(--space-8) var(--space-6);
+}
+
+.comparar-header__subtitle {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+}
+
+.comparar-selector {
+  padding-block: var(--space-6);
+}
+
+.comparar-selector__chips {
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+}
+
+.comparar-selector__chip {
+  flex: 0 0 auto;
+}
+
+.comparar-selector__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.comparar-selector__count {
+  color: var(--color-text-secondary);
+}
+
+.comparar-results {
+  padding-block: var(--space-6) var(--space-8);
+}
+
+.comparar-results .container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .comparar-results .container {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.comparar-results__salary {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+}
+
+.comparar-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-semantic-error-subtle);
+  color: var(--color-semantic-error);
+  margin-top: var(--space-4);
+}

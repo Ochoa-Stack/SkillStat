@@ -20,7 +20,7 @@
 
 .btn--primary {
   background-color: var(--color-primary);
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .btn--primary:hover {
@@ -68,5 +68,10 @@
 .pill--active {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
-  color: #FFFFFF;
+  color: #ffffff;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
