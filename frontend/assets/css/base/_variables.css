@@ -11,7 +11,7 @@
 
   --color-accent-green: #21a675;
   --color-accent-green-light: #29d194;
-  --color-accent-green-subtle: #E3F6EE;
+  --color-accent-green-subtle: #e3f6ee;
 
   --color-accent-orange: #f3701e;
   --color-accent-orange-light: #f58945;
@@ -80,7 +80,7 @@
   --color-bg-surface: #1a2535;
   --color-bg-elevated: #2e3d52;
   --color-bg-overlay: #3a4d64;
-  
+
   --color-bg-warm: var(--color-bg-elevated);
 
   --color-primary: #4b607f;
@@ -89,7 +89,7 @@
 
   --color-accent-green: #21a675;
   --color-accent-green-light: #29d194;
-  --color-accent-green-subtle: #16332A;
+  --color-accent-green-subtle: #16332a;
 
   --color-accent-orange: #f3701e;
   --color-accent-orange-light: #f58945;

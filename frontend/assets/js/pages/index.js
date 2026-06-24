@@ -15,7 +15,7 @@ async function initIndexPage() {
     document.querySelector('[data-metric="skills-tracked"]').textContent =
       formatNumber(summary.total_skills_tracked);
     document.querySelector(
-      '[data-metric="skills-tracked-detail"]'
+      '[data-metric="skills-tracked-detail"]',
     ).textContent = "Catalogadas y actualizadas a diario";
 
     document.querySelector('[data-metric="total-jobs"]').textContent =

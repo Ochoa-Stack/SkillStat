@@ -1,13 +1,15 @@
 // Controla el carrusel de metricas; es decir, la navegacion via dots, deteccion del slide visible mediante IntersectionObserver, y auto-rotacion que se desactiva por completo si el usuario prefiere menos movimiento, no solo se hace mas lenta.
 
 (function () {
-  const carousel = document.querySelector('[data-carousel]');
+  const carousel = document.querySelector("[data-carousel]");
   if (!carousel) return;
 
-  const track = carousel.querySelector('[data-carousel-track]');
-  const slides = Array.from(carousel.querySelectorAll('[data-carousel-slide]'));
-  const dots = Array.from(carousel.querySelectorAll('[data-carousel-dot]'));
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const track = carousel.querySelector("[data-carousel-track]");
+  const slides = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
+  const dots = Array.from(carousel.querySelectorAll("[data-carousel-dot]"));
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   let currentIndex = 0;
   let autoRotateTimer = null;
@@ -15,8 +17,8 @@
   function setActiveDot(index) {
     dots.forEach(function (dot, i) {
       const isActive = i === index;
-      dot.classList.toggle('carousel__dot--active', isActive);
-      dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      dot.classList.toggle("carousel__dot--active", isActive);
+      dot.setAttribute("aria-selected", isActive ? "true" : "false");
     });
     currentIndex = index;
   }
@@ -25,14 +27,14 @@
     const slide = slides[index];
     if (!slide) return;
     slide.scrollIntoView({
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
-      inline: 'start',
-      block: 'nearest',
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      inline: "start",
+      block: "nearest",
     });
   }
 
   dots.forEach(function (dot, index) {
-    dot.addEventListener('click', function () {
+    dot.addEventListener("click", function () {
       goToSlide(index);
       stopAutoRotate();
     });
@@ -50,7 +52,7 @@
         }
       });
     },
-    { root: track, threshold: 0.5 }
+    { root: track, threshold: 0.5 },
   );
 
   slides.forEach(function (slide) {
@@ -72,9 +74,9 @@
     }
   }
 
-  carousel.addEventListener('mouseenter', stopAutoRotate);
-  carousel.addEventListener('mouseleave', startAutoRotate);
-  carousel.addEventListener('touchstart', stopAutoRotate, { passive: true });
+  carousel.addEventListener("mouseenter", stopAutoRotate);
+  carousel.addEventListener("mouseleave", startAutoRotate);
+  carousel.addEventListener("touchstart", stopAutoRotate, { passive: true });
 
   startAutoRotate();
 })();

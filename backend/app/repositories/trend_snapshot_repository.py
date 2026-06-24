@@ -78,6 +78,10 @@ class TrendSnapshotRepository(BaseRepository):
             db.select(func.count(func.distinct(TrendSnapshot.skill_id)))
         ).scalar_one()
 
+        total_companies = db.session.execute(
+            db.select(func.count(func.distinct(Job.company)))
+        ).scalar_one()
+
         latest_date = db.session.execute(
             db.select(func.max(TrendSnapshot.date))
         ).scalar_one_or_none()
@@ -100,6 +104,7 @@ class TrendSnapshotRepository(BaseRepository):
         return {
             "total_jobs": total_jobs,
             "total_skills_tracked": total_skills_tracked,
+            "total_companies": total_companies,
             "latest_date": latest_date,
             "top_emerging": top_emerging,
             "top_declining": top_declining,
@@ -110,9 +115,7 @@ class TrendSnapshotRepository(BaseRepository):
         from sqlalchemy import func
         from app.models.city import City
 
-        # Sumamos demand_count por ciudad. Si se filtra por skill_id
-        # la suma queda acotada a esa habilidad especifica, de lo
-        # contrario agregamos la demanda total de todas las habilidades.
+        # Sumamos demand_count por ciudad. Si se filtra por skill_id, la suma queda acotada a esa habilidad especifica, de lo contrario agregamos la demanda total de todas las habilidades.
         query = (
             db.select(
                 City.id.label("city_id"),

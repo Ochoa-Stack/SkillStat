@@ -2,8 +2,7 @@ from marshmallow import Schema, fields
 
 
 class SkillTrendSchema(Schema):
-    # Representa una habilidad con su metrica de demanda actual.
-    # Usado en skills/top y como bloque base de otros endpoints.
+    # Representa una habilidad con su metrica de demanda actual. Usado en skills/top y como bloque base de otros endpoints.
     skill_id = fields.Integer(dump_only=True)
     name = fields.String(dump_only=True)
     demand_count = fields.Integer(dump_only=True)
@@ -15,6 +14,7 @@ class SummaryResponseSchema(Schema):
     # KPIs globales del Panorama: totales y tendencias destacadas.
     total_jobs = fields.Integer(dump_only=True)
     total_skills_tracked = fields.Integer(dump_only=True)
+    total_companies = fields.Integer(dump_only=True)
     top_emerging_skill = fields.Nested(SkillTrendSchema, dump_only=True, allow_none=True)
     top_declining_skill = fields.Nested(SkillTrendSchema, dump_only=True, allow_none=True)
     last_updated = fields.Date(dump_only=True, allow_none=True)

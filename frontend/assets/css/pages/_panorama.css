@@ -1,1 +1,108 @@
-﻿/* _panorama.css — SkillStat */
+.panorama-header {
+  padding-block: var(--space-8) var(--space-6);
+}
+
+.panorama-header__subtitle {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+}
+
+.panorama-header__live {
+  color: var(--color-accent-green);
+  font-weight: var(--font-weight-medium);
+}
+
+.panorama-metrics {
+  padding-block: var(--space-6) var(--space-8);
+}
+
+.panorama-metrics__track {
+  gap: var(--space-4);
+  padding-bottom: var(--space-2);
+}
+
+.panorama-metrics__card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .panorama-metrics__track {
+    overflow-x: visible;
+  }
+
+  .panorama-metrics__card {
+    flex: 1;
+  }
+}
+
+.panorama-skills {
+  padding-block: var(--space-8);
+}
+
+.panorama-skills__header {
+  margin-bottom: var(--space-4);
+}
+
+.panorama-skills__subtitle {
+  color: var(--color-text-secondary);
+}
+
+.panorama-skills__filters {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.skills-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  height: 280px;
+  padding: var(--space-4);
+}
+
+.skills-chart__column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  flex: 0 0 56px;
+}
+
+.skills-chart__value {
+  margin-bottom: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.skills-chart__bar {
+  width: 100%;
+  max-width: 40px;
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: height var(--transition-base);
+}
+
+.skills-chart__bar--top {
+  background-color: var(--color-accent-orange);
+}
+
+.skills-chart__label {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  text-align: center;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .skills-chart {
+    height: 360px;
+    overflow-x: visible;
+  }
+
+  .skills-chart__column {
+    flex: 1;
+  }
+}
