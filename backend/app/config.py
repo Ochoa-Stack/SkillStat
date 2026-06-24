@@ -17,10 +17,15 @@ class BaseConfig:
         "JWT_SECRET_KEY", "jwt-insecure-key-change-in-production"
     )
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
-        seconds=int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES", 86400))
+        seconds=int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES", 7200))
     )
-
     JWT_ERROR_MESSAGE_KEY = "error"
+    # El JWT vive en una cookie httpOnly en vez de viajar en el cuerpo JSON, para que un script de XSS no pueda leerlo directamente.
+    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_COOKIE_SECURE = os.environ.get("JWT_COOKIE_SECURE", "false").lower() == "true"
+    JWT_COOKIE_SAMESITE = "Lax"
+    JWT_COOKIE_CSRF_PROTECT = True
+    JWT_CSRF_IN_COOKIES = True
 
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:5500").split(",")
 

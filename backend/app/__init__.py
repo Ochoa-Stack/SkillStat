@@ -16,6 +16,7 @@ def create_app(env: str = None) -> Flask:
     app.config.from_object(config_class)
 
     _init_extensions(app)
+    _register_jwt_handlers(app)
     _register_blueprints(app)
     _register_schedulers(app)
 
@@ -26,7 +27,36 @@ def _init_extensions(app: Flask) -> None:
     jwt.init_app(app)
     migrate.init_app(app, db)
     # Restringimos CORS al prefijo de la API para que el frontend pueda consumirla desde su propio origen sin bloqueos del navegador.
-    cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", "*")}})
+    cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", "*"), "supports_credentials": True}})
+
+def _register_jwt_handlers(app: Flask) -> None:
+    # Unificamos el formato de los errores que flask-jwt-extended genera directamente (antes de llegar a nuestras rutas) con el mismo formato {"error": {"code", "message"}} que usa el resto de la API.
+    from app.utils.response import error_response
+
+    @jwt.unauthorized_loader
+    def handle_missing_token(reason):
+        return error_response(
+            code="UNAUTHORIZED",
+            message="No se encontró una sesión activa.",
+            status_code=401,
+        )
+
+    @jwt.invalid_token_loader
+    def handle_invalid_token(reason):
+        return error_response(
+            code="TOKEN_INVALID",
+            message="La sesión no es válida.",
+            status_code=401,
+        )
+
+    @jwt.expired_token_loader
+    def handle_expired_token(jwt_header, jwt_payload):
+        return error_response(
+            code="TOKEN_EXPIRED",
+            message="La sesión ha expirado, vuelve a iniciar sesión.",
+            status_code=401,
+        )
+
 
 def _register_blueprints(app: Flask) -> None:
     # Importaciones diferidas para prevenir dependencias circulares antes de inicializar Flask

@@ -61,3 +61,28 @@
     }
   });
 })();
+
+// Cierra la sesion real contra el backend y limpia la cookie httpOnly
+// antes de regresar al usuario a la pagina publica. Centralizado aqui
+// porque el boton de logout vive en el navbar compartido entre las
+// vistas autenticadas, no en cada pagina por separado.
+(function () {
+  const logoutButtons = document.querySelectorAll('[data-auth-action="logout"]');
+  if (logoutButtons.length === 0) return;
+
+  async function handleLogout() {
+    try {
+      await apiPost('/auth/logout', {});
+    } catch (error) {
+      console.error('No se pudo cerrar la sesión en el servidor:', error);
+    } finally {
+      // Aunque la peticion falle, regresamos a index.html — desde la
+      // perspectiva del usuario, salir debe funcionar siempre.
+      window.location.href = '../views/index.html';
+    }
+  }
+
+  logoutButtons.forEach(function (button) {
+    button.addEventListener('click', handleLogout);
+  });
+})();

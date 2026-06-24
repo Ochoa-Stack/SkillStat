@@ -1,1 +1,255 @@
-﻿<!-- register — SkillStat -->
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Inicia sesión o crea una cuenta en SkillStat para acceder a tu tablero de inteligencia de mercado laboral tecnológico en México."
+    />
+    <title>SkillStat - Iniciar sesión</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <div class="auth-screen" data-auth-screen data-auth-mode="login">
+      <section class="auth-form-panel">
+        <button
+          class="auth-close"
+          type="button"
+          aria-label="Cerrar"
+          data-auth-close
+        >
+          <i data-lucide="x"></i>
+        </button>
+
+        <div class="auth-form-panel__content">
+          <a
+            href="../views/index.html"
+            class="navbar__logo auth-form-panel__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo-compact.svg"
+              alt="SkillStat"
+              width="28"
+              height="28"
+              class="navbar__logo-img"
+            />
+            SkillStat
+          </a>
+
+          <div data-auth-form="login">
+            <h1>Iniciar sesión</h1>
+            <p class="auth-form-panel__subtitle text-body">
+              Accede a tu tablero de inteligencia laboral.
+            </p>
+
+            <form class="auth-form" data-login-form novalidate>
+              <p class="form-error" data-login-error role="alert" hidden></p>
+
+              <div class="form-group">
+                <label for="login-email" class="form-label">Correo</label>
+                <input
+                  type="email"
+                  id="login-email"
+                  name="email"
+                  class="form-input"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="login-password" class="form-label"
+                  >Contraseña</label
+                >
+                <input
+                  type="password"
+                  id="login-password"
+                  name="password"
+                  class="form-input"
+                  autocomplete="current-password"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn--primary auth-form__submit"
+                data-login-submit
+              >
+                Iniciar sesión
+              </button>
+            </form>
+
+            <p class="auth-form-panel__switch text-body-sm">
+              ¿Sin cuenta?
+              <button
+                type="button"
+                class="auth-form-panel__switch-link"
+                data-auth-switch="register"
+              >
+                Crear cuenta
+              </button>
+            </p>
+          </div>
+
+          <div data-auth-form="register" hidden>
+            <h1>Crear cuenta</h1>
+            <p class="auth-form-panel__subtitle text-body">
+              Empieza a explorar el mercado tech de México.
+            </p>
+
+            <form class="auth-form" data-register-form novalidate>
+              <p class="form-error" data-register-error role="alert" hidden></p>
+
+              <div class="form-group">
+                <label for="register-name" class="form-label"
+                  >Nombre completo</label
+                >
+                <input
+                  type="text"
+                  id="register-name"
+                  name="fullName"
+                  class="form-input"
+                  autocomplete="name"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="register-email" class="form-label">Correo</label>
+                <input
+                  type="email"
+                  id="register-email"
+                  name="email"
+                  class="form-input"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="register-password" class="form-label"
+                  >Contraseña</label
+                >
+                <input
+                  type="password"
+                  id="register-password"
+                  name="password"
+                  class="form-input"
+                  autocomplete="new-password"
+                  required
+                  data-register-password
+                />
+                <ul class="password-checklist" data-password-checklist>
+                  <li data-rule="length">Mínimo 8 caracteres</li>
+                  <li data-rule="upper">Una letra mayúscula</li>
+                  <li data-rule="number">Un número</li>
+                  <li data-rule="special">Un carácter especial</li>
+                </ul>
+              </div>
+
+              <div class="form-group">
+                <label for="register-confirm" class="form-label"
+                  >Confirmar contraseña</label
+                >
+                <input
+                  type="password"
+                  id="register-confirm"
+                  name="confirmPassword"
+                  class="form-input"
+                  autocomplete="new-password"
+                  required
+                />
+              </div>
+
+              <div class="form-group form-group--checkbox">
+                <label class="form-checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="acceptTerms"
+                    required
+                    data-register-terms
+                  />
+                  Acepto los
+                  <a href="terminos.html" target="_blank"
+                    >Términos y Condiciones</a
+                  >
+                  y la
+                  <a href="privacidad.html" target="_blank"
+                    >Política de Privacidad</a
+                  >.
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn--primary auth-form__submit"
+                disabled
+                data-register-submit
+              >
+                Crear cuenta
+              </button>
+            </form>
+
+            <p class="auth-form-panel__switch text-body-sm">
+              ¿Ya tienes cuenta?
+              <button
+                type="button"
+                class="auth-form-panel__switch-link"
+                data-auth-switch="login"
+              >
+                Inicia sesión
+              </button>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-marketing-panel">
+        <div class="auth-marketing-panel__content">
+          <div data-auth-marketing="login">
+            <p class="auth-marketing-panel__headline">
+              El pulso del mercado tech mexicano.
+            </p>
+            <p class="auth-marketing-panel__subtitle text-body">
+              Skills, salarios y regiones, actualizados a diario.
+            </p>
+          </div>
+
+          <div data-auth-marketing="register" hidden>
+            <p class="auth-marketing-panel__headline">
+              Decisiones de talento con datos, no con corazonadas.
+            </p>
+            <p class="auth-marketing-panel__subtitle text-body">
+              Únete a quienes ya analizan el mercado tech de México.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="../assets/js/api/client.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/pages/register.js"></script>
+  </body>
+</html>
