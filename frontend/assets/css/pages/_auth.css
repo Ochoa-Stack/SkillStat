@@ -137,3 +137,34 @@
   color: var(--color-text-secondary);
   margin-block: var(--space-4) var(--space-6);
 }
+
+.auth-google {
+  margin-bottom: var(--space-2);
+}
+
+[data-google-button] {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-5);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border-subtle);
+}
+
+.auth-divider__text {
+  color: var(--color-text-disabled);
+  white-space: nowrap;
+}
