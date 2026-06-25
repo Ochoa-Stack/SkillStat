@@ -29,6 +29,7 @@ class BaseConfig:
 
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:5500").split(",")
 
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     ADZUNA_APP_ID = os.environ.get("ADZUNA_APP_ID")
     ADZUNA_APP_KEY = os.environ.get("ADZUNA_APP_KEY")
     SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
