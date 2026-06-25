@@ -9,12 +9,14 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+    # Nullable porque un usuario que entra solo via Google/GitHub/Apple nunca define una contrasena propia.
+    password_hash = db.Column(db.String(255), nullable=True)
     role = db.Column(db.String(20), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     alerts = db.relationship("Alert", backref="user", lazy=True)
     backups = db.relationship("Backup", backref="user", lazy=True)
+    oauth_accounts = db.relationship("OAuthAccount", backref="user", lazy=True)
 
     # Restringimos los roles permitidos directamente en la base de datos por seguridad
     __table_args__ = (
