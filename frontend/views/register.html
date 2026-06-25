@@ -54,12 +54,31 @@
             SkillStat
           </a>
 
-          <div data-auth-form="login">
+          <div data-auth-heading="login">
             <h1>Iniciar sesión</h1>
             <p class="auth-form-panel__subtitle text-body">
               Accede a tu tablero de inteligencia laboral.
             </p>
+          </div>
+          <div data-auth-heading="register" hidden>
+            <h1>Crear cuenta</h1>
+            <p class="auth-form-panel__subtitle text-body">
+              Empieza a explorar el mercado tech de México.
+            </p>
+          </div>
 
+          <div class="auth-google">
+            <div data-google-button></div>
+            <p class="form-error" data-google-error role="alert" hidden></p>
+          </div>
+
+          <div class="auth-divider">
+            <span class="auth-divider__text text-body-sm"
+              >o continúa con tu correo</span
+            >
+          </div>
+
+          <div data-auth-form="login">
             <form class="auth-form" data-login-form novalidate>
               <p class="form-error" data-login-error role="alert" hidden></p>
 
@@ -111,11 +130,6 @@
           </div>
 
           <div data-auth-form="register" hidden>
-            <h1>Crear cuenta</h1>
-            <p class="auth-form-panel__subtitle text-body">
-              Empieza a explorar el mercado tech de México.
-            </p>
-
             <form class="auth-form" data-register-form novalidate>
               <p class="form-error" data-register-error role="alert" hidden></p>
 
@@ -188,14 +202,16 @@
                     required
                     data-register-terms
                   />
-                  Acepto los
-                  <a href="terminos.html" target="_blank"
-                    >Términos y Condiciones</a
+                  <span
+                    >Acepto los
+                    <a href="terminos.html" target="_blank"
+                      >Términos y Condiciones</a
+                    >
+                    y la
+                    <a href="privacidad.html" target="_blank"
+                      >Política de Privacidad</a
+                    >.</span
                   >
-                  y la
-                  <a href="privacidad.html" target="_blank"
-                    >Política de Privacidad</a
-                  >.
                 </label>
               </div>
 
@@ -247,9 +263,11 @@
     </div>
 
     <script src="../assets/js/api/client.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="../assets/js/components/icons.init.js"></script>
     <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/google-auth.init.js"></script>
     <script src="../assets/js/pages/register.js"></script>
   </body>
 </html>

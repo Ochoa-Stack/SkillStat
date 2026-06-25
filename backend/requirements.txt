@@ -34,3 +34,6 @@ sendgrid>=6.11,<7.0
 
 # Servidor WSGI para producción
 gunicorn>=23.0,<24.0
+
+# Verificación de tokens de identidad de Google OAuth
+google-auth

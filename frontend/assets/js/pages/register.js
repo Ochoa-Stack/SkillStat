@@ -2,6 +2,10 @@ function setAuthMode(mode) {
   const screen = document.querySelector("[data-auth-screen]");
   screen.dataset.authMode = mode;
 
+  document.querySelectorAll("[data-auth-heading]").forEach((panel) => {
+    panel.hidden = panel.dataset.authHeading !== mode;
+  });
+
   document.querySelectorAll("[data-auth-form]").forEach((panel) => {
     panel.hidden = panel.dataset.authForm !== mode;
   });
