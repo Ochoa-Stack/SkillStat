@@ -28,6 +28,7 @@ class BaseConfig:
     JWT_CSRF_IN_COOKIES = True
 
     CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:5500").split(",")
+    FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:5500/frontend")
 
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     ADZUNA_APP_ID = os.environ.get("ADZUNA_APP_ID")

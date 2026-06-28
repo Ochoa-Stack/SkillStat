@@ -2,8 +2,7 @@ from app.models.user import User
 from app.extensions import db
 
 class UserRepository:
-    # Encapsula el acceso a datos para la entidad User.
-    # Aísla las consultas SQLAlchemy de la lógica de negocio.
+    # Encapsula el acceso a datos para la entidad User. Aísla las consultas SQLAlchemy de la lógica de negocio.
 
     @classmethod
     def create(cls, user_data: dict) -> User:
@@ -28,3 +27,14 @@ class UserRepository:
     @classmethod
     def get_all(cls) -> list[User]:
         return db.session.execute(db.select(User)).scalars().all()
+
+    @classmethod
+    def save(cls, user: User) -> User:
+        # Persiste cambios en una entidad ya existente, como el reseteo de password_hash; no crea un nuevo registro, solo hace commit.
+        db.session.add(user)
+        try:
+            db.session.commit()
+            return user
+        except Exception:
+            db.session.rollback()
+            return None
