@@ -68,7 +68,7 @@ def login():
     tokens = generate_tokens(user_id=user.id, role=user.role)
     user_data = UserResponseSchema().dump(user)
 
-    # El token nunca viaja en el cuerpo JSON: si lo devolvieramos aqui, un script de XSS podria leerlo desde la respuesta del fetch aunque la cookie sea httpOnly, anulando la proteccion que buscamos.
+    # El token nunca viaja en el cuerpo JSON ya que si lo devolvieramos aqui, un script de XSS podria leerlo desde la respuesta del fetch aunque la cookie sea httpOnly, anulando la proteccion que buscamos.
     response, status_code = success_response(data=user_data, status_code=200)
     set_access_cookies(response, tokens["access_token"])
     return response, status_code
@@ -147,7 +147,7 @@ def google_login():
     else:
         user = UserRepository.get_by_email(email)
         if not user:
-            # Primera vez que vemos este correo: la cuenta nace sin password_hash porque este usuario siempre entrara por Google.
+            # Si es la primera vez que vemos este correo, la cuenta nace sin password_hash porque este usuario siempre entrara por Google.
             user = UserRepository.create({
                 "email": email,
                 "first_name": idinfo.get("given_name", "Usuario"),
