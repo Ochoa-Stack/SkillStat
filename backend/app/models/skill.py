@@ -13,3 +13,4 @@ class Skill(db.Model):
     job_skills = db.relationship("JobSkill", backref="skill", lazy=True)
     alerts = db.relationship("Alert", backref="skill", lazy=True)
     trend_snapshots = db.relationship("TrendSnapshot", backref="skill", lazy=True)
+    user_skills = db.relationship("UserSkill", backref="skill", lazy=True)
