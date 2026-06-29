@@ -3,8 +3,7 @@ from marshmallow import Schema, fields, validate, pre_load, ValidationError
 
 
 def validate_password_strength(password):
-    # Reglas estandar de la industria: longitud minima ya la valida
-    # validate.Length por separado, aqui solo checamos composicion.
+    # Reglas estandar de la industria: longitud minima ya la valida validate.Length por separado, aqui solo checamos composicion.
     if not re.search(r"[A-Z]", password):
         raise ValidationError("La contraseña debe incluir al menos una mayúscula.")
     if not re.search(r"[a-z]", password):
@@ -43,3 +42,32 @@ class UserResponseSchema(Schema):
     last_name = fields.String(dump_only=True)
     role = fields.String(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
+
+
+class ForgotPasswordSchema(Schema):
+    email = fields.Email(
+        required=True,
+        error_messages={
+            "required": "El correo es obligatorio.",
+            "invalid": "Formato de correo inválido.",
+        },
+    )
+
+    @pre_load
+    def normalize_email(self, data, **kwargs):
+        if "email" in data and isinstance(data["email"], str):
+            data["email"] = data["email"].lower().strip()
+        return data
+
+
+class ResetPasswordSchema(Schema):
+    token = fields.String(
+        required=True,
+        error_messages={"required": "El token es obligatorio."},
+    )
+    # Reutilizamos el mismo validador de complejidad definido arriba en este mismo archivo, la regla vive en un solo lugar, no copiada.
+    new_password = fields.String(
+        required=True,
+        validate=[validate.Length(min=8, max=128), validate_password_strength],
+        error_messages={"required": "La nueva contraseña es obligatoria."},
+    )

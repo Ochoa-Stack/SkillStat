@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Recupera el acceso a tu cuenta de SkillStat."
+    />
+    <title>SkillStat - Olvidé mi contraseña</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <div class="auth-screen" data-auth-screen>
+      <section class="auth-form-panel">
+        <button
+          class="auth-close"
+          type="button"
+          aria-label="Cerrar"
+          data-auth-close
+        >
+          <i data-lucide="x"></i>
+        </button>
+
+        <div class="auth-form-panel__content">
+          <a
+            href="../views/index.html"
+            class="navbar__logo auth-form-panel__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo-compact.svg"
+              alt="SkillStat"
+              width="28"
+              height="28"
+              class="navbar__logo-img"
+            />
+            SkillStat
+          </a>
+
+          <div>
+            <h1>Recuperar contraseña</h1>
+            <p class="auth-form-panel__subtitle text-body">
+              Ingresa tu correo y te enviaremos un enlace para restablecerla.
+            </p>
+          </div>
+
+          <div>
+            <form class="auth-form" data-forgot-form novalidate>
+              <p class="form-error" data-forgot-message role="alert" hidden></p>
+
+              <div class="form-group">
+                <label for="forgot-email" class="form-label">Correo</label>
+                <input
+                  type="email"
+                  id="forgot-email"
+                  name="email"
+                  class="form-input"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn--primary auth-form__submit"
+                data-forgot-submit
+              >
+                Enviar enlace
+              </button>
+            </form>
+
+            <p class="auth-form-panel__switch text-body-sm">
+              <a href="register.html" class="auth-form-panel__switch-link">
+                Volver a inicio de sesión
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-marketing-panel">
+        <div class="auth-marketing-panel__content">
+          <div>
+            <p class="auth-marketing-panel__headline">Recupera tu acceso.</p>
+            <p class="auth-marketing-panel__subtitle text-body">
+              Vuelve a tener el pulso del mercado tech mexicano a tu
+              disposición.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="../assets/js/api/client.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/pages/olvide-contrasena.js"></script>
+  </body>
+</html>

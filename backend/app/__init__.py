@@ -1,4 +1,5 @@
 import os
+import logging_config
 from flask import Flask
 from dotenv import load_dotenv
 
@@ -56,6 +57,33 @@ def _register_jwt_handlers(app: Flask) -> None:
             message="La sesión ha expirado, vuelve a iniciar sesión.",
             status_code=401,
         )
+
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        # Importación diferida para evitar ciclo de importación con db/User.
+        from app.repositories.user_repository import UserRepository
+        from datetime import datetime, timezone as tz
+
+        user_id = jwt_payload.get("sub")
+        if not user_id:
+            return False
+
+        user = UserRepository.get_by_id(int(user_id))
+        if not user or user.password_changed_at is None:
+            # Usuario no encontrado o exclusivamente OAuth (sin contraseña), no aplicamos invalidación por cambio de contraseña.
+            return False
+
+        # El claim "iat" (issued-at) es un timestamp Unix con precisión de segundos. password_changed_at tiene microsegundos; truncamos al segundo para que un token emitido en el mismo segundo que el reset no quede bloqueado falsamente. El ataque de "token emitido justo antes del reset" sigue bloqueado correctamente porque iat < pca_floor cuando la diferencia es de al menos 1 segundo completo.
+        iat = jwt_payload.get("iat", 0)
+        pca = user.password_changed_at
+        if pca.tzinfo is None:
+            pca = pca.replace(tzinfo=tz.utc)
+
+        # Truncar pca a precisión de segundos para alinear con iat
+        pca_floor = pca.replace(microsecond=0)
+
+        token_issued_at = datetime.fromtimestamp(iat, tz=tz.utc)
+        return token_issued_at < pca_floor
 
 
 def _register_blueprints(app: Flask) -> None:

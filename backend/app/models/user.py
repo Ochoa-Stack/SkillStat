@@ -13,6 +13,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=True)
     role = db.Column(db.String(20), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    # Null para usuarios exclusivamente OAuth (sin contraseña propia). El blocklist callback trata null como "sin restricción" — esos usuarios nunca se desloguean por este mecanismo porque no tienen contraseña que cambiar.
+    password_changed_at = db.Column(db.DateTime, nullable=True)
 
     alerts = db.relationship("Alert", backref="user", lazy=True)
     backups = db.relationship("Backup", backref="user", lazy=True)
