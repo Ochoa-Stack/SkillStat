@@ -19,11 +19,12 @@ class User(db.Model):
     alerts = db.relationship("Alert", backref="user", lazy=True)
     backups = db.relationship("Backup", backref="user", lazy=True)
     oauth_accounts = db.relationship("OAuthAccount", backref="user", lazy=True)
+    user_skills = db.relationship("UserSkill", backref="user", lazy=True)
 
     # Restringimos los roles permitidos directamente en la base de datos por seguridad
     __table_args__ = (
         db.CheckConstraint(
-            "role IN ('GUEST', 'REGISTERED', 'ADMIN')", name="chk_users_role"
+            "role IN ('REGISTERED', 'ADMIN')", name="chk_users_role"
         ),
     )
 
