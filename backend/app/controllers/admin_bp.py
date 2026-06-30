@@ -4,12 +4,13 @@ from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from app.services.ingestion_service import IngestionService
 from app.services.backup_service import BackupService
 from app.utils.response import success_response, error_response
+from app.utils.decorators import role_required
 
 admin_bp = Blueprint("admin_bp", __name__)
 
+
 def admin_required():
-    # Helper local para evaluar los claims del JWT inyectados durante el login.
-    # Garantiza que incluso un token válido sea rechazado si carece del privilegio necesario.
+    # Helper local para evaluar los claims del JWT inyectados durante el login. Garantiza que incluso un token válido sea rechazado si carece del privilegio necesario.
     claims = get_jwt()
     return claims.get("role") == "ADMIN"
 

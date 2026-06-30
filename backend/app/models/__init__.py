@@ -9,6 +9,7 @@ from .password_reset_token import PasswordResetToken
 from .alert import Alert
 from .trend_snapshot import TrendSnapshot
 from .backup import Backup
+from .user_skill import UserSkill
 
 __all__ = [
     "Category",
@@ -22,4 +23,5 @@ __all__ = [
     "Alert",
     "TrendSnapshot",
     "Backup",
+    "UserSkill",
 ]
