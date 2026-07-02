@@ -13,18 +13,23 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=True)
     role = db.Column(db.String(20), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    # Null para usuarios exclusivamente OAuth (sin contraseña propia). El blocklist callback trata null como "sin restricción" — esos usuarios nunca se desloguean por este mecanismo porque no tienen contraseña que cambiar.
+    # Null para usuarios exclusivamente OAuth (sin contraseña propia). El blocklist callback trata null como "sin restricción"; esos usuarios nunca se desloguean por este mecanismo porque no tienen contraseña que cambiar.
     password_changed_at = db.Column(db.DateTime, nullable=True)
+    # Null es el estado valido para "sin definir"; el valor se puede completar mas adelante desde el perfil.
+    intent = db.Column(db.String(20), nullable=True)
 
     alerts = db.relationship("Alert", backref="user", lazy=True)
     backups = db.relationship("Backup", backref="user", lazy=True)
     oauth_accounts = db.relationship("OAuthAccount", backref="user", lazy=True)
     user_skills = db.relationship("UserSkill", backref="user", lazy=True)
 
-    # Restringimos los roles permitidos directamente en la base de datos por seguridad
+    # Restringimos los roles y los intents permitidos directamente en la base de datos por seguridad
     __table_args__ = (
         db.CheckConstraint(
             "role IN ('REGISTERED', 'ADMIN')", name="chk_users_role"
+        ),
+        db.CheckConstraint(
+            "intent IS NULL OR intent IN ('ESTUDIANTE', 'RECLUTADOR')", name="chk_users_intent"
         ),
     )
 

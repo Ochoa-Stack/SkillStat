@@ -92,11 +92,13 @@ def _register_blueprints(app: Flask) -> None:
     from app.controllers.panorama_bp import panorama_bp
     from app.controllers.alerts_bp import alerts_bp
     from app.controllers.admin_bp import admin_bp
+    from app.controllers.profile_bp import profile_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(panorama_bp, url_prefix="/api/panorama")
     app.register_blueprint(alerts_bp, url_prefix="/api/alerts")
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
+    app.register_blueprint(profile_bp, url_prefix="/api/profile")
 
 def _register_schedulers(app: Flask) -> None:
     from scheduler.jobs import daily_pipeline
