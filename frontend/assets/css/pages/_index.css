@@ -58,6 +58,30 @@
   .cta-section .btn {
     width: auto;
   }
+  .carousel-section .carousel {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .carousel-section .carousel {
+    max-width: 100%;
+  }
+  .panorama-preview .browser-chrome {
+    max-width: 860px;
+  }
+  .hero__heading {
+    max-width: 900px;
+  }
+  .hero__subheading {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .panorama-preview .browser-chrome {
+    max-width: 1000px;
+  }
 }
 
 .value-props {
@@ -78,3 +102,43 @@
   margin-inline: auto;
   text-align: left;
 }
+
+/* Top skills landing section */
+.top-skills-section {
+  padding-block: var(--space-12);
+  text-align: center;
+}
+
+.top-skills-section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-6);
+}
+
+.top-skills-section h2 {
+  margin-bottom: var(--space-8);
+}
+
+.top-skills-section__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.top-skills-section__link {
+  display: inline-block;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.top-skills-section__link:hover {
+  text-decoration: underline;
+}
+
