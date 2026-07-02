@@ -2,7 +2,7 @@ async function initIndexPage() {
   try {
     const [summary, topSkills] = await Promise.all([
       getSummary(),
-      getTopSkills(5),
+      getTopSkills(10),
     ]);
 
     const topSkill = topSkills[0];
@@ -27,6 +27,8 @@ async function initIndexPage() {
       formatNumber(summary.total_jobs);
     document.querySelector('[data-metric="preview-skill"]').textContent =
       topSkill.name;
+
+    renderTopSkillsChips(topSkills);
   } catch (error) {
     console.error("No se pudieron cargar los datos del Panorama:", error);
 
@@ -35,7 +37,41 @@ async function initIndexPage() {
         element.textContent = "No disponible";
       }
     });
+
+    // La seccion de top skills es aditiva; si falla, se oculta sin romper el resto.
+    const topSkillsSection = document.getElementById("top-skills-section");
+    if (topSkillsSection) topSkillsSection.hidden = true;
   }
+}
+
+function renderTopSkillsChips(skills) {
+  const container = document.getElementById("top-skills-chips");
+  if (!container || !Array.isArray(skills) || skills.length === 0) {
+    const section = document.getElementById("top-skills-section");
+    if (section) section.hidden = true;
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  skills.slice(0, 10).forEach(function (skill) {
+    const chip = document.createElement("div");
+    chip.className = "chip";
+    chip.setAttribute("role", "listitem");
+
+    const name = document.createElement("span");
+    name.textContent = skill.name;
+
+    const badge = document.createElement("span");
+    badge.className = "chip__badge";
+    badge.textContent = formatNumber(skill.demand_count);
+    badge.setAttribute("aria-label", `${formatNumber(skill.demand_count)} vacantes`);
+
+    chip.appendChild(name);
+    chip.appendChild(badge);
+    fragment.appendChild(chip);
+  });
+
+  container.appendChild(fragment);
 }
 
 document.addEventListener("DOMContentLoaded", initIndexPage);

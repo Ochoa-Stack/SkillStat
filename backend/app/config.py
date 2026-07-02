@@ -22,6 +22,7 @@ class BaseConfig:
     JWT_ERROR_MESSAGE_KEY = "error"
     # El JWT vive en una cookie httpOnly en vez de viajar en el cuerpo JSON, para que un script de XSS no pueda leerlo directamente.
     JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_BLOCKLIST_TOKEN_CHECKS = ["access", "refresh"]
     JWT_COOKIE_SECURE = os.environ.get("JWT_COOKIE_SECURE", "false").lower() == "true"
     JWT_COOKIE_SAMESITE = "Lax"
     JWT_COOKIE_CSRF_PROTECT = True

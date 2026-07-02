@@ -26,11 +26,20 @@
   function goToSlide(index) {
     const slide = slides[index];
     if (!slide) return;
-    slide.scrollIntoView({
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-      inline: "start",
-      block: "nearest",
-    });
+    // Solo ejecuta scrollIntoView si el carousel esta dentro del viewport.
+    // Si esta fuera (por ejemplo el usuario bajo al footer), avanza el indice
+    // logico sin mover la pagina, para que al volver vea el slide correcto.
+    const rect = carousel.getBoundingClientRect();
+    const inViewport = rect.top >= 0 && rect.bottom <= window.innerHeight;
+    if (inViewport) {
+      slide.scrollIntoView({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        inline: "start",
+        block: "nearest",
+      });
+    } else {
+      setActiveDot(index);
+    }
   }
 
   dots.forEach(function (dot, index) {
@@ -60,7 +69,7 @@
   });
 
   function startAutoRotate() {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || autoRotateTimer) return;
     autoRotateTimer = setInterval(function () {
       const nextIndex = (currentIndex + 1) % slides.length;
       goToSlide(nextIndex);
@@ -74,9 +83,21 @@
     }
   }
 
-  carousel.addEventListener("mouseenter", stopAutoRotate);
-  carousel.addEventListener("mouseleave", startAutoRotate);
-  carousel.addEventListener("touchstart", stopAutoRotate, { passive: true });
+  // IntersectionObserver sobre el carousel completo: detiene el auto-rotate
+  // cuando el carousel sale del viewport y lo reanuda cuando entra.
+  // Esto reemplaza los listeners de mouseenter/mouseleave/touchstart.
+  const visibilityObserver = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          startAutoRotate();
+        } else {
+          stopAutoRotate();
+        }
+      });
+    },
+    { threshold: 0.1 },
+  );
 
-  startAutoRotate();
+  visibilityObserver.observe(carousel);
 })();

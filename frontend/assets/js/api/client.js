@@ -44,10 +44,27 @@ async function apiGet(endpoint) {
   return json.data;
 }
 
+function getCsrfToken() {
+  // Flask-JWT-Extended emite la cookie csrf_access_token sin la bandera httpOnly intencionalmente. Esto nos permite leerla desde JavaScript en el navegador y adjuntarla como el header X-CSRF-TOKEN en las peticiones que mutan estado, completando el patrón Double Submit Cookie para protegernos de ataques CSRF sin requerir que nuestro backend de API mantenga estado de sesiones.
+  const match = document.cookie.match(
+    new RegExp("(^| )csrf_access_token=([^;]+)"),
+  );
+  if (match) {
+    return decodeURIComponent(match[2]);
+  }
+  return null;
+}
+
 async function apiPost(endpoint, body) {
+  const headers = { "Content-Type": "application/json" };
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRF-TOKEN"] = csrfToken;
+  }
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: headers,
     credentials: "include",
     body: JSON.stringify(body),
   });
@@ -59,4 +76,54 @@ async function apiPost(endpoint, body) {
 
   const json = await response.json();
   return json.data;
+}
+
+async function apiPatch(endpoint, body) {
+  const headers = { "Content-Type": "application/json" };
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRF-TOKEN"] = csrfToken;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "PATCH",
+    headers: headers,
+    credentials: "include",
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorBody = await parseErrorBody(response);
+    throw buildApiError(errorBody, response, endpoint);
+  }
+
+  const json = await response.json();
+  return json.data;
+}
+
+async function apiDelete(endpoint) {
+  const headers = {};
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRF-TOKEN"] = csrfToken;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "DELETE",
+    headers: headers,
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorBody = await parseErrorBody(response);
+    throw buildApiError(errorBody, response, endpoint);
+  }
+
+  // DELETE podria devolver 204 No Content o un JSON con datos, lo manejamos sin fallar.
+  try {
+    const json = await response.json();
+    return json.data || null;
+  } catch {
+    return null;
+  }
 }
