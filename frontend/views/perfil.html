@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Gestiona tu perfil, actualiza tus datos, y descubre tu brecha de habilidades."
+    />
+    <title>SkillStat - Mi perfil</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <button
+          class="navbar__menu-toggle"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          data-nav-drawer-open
+        >
+          <i data-lucide="menu"></i>
+        </button>
+
+        <a
+          href="../views/index.html"
+          class="navbar__logo"
+          aria-label="SkillStat - Inicio"
+        >
+          <img
+            src="../assets/images/brand/skillstat-logo-compact.svg"
+            alt="SkillStat"
+            width="32"
+            height="32"
+            class="navbar__logo-img"
+          />
+          SkillStat
+        </a>
+
+        <ul class="navbar__links" role="list">
+          <li>
+            <a href="panorama.html" class="navbar__link">Panorama</a>
+          </li>
+          <li><a href="comparar.html" class="navbar__link">Comparar</a></li>
+          <li>
+            <a href="#" class="navbar__link" data-pending-page>Habilidades</a>
+          </li>
+          <li>
+            <a href="#" class="navbar__link" data-pending-page>Salarios</a>
+          </li>
+          <li>
+            <a href="#" class="navbar__link" data-pending-page>Regiones</a>
+          </li>
+          <li>
+            <a href="#" class="navbar__link" data-pending-page>Reportes</a>
+          </li>
+        </ul>
+
+        <div class="navbar__actions">
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Cambiar tema"
+          >
+            <i
+              data-lucide="sun"
+              class="theme-toggle__icon theme-toggle__icon--sun"
+            ></i>
+            <i
+              data-lucide="moon"
+              class="theme-toggle__icon theme-toggle__icon--moon"
+            ></i>
+          </button>
+          <button
+            class="navbar__logout"
+            type="button"
+            aria-label="Cerrar sesión"
+            data-auth-action="logout"
+          >
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <div class="nav-drawer" data-nav-drawer aria-hidden="true">
+      <div class="nav-drawer__backdrop" data-nav-drawer-close></div>
+      <div
+        class="nav-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+      >
+        <div class="nav-drawer__header">
+          <a
+            href="../views/index.html"
+            class="navbar__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo-compact.svg"
+              alt="SkillStat"
+              width="28"
+              height="28"
+              class="navbar__logo-img"
+            />
+            SkillStat
+          </a>
+          <div class="nav-drawer__header-actions">
+            <button
+              class="theme-toggle"
+              type="button"
+              data-theme-toggle
+              aria-label="Cambiar tema"
+            >
+              <i
+                data-lucide="sun"
+                class="theme-toggle__icon theme-toggle__icon--sun"
+              ></i>
+              <i
+                data-lucide="moon"
+                class="theme-toggle__icon theme-toggle__icon--moon"
+              ></i>
+            </button>
+            <button
+              class="nav-drawer__close"
+              type="button"
+              aria-label="Cerrar menú"
+              data-nav-drawer-close
+            >
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav-drawer__links" role="list">
+          <li>
+            <a href="panorama.html" class="nav-drawer__link">Panorama</a>
+          </li>
+          <li><a href="comparar.html" class="nav-drawer__link">Comparar</a></li>
+          <li>
+            <a href="#" class="nav-drawer__link" data-pending-page
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="#" class="nav-drawer__link" data-pending-page>Salarios</a>
+          </li>
+          <li>
+            <a href="#" class="nav-drawer__link" data-pending-page>Regiones</a>
+          </li>
+          <li>
+            <a href="#" class="nav-drawer__link" data-pending-page>Reportes</a>
+          </li>
+        </ul>
+
+        <button
+          class="nav-drawer__logout"
+          type="button"
+          data-auth-action="logout"
+        >
+          <i data-lucide="log-out"></i>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <main id="profile-main" hidden>
+      <section class="panorama-header">
+        <div class="container">
+          <h1>Mi perfil</h1>
+        </div>
+      </section>
+
+      <section class="profile-nav">
+        <div class="container">
+          <div
+            class="panorama-skills__filters"
+            role="group"
+            aria-label="Secciones del perfil"
+          >
+            <button
+              class="pill pill--active"
+              type="button"
+              data-nav-section="datos"
+            >
+              Mis datos
+            </button>
+            <button class="pill" type="button" data-nav-section="habilidades">
+              Mis habilidades
+            </button>
+            <button class="pill" type="button" data-nav-section="seguridad">
+              Seguridad
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="profile-content">
+        <div class="container">
+          <!-- Mis datos -->
+          <div id="section-datos" data-section class="profile-section">
+            <h2>Mis datos</h2>
+            <div class="grid-2-col">
+              <div>
+                <form id="datos-form" class="auth-form profile-form" novalidate>
+                  <p class="form-error" id="datos-msg" role="alert" hidden></p>
+                  <div class="form-group">
+                    <label class="form-label" for="first_name">Nombre</label>
+                    <input
+                      type="text"
+                      id="first_name"
+                      name="first_name"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="last_name">Apellido</label>
+                    <input
+                      type="text"
+                      id="last_name"
+                      name="last_name"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="intent"
+                      >Intención en la plataforma</label
+                    >
+                    <select id="intent" name="intent" class="form-input">
+                      <option value="">Sin definir</option>
+                      <option value="ESTUDIANTE">
+                        ESTUDIANTE (Busco trabajo o aprender)
+                      </option>
+                      <option value="RECLUTADOR">
+                        RECLUTADOR (Busco talento)
+                      </option>
+                    </select>
+                  </div>
+                  <button
+                    type="submit"
+                    class="btn btn--primary"
+                    id="btn-save-datos"
+                  >
+                    Guardar cambios
+                  </button>
+                </form>
+              </div>
+
+              <div class="profile-card-context surface">
+                <h3>Información de cuenta</h3>
+                <div class="form-group">
+                  <label class="form-label">Correo electrónico</label>
+                  <p class="text-body-sm" data-profile-email>Cargando...</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Rol actual</label>
+                  <p class="text-body-sm" data-profile-role>Cargando...</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Miembro desde</label>
+                  <p class="text-body-sm" data-profile-since>Cargando...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mis habilidades -->
+          <div
+            id="section-habilidades"
+            data-section
+            class="profile-section"
+            hidden
+          >
+            <h2>Brecha de habilidades</h2>
+            <p class="text-body">
+              Descubre cuáles son las tecnologías más demandadas en el mercado
+              que aún no dominas, y registra lo que ya sabes para visualizar tu
+              progreso.
+            </p>
+
+            <div class="profile-skills-grid">
+              <div>
+                <h3>Habilidades en demanda que aún no tienes</h3>
+                <div id="brechas-container" class="profile-skills-list">
+                  <!-- Chips inyectados por JS -->
+                </div>
+                <p id="brechas-empty" class="text-body-sm" hidden>
+                  ¡Felicidades! Dominas todas las habilidades principales del
+                  mercado actual.
+                </p>
+              </div>
+
+              <div class="profile-skills-sidebar surface">
+                <h3>Lo que ya dominas</h3>
+                <div id="mis-habilidades-container" class="profile-skills-list">
+                  <!-- Chips inyectados por JS -->
+                </div>
+                <p id="mis-habilidades-empty" class="text-body-sm" hidden>
+                  No has agregado ninguna habilidad todavía.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seguridad -->
+          <div
+            id="section-seguridad"
+            data-section
+            class="profile-section"
+            hidden
+          >
+            <h2>Seguridad</h2>
+            <div class="grid-2-col">
+              <div>
+                <form
+                  id="seguridad-form"
+                  class="auth-form profile-form"
+                  novalidate
+                >
+                  <p
+                    class="form-error"
+                    id="seguridad-msg"
+                    role="alert"
+                    hidden
+                  ></p>
+
+                  <div class="form-group">
+                    <label class="form-label" for="current_password"
+                      >Contraseña actual</label
+                    >
+                    <input
+                      type="password"
+                      id="current_password"
+                      name="current_password"
+                      class="form-input"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="new_password"
+                      >Nueva contraseña</label
+                    >
+                    <input
+                      type="password"
+                      id="new_password"
+                      name="new_password"
+                      class="form-input"
+                      autocomplete="new-password"
+                      required
+                    />
+                    <ul class="password-checklist">
+                      <li data-rule="length">Mínimo 8 caracteres</li>
+                      <li data-rule="upper">Una letra mayúscula</li>
+                      <li data-rule="number">Un número</li>
+                      <li data-rule="special">Un carácter especial</li>
+                    </ul>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="confirm_password"
+                      >Confirmar nueva contraseña</label
+                    >
+                    <input
+                      type="password"
+                      id="confirm_password"
+                      name="confirm_password"
+                      class="form-input"
+                      autocomplete="new-password"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    class="btn btn--primary"
+                    id="btn-save-password"
+                    disabled
+                  >
+                    Cambiar contraseña
+                  </button>
+                </form>
+              </div>
+
+              <div class="profile-card-context surface">
+                <h3>Protege tu cuenta</h3>
+                <ul class="text-body-sm">
+                  <li>
+                    Utiliza una contraseña que no uses en otros sitios web.
+                  </li>
+                  <li>Evita compartir tus credenciales con terceros.</li>
+                  <li>
+                    Recuerda cerrar sesión si usas un dispositivo compartido o
+                    público.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Estado de carga central -->
+    <div id="profile-loading" class="profile-loading">
+      <p class="text-body">Cargando perfil...</p>
+    </div>
+
+    <script src="../assets/js/api/client.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/pages/perfil.js"></script>
+  </body>
+</html>

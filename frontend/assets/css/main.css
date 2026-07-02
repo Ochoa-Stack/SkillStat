@@ -21,7 +21,7 @@
 
 /* Instanciamos los layouts (descomente conforme se crea cada archivo) */
 @import url("layouts/_containers.css");
-/* @import url('layouts/_grid.css'); */
+@import url("layouts/_grid.css");
 /* @import url('layouts/_navbar-layout.css'); */
 
 /* Instanciamos las páginas (descomente conforme se crea cada archivo) */
@@ -30,4 +30,5 @@
 @import url("pages/_auth.css");
 /* @import url('pages/_alertas.css'); */
 @import url("pages/_comparar.css");
+@import url("pages/_perfil.css");
 /* @import url('pages/_admin.css'); */

@@ -1,0 +1,115 @@
+/* Estilos especificos para la pagina de perfil. Mantenemos este archivo separado para no polucionar el CSS global con reglas que solo se usan aqui, y evitamos absolutamente el CSS inline para mantener la especificidad y el mantenimiento bajo control. */
+
+.profile-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.profile-nav {
+  margin-bottom: var(--space-8);
+}
+
+.profile-section {
+  margin-top: var(--space-6);
+}
+
+.profile-section > h2 {
+  margin-bottom: var(--space-4);
+}
+
+.profile-section > .text-body {
+  margin-bottom: var(--space-6);
+}
+
+.profile-form {
+  width: 100%;
+}
+
+.profile-card-context {
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  height: fit-content;
+  position: sticky;
+  top: var(--space-8);
+}
+
+.profile-card-context ul {
+  list-style: disc;
+  margin-left: var(--space-4);
+}
+
+.profile-skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.profile-skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .profile-skills-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .profile-skills-grid #brechas-container {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .profile-form .password-checklist {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+}
+
+.profile-skills-sidebar {
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  height: fit-content;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  font-size: var(--text-sm);
+}
+
+.chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  color: var(--color-text-disabled);
+}
+
+.chip button:hover {
+  color: var(--color-text-primary);
+}
+
+.chip__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  min-width: 1.5rem;
+}
