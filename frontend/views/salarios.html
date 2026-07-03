@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Panorama del mercado laboral tecnológico en México: vacantes activas, habilidades más demandadas, salarios por habilidad y empresas contratando, con datos reales."
+      content="Salarios del mercado laboral tecnológico en México por habilidad."
     />
-    <title>SkillStat - Panorama</title>
+    <title>SkillStat - Salarios</title>
     <link
       rel="icon"
       type="image/svg+xml"
@@ -56,19 +56,19 @@
 
         <ul class="navbar__links" role="list">
           <li>
-            <a
-              href="panorama.html"
-              class="navbar__link navbar__link--active"
-              aria-current="page"
-              >Panorama</a
-            >
+            <a href="panorama.html" class="navbar__link">Panorama</a>
           </li>
           <li><a href="comparar.html" class="navbar__link">Comparar</a></li>
           <li>
             <a href="habilidades.html" class="navbar__link">Habilidades</a>
           </li>
           <li>
-            <a href="salarios.html" class="navbar__link">Salarios</a>
+            <a
+              href="salarios.html"
+              class="navbar__link navbar__link--active"
+              aria-current="page"
+              >Salarios</a
+            >
           </li>
           <li>
             <a href="#" class="navbar__link" data-pending-page>Regiones</a>
@@ -158,19 +158,19 @@
 
         <ul class="nav-drawer__links" role="list">
           <li>
-            <a
-              href="panorama.html"
-              class="nav-drawer__link nav-drawer__link--active"
-              aria-current="page"
-              >Panorama</a
-            >
+            <a href="panorama.html" class="nav-drawer__link">Panorama</a>
           </li>
           <li><a href="comparar.html" class="nav-drawer__link">Comparar</a></li>
           <li>
             <a href="habilidades.html" class="nav-drawer__link">Habilidades</a>
           </li>
           <li>
-            <a href="salarios.html" class="nav-drawer__link">Salarios</a>
+            <a
+              href="salarios.html"
+              class="nav-drawer__link nav-drawer__link--active"
+              aria-current="page"
+              >Salarios</a
+            >
           </li>
           <li>
             <a href="#" class="nav-drawer__link" data-pending-page>Regiones</a>
@@ -192,130 +192,60 @@
     </div>
 
     <main>
-      <section class="panorama-header">
+      <section class="habilidades-header">
         <div class="container">
-          <h1>Panorama</h1>
-          <p class="panorama-header__subtitle text-body">
-            Inteligencia de mercado laboral tecnológico · México ·
-            <span class="panorama-header__live">Actualizado</span>
+          <h1>Salarios del mercado tech</h1>
+          <p class="text-body">
+            Los salarios mostrados provienen de vacantes que declaran rango
+            salarial explícitamente. Actualmente representan una muestra parcial
+            del mercado; se amplían conforme se incorporan más vacantes con dato
+            disponible.
           </p>
         </div>
       </section>
 
-      <section class="panorama-metrics">
+      <section class="habilidades-content">
         <div class="container">
-          <div class="panorama-metrics__track scroll-row" data-scroll-row>
-            <article
-              class="metric-card surface panorama-metrics__card"
-              aria-label="Vacantes activas"
+          <div class="salarios-selector-container">
+            <div
+              id="salarios-filters"
+              class="habilidades-filters"
+              role="group"
+              aria-label="Seleccionar habilidad para ver salario"
             >
-              <div class="card-header">
-                <span class="metric-card__label text-label"
-                  >Vacantes activas</span
-                >
-                <span class="metric-card__live" aria-label="Datos actualizados"
-                  >Actualizado</span
-                >
-              </div>
-              <p
-                class="metric-card__value text-metric"
-                data-metric="active-jobs"
-              >
-                —
-              </p>
-              <p
-                class="metric-card__detail text-body-sm"
-                data-metric="active-jobs-detail"
-              >
-                Cargando datos...
-              </p>
-            </article>
-
-            <article
-              class="metric-card surface panorama-metrics__card"
-              aria-label="Empresas contratando"
-            >
-              <div class="card-header">
-                <span class="metric-card__label text-label"
-                  >Empresas contratando</span
-                >
-                <span class="metric-card__live" aria-label="Datos actualizados"
-                  >Actualizado</span
-                >
-              </div>
-              <p
-                class="metric-card__value text-metric"
-                data-metric="active-companies"
-              >
-                —
-              </p>
-              <p
-                class="metric-card__detail text-body-sm"
-                data-metric="active-companies-detail"
-              >
-                Cargando datos...
-              </p>
-            </article>
-
-            <article
-              class="metric-card surface panorama-metrics__card"
-              aria-label="Habilidades rastreadas"
-            >
-              <div class="card-header">
-                <span class="metric-card__label text-label"
-                  >Habilidades rastreadas</span
-                >
-                <span class="metric-card__live" aria-label="Datos actualizados"
-                  >Actualizado</span
-                >
-              </div>
-              <p
-                class="metric-card__value text-metric"
-                data-metric="skills-tracked-panorama"
-              >
-                —
-              </p>
-              <p
-                class="metric-card__detail text-body-sm"
-                data-metric="skills-tracked-panorama-detail"
-              >
-                Cargando datos...
-              </p>
-            </article>
+              <!-- Chips generados dinámicamente -->
+            </div>
+            <div id="salarios-error-container"></div>
           </div>
-        </div>
-      </section>
 
-      <section class="panorama-skills">
-        <div class="container">
-          <div class="panorama-skills__header">
-            <h2>Top skills demandados</h2>
-            <p class="panorama-skills__subtitle text-body-sm">
-              Menciones en vacantes
+          <div id="salarios-loading" class="habilidades-state" hidden>
+            <i data-lucide="loader-2" class="icon-spin"></i>
+            <p class="text-body" style="margin-top: var(--space-4)">
+              Consultando datos...
             </p>
           </div>
 
-          <div
-            class="panorama-skills__filters"
-            role="group"
-            aria-label="Cantidad de habilidades a mostrar"
-          >
-            <button
-              class="pill pill--active"
-              type="button"
-              data-skills-limit="5"
-            >
-              Top 5
-            </button>
-            <button class="pill" type="button" data-skills-limit="10">
-              Top 10
-            </button>
-            <button class="pill" type="button" data-skills-limit="15">
-              Top 15
-            </button>
+          <div id="salary-result" class="salary-card surface" hidden>
+            <h2
+              id="salary-skill-name"
+              class="salary-card__title text-heading"
+            ></h2>
+            <p class="salary-card__range text-metric">
+              <span id="salary-range-value"></span>
+              <span class="salary-card__currency text-body-sm">MXN/mes</span>
+            </p>
+            <p
+              id="salary-sample"
+              class="salary-card__sample text-body-sm text-secondary"
+            ></p>
           </div>
 
-          <div class="skills-chart surface scroll-row" data-skills-chart></div>
+          <div id="salary-empty" class="habilidades-state" hidden>
+            <p class="text-body">
+              Sin datos de salario disponibles para esta habilidad. El dato se
+              actualiza conforme se incorporan vacantes con salario declarado.
+            </p>
+          </div>
         </div>
       </section>
     </main>
@@ -326,7 +256,6 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="../assets/js/components/icons.init.js"></script>
     <script src="../assets/js/components/navbar.js"></script>
-    <script src="../assets/js/components/chart.init.js"></script>
-    <script src="../assets/js/pages/panorama.js"></script>
+    <script src="../assets/js/pages/salarios.js"></script>
   </body>
 </html>
