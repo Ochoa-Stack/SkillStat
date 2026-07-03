@@ -8,10 +8,11 @@ class SkillTrendSchema(Schema):
     demand_count = fields.Integer(dump_only=True)
     growth_rate = fields.Decimal(dump_only=True, allow_none=True, as_string=True)
     avg_salary = fields.Decimal(dump_only=True, allow_none=True, as_string=True)
+    category = fields.String(dump_only=True, allow_none=True)
 
 
 class SummaryResponseSchema(Schema):
-    # KPIs globales del Panorama: totales y tendencias destacadas.
+    # KPIs globales del Panorama, totales y tendencias destacadas.
     total_jobs = fields.Integer(dump_only=True)
     total_skills_tracked = fields.Integer(dump_only=True)
     total_companies = fields.Integer(dump_only=True)

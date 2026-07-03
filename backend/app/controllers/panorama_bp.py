@@ -83,6 +83,7 @@ def get_top_skills():
         {
             "skill_id": s.skill_id,
             "name": s.skill.name if s.skill else None,
+            "category": s.skill.category.name if s.skill and s.skill.category else None,
             "demand_count": s.demand_count,
             "growth_rate": s.growth_rate,
             "avg_salary": s.avg_salary,
@@ -218,7 +219,7 @@ def get_compare():
             status_code=422,
         )
 
-    # Acotamos entre 2 y 5 habilidades: comparar una sola no tiene sentido funcional, y mas de 5 degrada la lectura de la grafica.
+    # Acotamos entre 2 y 5 habilidades, puesto que comparar una sola no tiene sentido funcional, y mas de 5 degrada la lectura de la grafica.
     if len(skill_ids) < 2 or len(skill_ids) > 5:
         return error_response(
             code="VALIDATION_ERROR",

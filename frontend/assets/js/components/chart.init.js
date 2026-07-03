@@ -16,7 +16,7 @@ function renderSkillsChart(container, skills) {
 
     const bar = document.createElement("div");
     bar.className =
-      index === 0
+      skill.demand_count === skills[0].demand_count
         ? "skills-chart__bar skills-chart__bar--top"
         : "skills-chart__bar";
     bar.style.height = `${heightPercent}%`;
