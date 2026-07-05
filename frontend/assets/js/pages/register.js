@@ -72,6 +72,83 @@ function updateRegisterSubmitState() {
   );
 }
 
+function showRegisterConfirmation(email) {
+  const registerPanel = document.querySelector('[data-auth-form="register"]');
+  if (!registerPanel) return;
+
+  registerPanel.innerHTML = `
+    <div class="verify-state" style="margin-top: var(--space-6)">
+      <div class="verify-state__icon verify-state__icon--success">
+        <i data-lucide="mail-check"></i>
+      </div>
+      <h2 class="verify-state__title">¡Revisa tu correo!</h2>
+      <p class="verify-state__subtitle text-body">
+        Enviamos un enlace de verificación a <strong>${email}</strong>.
+        Haz clic en él para activar tu cuenta.
+      </p>
+      <p class="text-body-sm" style="color: var(--color-text-secondary); margin-top: var(--space-2)">
+        ¿No llegó? Revisa la carpeta de spam o
+        <button type="button" class="auth-form-panel__switch-link" id="reg-resend-btn">
+          solicita un nuevo enlace
+        </button>.
+      </p>
+    </div>
+  `;
+
+  if (typeof lucide !== "undefined") lucide.createIcons();
+
+  const resendBtn = document.getElementById("reg-resend-btn");
+  if (resendBtn) {
+    resendBtn.addEventListener("click", async () => {
+      resendBtn.disabled = true;
+      resendBtn.textContent = "Enviando...";
+      try {
+        await apiPost("/auth/resend-verification", { email });
+        resendBtn.textContent = "¡Enviado!";
+      } catch {
+        resendBtn.textContent = "Error al reenviar";
+        resendBtn.disabled = false;
+      }
+    });
+  }
+}
+
+function showUnverifiedBanner(form, email) {
+  const existing = document.getElementById("login-unverified-banner");
+  if (existing) existing.remove();
+
+  const banner = document.createElement("div");
+  banner.id = "login-unverified-banner";
+  banner.className = "login-unverified-banner";
+  banner.setAttribute("role", "alert");
+  banner.innerHTML = `
+    <p class="login-unverified-banner__msg">
+      Verifica tu correo antes de iniciar sesión.
+      Revisa tu bandeja de entrada en <strong>${email}</strong>.
+    </p>
+    <button type="button" class="btn btn--secondary login-unverified-banner__btn" id="login-resend-btn">
+      Reenviar correo de verificación
+    </button>
+  `;
+
+  form.insertAdjacentElement("afterend", banner);
+
+  const resendBtn = document.getElementById("login-resend-btn");
+  if (resendBtn) {
+    resendBtn.addEventListener("click", async () => {
+      resendBtn.disabled = true;
+      resendBtn.textContent = "Enviando...";
+      try {
+        await apiPost("/auth/resend-verification", { email });
+        resendBtn.textContent = "¡Enviado! Revisa tu bandeja.";
+      } catch {
+        resendBtn.textContent = "Error al reenviar. Intenta de nuevo.";
+        resendBtn.disabled = false;
+      }
+    });
+  }
+}
+
 async function handleRegisterSubmit(event) {
   event.preventDefault();
 
@@ -85,15 +162,17 @@ async function handleRegisterSubmit(event) {
   submitButton.textContent = "Creando cuenta...";
 
   const { firstName, lastName } = splitFullName(form.fullName.value);
+  const email = form.email.value;
 
   try {
     await apiPost("/auth/register", {
       first_name: firstName,
       last_name: lastName,
-      email: form.email.value,
+      email: email,
       password: form.password.value,
     });
-    window.location.href = "panorama.html";
+    // No redirigimos al panorama porque el registro exitoso ya no otorga sesión; requerimos que el usuario confirme su correo primero.
+    showRegisterConfirmation(email);
   } catch (error) {
     errorBox.textContent = error.message;
     errorBox.hidden = false;
@@ -124,6 +203,10 @@ async function handleLoginSubmit(event) {
   const originalText = submitButton.textContent;
 
   errorBox.hidden = true;
+  // Limpia cualquier banner de reenvío previo
+  const prevBanner = document.getElementById("login-unverified-banner");
+  if (prevBanner) prevBanner.remove();
+
   submitButton.disabled = true;
   submitButton.textContent = "Iniciando sesión...";
 
@@ -134,8 +217,12 @@ async function handleLoginSubmit(event) {
     });
     window.location.href = "panorama.html";
   } catch (error) {
-    errorBox.textContent = error.message;
-    errorBox.hidden = false;
+    if (error.code === "EMAIL_NOT_VERIFIED") {
+      showUnverifiedBanner(form, form.email.value);
+    } else {
+      errorBox.textContent = error.message;
+      errorBox.hidden = false;
+    }
     submitButton.disabled = false;
     submitButton.textContent = originalText;
   }
