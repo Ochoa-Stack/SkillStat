@@ -37,3 +37,7 @@ gunicorn>=23.0,<24.0
 
 # Verificación de tokens de identidad de Google OAuth
 google-auth
+
+resend==2.32.2
+
+
