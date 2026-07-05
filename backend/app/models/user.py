@@ -17,6 +17,8 @@ class User(db.Model):
     password_changed_at = db.Column(db.DateTime, nullable=True)
     # Null es el estado valido para "sin definir"; el valor se puede completar mas adelante desde el perfil.
     intent = db.Column(db.String(20), nullable=True)
+    # Fecha de verificacion de correo, null si no esta verificado
+    email_verified_at = db.Column(db.DateTime, nullable=True)
 
     alerts = db.relationship("Alert", backref="user", lazy=True)
     backups = db.relationship("Backup", backref="user", lazy=True)
