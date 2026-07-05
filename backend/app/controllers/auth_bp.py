@@ -14,11 +14,13 @@ from app.schemas.auth_schema import (
     UserLoginSchema,
     UserResponseSchema,
     ForgotPasswordSchema,
+    EmailOnlySchema,
     ResetPasswordSchema,
 )
 from app.repositories.user_repository import UserRepository
 from app.repositories.oauth_account_repository import OAuthAccountRepository
 from app.repositories.password_reset_token_repository import PasswordResetTokenRepository
+from app.repositories.email_verification_token_repository import EmailVerificationTokenRepository
 from app.utils.hash import hash_password, verify_password
 from app.utils.security import generate_tokens
 from app.utils.response import success_response, error_response
@@ -37,20 +39,30 @@ def register():
     if UserRepository.get_by_email(data["email"]):
         return error_response(code="CONFLICT", message="El correo ya está registrado.", status_code=409)
 
-    # Traducimos el DTO de entrada al modelo de dominio. Extraemos 'password' y lo inyectamos como 'password_hash' para que SQLAlchemy lo acepte.
     data["password_hash"] = hash_password(data.pop("password"))
     data["role"] = "REGISTERED"
     # Marcamos el instante de creación de contraseña para que el blocklist callback pueda invalidar sesiones anteriores si la contraseña cambia.
     data["password_changed_at"] = datetime.now(timezone.utc)
 
     user = UserRepository.create(data)
-    result = UserResponseSchema().dump(user)
 
-    # Dejamos al usuario logueado de inmediato tras registrarse, en vez de obligarlo a escribir sus credenciales otra vez en una pantalla de login separada.
-    tokens = generate_tokens(user_id=user.id, role=user.role)
-    response, status_code = success_response(data=result, status_code=201)
-    set_access_cookies(response, tokens["access_token"])
-    return response, status_code
+    plain_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(plain_token.encode()).hexdigest()
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=24)
+
+    EmailVerificationTokenRepository.create({
+        "user_id": user.id,
+        "token_hash": token_hash,
+        "expires_at": expires_at,
+    })
+
+    from app.services.email_service import send_verification_email, EmailDeliveryError, build_verification_link
+    try:
+        logger.info(f"[DEV] Verification link para {user.email}: {build_verification_link(plain_token)}")
+        send_verification_email(user.email, plain_token)
+        return success_response(data={"message": "Cuenta creada. Revisa tu correo para verificarla."}, status_code=201)
+    except EmailDeliveryError:
+        return success_response(data={"message": "Cuenta creada pero no pudimos enviar el correo. Intenta reenviarlo."}, status_code=201)
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
@@ -61,9 +73,11 @@ def login():
 
     user = UserRepository.get_by_email(data["email"])
 
-    # Comparamos contra el atributo real del modelo de base de datos (password_hash). Guardia explícita para cuentas solo-OAuth (password_hash is None) antes de llamar a bcrypt.
     if not user or user.password_hash is None or not verify_password(data["password"], user.password_hash):
         return error_response(code="UNAUTHORIZED", message="Credenciales incorrectas.", status_code=401)
+
+    if user.email_verified_at is None:
+        return error_response(code="EMAIL_NOT_VERIFIED", message="Verifica tu correo antes de iniciar sesión.", status_code=403)
 
     tokens = generate_tokens(user_id=user.id, role=user.role)
     user_data = UserResponseSchema().dump(user)
@@ -153,9 +167,9 @@ def google_login():
                 "first_name": idinfo.get("given_name", "Usuario"),
                 "last_name": idinfo.get("family_name", "Google"),
                 "role": "REGISTERED",
+                "email_verified_at": datetime.now(timezone.utc),
             })
 
-        # Vinculamos esta identidad de Google a la cuenta, nueva o existente; si ya habia una cuenta con este correo via registro normal, queda vinculada automaticamente.
         oauth_link = OAuthAccountRepository.create({
             "user_id": user.id,
             "provider": "google",
@@ -174,6 +188,137 @@ def google_login():
     response, status_code = success_response(data=result, status_code=200)
     set_access_cookies(response, tokens["access_token"])
     return response, status_code
+
+
+def _validate_verification_token(token: str):
+    """Valida un token de verificación sin mutar ningún estado.
+    Retorna (token_row, user, None) si el token es válido; retorna (None, None, response_tuple) con el error correspondiente si no lo es.
+    Esta función es segura para llamarse desde un GET, no escribe en base de datos"""
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    token_row = EmailVerificationTokenRepository.get_by_token_hash(token_hash)
+
+    if not token_row:
+        return None, None, error_response(
+            code="TOKEN_INVALID",
+            message="El enlace de verificación no es válido.",
+            status_code=404,
+        )
+
+    if token_row.used_at is not None:
+        return None, None, error_response(
+            code="TOKEN_ALREADY_USED",
+            message="Este correo ya fue verificado anteriormente.",
+            status_code=409,
+        )
+
+    now = datetime.now(timezone.utc)
+    expires_aware = (
+        token_row.expires_at.replace(tzinfo=timezone.utc)
+        if token_row.expires_at.tzinfo is None
+        else token_row.expires_at
+    )
+    if expires_aware < now:
+        return None, None, error_response(
+            code="TOKEN_EXPIRED",
+            message="El enlace expiró. Solicita uno nuevo.",
+            status_code=410,
+        )
+
+    user = UserRepository.get_by_id(token_row.user_id)
+    return token_row, user, None
+
+
+@auth_bp.route("/verify-email", methods=["GET"])
+def verify_email_check():
+    """GET solo valida el token, sin marcar nada como usado ni verificar la cuenta.
+    Seguro para ser prefetcheado por escáneres de correo, no tiene efectos secundarios.
+    Responde 200 con {valid: true, email} si el token sigue siendo válido"""
+    token = request.args.get("token")
+    if not token:
+        return error_response(
+            code="VALIDATION_ERROR",
+            message="El token es obligatorio.",
+            status_code=422,
+        )
+
+    token_row, user, err = _validate_verification_token(token)
+    if err:
+        return err
+
+    return success_response(
+        data={"valid": True, "email": user.email if user else None},
+        status_code=200,
+    )
+
+
+@auth_bp.route("/verify-email", methods=["POST"])
+def verify_email_confirm():
+    """POST ejecuta la verificación real tras la confirmación explícita del usuario.
+    Vuelve a validar el token para cubrir la ventana entre el GET y el clic del usuario (race condition o token consumido en paralelo). Si sigue siendo válido, muta el estado:
+    marca email_verified_at en el usuario y used_at en el token"""
+    data = request.get_json() or {}
+    token = data.get("token")
+    if not token:
+        return error_response(
+            code="VALIDATION_ERROR",
+            message="El token es obligatorio.",
+            status_code=422,
+        )
+
+    token_row, user, err = _validate_verification_token(token)
+    if err:
+        return err
+
+    now = datetime.now(timezone.utc)
+    if user:
+        user.email_verified_at = now
+        UserRepository.save(user)
+
+    EmailVerificationTokenRepository.mark_as_used(token_row)
+
+    return success_response(
+        data={"message": "Correo verificado correctamente."},
+        status_code=200,
+    )
+
+
+@auth_bp.route("/resend-verification", methods=["POST"])
+def resend_verification():
+    try:
+        data = EmailOnlySchema().load(request.get_json() or {})
+    except ValidationError as err:
+        return error_response(code="VALIDATION_ERROR", message=err.messages, status_code=422)
+        
+    generic_ok, status_code = success_response(data={"message": "Si el correo existe y no ha sido verificado, se envió un nuevo enlace."}, status_code=200)
+    
+    user = UserRepository.get_by_email(data["email"])
+    if not user or user.email_verified_at is not None:
+        return generic_ok, status_code
+        
+    unused_tokens = EmailVerificationTokenRepository.get_unused_by_user_id(user.id)
+    for t in unused_tokens:
+        EmailVerificationTokenRepository.mark_as_used(t)
+        
+    plain_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(plain_token.encode()).hexdigest()
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=24)
+
+    EmailVerificationTokenRepository.create({
+        "user_id": user.id,
+        "token_hash": token_hash,
+        "expires_at": expires_at,
+    })
+
+    from app.services.email_service import send_verification_email, build_verification_link
+    try:
+        logger.info(f"[DEV] Verification link para {user.email}: {build_verification_link(plain_token)}")
+        send_verification_email(user.email, plain_token)
+    except Exception as e:
+        logger.error(f"Error reenviando correo de verificación a {user.email}: {str(e)}")
+        
+    return generic_ok, status_code
+
+
 
 
 @auth_bp.route("/forgot-password", methods=["POST"])
@@ -204,7 +349,7 @@ def forgot_password():
         "expires_at": expires_at,
     })
 
-    # Stub de desarrollo. SendGrid se integra en ronda separada, ver continuidad del proyecto.
+    # Stub de desarrollo. El envío real de este flujo (via Resend) queda pendiente de migración; ver deuda técnica documentada.
     reset_url = f"{current_app.config['FRONTEND_BASE_URL']}/views/restablecer-contrasena.html?token={plain_token}"
     logger.info("[DEV] Reset link para %s: %s", user.email, reset_url)
 
@@ -221,7 +366,6 @@ def reset_password():
     token_hash = hashlib.sha256(data["token"].encode()).hexdigest()
     token_row = PasswordResetTokenRepository.get_by_token_hash(token_hash)
 
-    # Rechazamos si el token no existe, ya fue consumido, o expiró.
     now = datetime.now(timezone.utc)
     expires_aware = token_row.expires_at.replace(tzinfo=timezone.utc) if token_row and token_row.expires_at.tzinfo is None else (token_row.expires_at if token_row else None)
 
