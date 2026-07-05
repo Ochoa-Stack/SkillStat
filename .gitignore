@@ -39,3 +39,4 @@ htmlcov/
 
 # Migrations (solo rastrear estructura, no datos generados)
 migrations/versions/
+*.log.*
