@@ -1,0 +1,125 @@
+/* Estilos para verificar-correo.html, son cuatro estados de verificación. Extiende _auth.css sin duplicar sus variables ni su layout base */
+
+/* Estado contenedor */
+.verify-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+}
+
+/* Ícono de estado */
+.verify-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-2);
+}
+
+.verify-state__icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.verify-state__icon--loading {
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+}
+
+.verify-state__icon--success {
+  background-color: color-mix(in srgb, #21a675 15%, transparent);
+  color: #21a675;
+}
+
+.verify-state__icon--warning {
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-orange) 12%,
+    transparent
+  );
+  color: var(--color-accent-orange);
+}
+
+.verify-state__icon--info {
+  background-color: color-mix(in srgb, #4b607f 12%, transparent);
+  color: #4b607f;
+}
+
+/* Textos */
+.verify-state__title {
+  font-size: var(--text-xl);
+  margin: 0;
+}
+
+.verify-state__subtitle {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Botón de acción principal */
+.verify-state__action {
+  width: 100%;
+  text-align: center;
+  margin-top: var(--space-2);
+}
+
+/* Formulario de reenvío (alineado a la izquierda) */
+.verify-resend-form {
+  width: 100%;
+  text-align: left;
+  margin-top: var(--space-4);
+  margin-bottom: 0;
+}
+
+/* Mensaje de éxito inline dentro del formulario */
+.verify-state__success-msg {
+  font-size: var(--text-sm);
+  color: #21a675;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, #21a675 30%, transparent);
+  border-radius: var(--radius-md);
+  background-color: color-mix(in srgb, #21a675 8%, transparent);
+  margin-bottom: var(--space-3);
+}
+
+/* Animación de carga */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* Banner inline para login con correo no verificado */
+.login-unverified-banner {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent-orange) 35%, transparent);
+  border-radius: var(--radius-md);
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent-orange) 8%,
+    transparent
+  );
+}
+
+.login-unverified-banner__msg {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.login-unverified-banner__btn {
+  width: 100%;
+}
