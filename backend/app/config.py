@@ -34,7 +34,12 @@ class BaseConfig:
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
     ADZUNA_APP_ID = os.environ.get("ADZUNA_APP_ID")
     ADZUNA_APP_KEY = os.environ.get("ADZUNA_APP_KEY")
-    SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY")
+    RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+    RESEND_FROM_EMAIL = os.environ.get("RESEND_FROM_EMAIL", "onboarding@resend.dev")
+    
+    # Validación explícita en arranque (guard incondicional)
+    if not RESEND_API_KEY:
+        raise ValueError("Error de arranque: RESEND_API_KEY es obligatoria y no está configurada en el entorno.")
 
     BACKUP_STORAGE_URL = os.environ.get("BACKUP_STORAGE_URL")
     BACKUP_STORAGE_KEY = os.environ.get("BACKUP_STORAGE_KEY")

@@ -1,14 +1,12 @@
 import os
 import logging_config
 from flask import Flask
-from dotenv import load_dotenv
 
 from app.config import config_map
 from app.extensions import db, jwt, cors, migrate, scheduler
 
 def create_app(env: str = None) -> Flask:
-    # Patrón Application Factory. Aísla la inicialización para permitir múltiples instancias durante pruebas automatizadas y evita variables globales.
-    load_dotenv()
+    # Aplicamos el patrón Application Factory porque aislar la inicialización nos permite instanciar aplicaciones independientes durante las pruebas automatizadas, previniendo choques por estado global.
     
     app = Flask(__name__)
     
@@ -79,7 +77,7 @@ def _register_jwt_handlers(app: Flask) -> None:
         if pca.tzinfo is None:
             pca = pca.replace(tzinfo=tz.utc)
 
-        # Truncar pca a precisión de segundos para alinear con iat
+        # Truncamos la marca de tiempo de cambio de contraseña a segundos exactos porque el claim 'iat' del JWT no tiene milisegundos; esto previene que revoquemos accidentalmente un token legítimo emitido durante el mismo segundo del cambio.
         pca_floor = pca.replace(microsecond=0)
 
         token_issued_at = datetime.fromtimestamp(iat, tz=tz.utc)

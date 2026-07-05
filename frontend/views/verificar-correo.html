@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Verifica tu dirección de correo electrónico para activar tu cuenta en SkillStat."
+    />
+    <title>SkillStat - Verificar correo</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <div class="auth-screen">
+      <section class="auth-form-panel">
+        <button
+          class="auth-close"
+          type="button"
+          aria-label="Cerrar"
+          data-auth-close
+        >
+          <i data-lucide="x"></i>
+        </button>
+
+        <div class="auth-form-panel__content">
+          <a
+            href="../views/index.html"
+            class="navbar__logo auth-form-panel__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo-compact.svg"
+              alt="SkillStat"
+              width="28"
+              height="28"
+              class="navbar__logo-img"
+            />
+            SkillStat
+          </a>
+
+          <div id="verify-loading" class="verify-state">
+            <div class="verify-state__icon verify-state__icon--loading">
+              <i data-lucide="loader-circle" class="spin-icon"></i>
+            </div>
+            <h1 class="verify-state__title">Verificando tu correo...</h1>
+            <p class="verify-state__subtitle text-body">
+              Espera un momento mientras procesamos tu enlace.
+            </p>
+          </div>
+
+          <div id="verify-confirm" class="verify-state" hidden>
+            <div class="verify-state__icon verify-state__icon--info">
+              <i data-lucide="mail-check"></i>
+            </div>
+            <h1 class="verify-state__title">Confirma tu correo</h1>
+            <p
+              class="verify-state__subtitle text-body"
+              id="verify-confirm-subtitle"
+            >
+              Tu enlace es válido. Haz clic en el botón para activar tu cuenta.
+            </p>
+            <p
+              class="form-error"
+              id="verify-confirm-error"
+              role="alert"
+              hidden
+            ></p>
+            <button
+              type="button"
+              class="btn btn--primary verify-state__action"
+              id="verify-confirm-btn"
+            >
+              Confirmar verificación de correo
+            </button>
+          </div>
+
+          <div id="verify-success" class="verify-state" hidden>
+            <div class="verify-state__icon verify-state__icon--success">
+              <i data-lucide="circle-check-big"></i>
+            </div>
+            <h1 class="verify-state__title">¡Correo verificado!</h1>
+            <p class="verify-state__subtitle text-body">
+              Tu cuenta está activa. Ya puedes iniciar sesión y explorar el
+              mercado tech de México.
+            </p>
+            <a
+              href="register.html"
+              class="btn btn--primary verify-state__action"
+              id="verify-login-btn"
+            >
+              Iniciar sesión
+            </a>
+          </div>
+
+          <div id="verify-resend" class="verify-state" hidden>
+            <div class="verify-state__icon verify-state__icon--warning">
+              <i data-lucide="clock-alert" id="verify-resend-icon"></i>
+            </div>
+            <h1 class="verify-state__title" id="verify-resend-title">
+              El enlace expiró
+            </h1>
+            <p
+              class="verify-state__subtitle text-body"
+              id="verify-resend-subtitle"
+            >
+              Los enlaces de verificación son válidos por 24 horas. Solicita uno
+              nuevo y revisa tu bandeja.
+            </p>
+
+            <form
+              class="auth-form verify-resend-form"
+              id="verify-resend-form"
+              novalidate
+            >
+              <p
+                class="form-error"
+                id="verify-resend-error"
+                role="alert"
+                hidden
+              ></p>
+              <p
+                class="verify-state__success-msg"
+                id="verify-resend-ok"
+                role="status"
+                hidden
+              ></p>
+
+              <div class="form-group">
+                <label for="resend-email" class="form-label"
+                  >Tu correo electrónico</label
+                >
+                <input
+                  type="email"
+                  id="resend-email"
+                  name="email"
+                  class="form-input"
+                  autocomplete="email"
+                  required
+                  placeholder="nombre@ejemplo.com"
+                />
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn--secondary auth-form__submit"
+                id="verify-resend-submit"
+              >
+                Reenviar enlace
+              </button>
+            </form>
+          </div>
+
+          <div id="verify-already-used" class="verify-state" hidden>
+            <div class="verify-state__icon verify-state__icon--info">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <h1 class="verify-state__title">Tu cuenta ya fue verificada</h1>
+            <p class="verify-state__subtitle text-body">
+              Este correo ya fue confirmado anteriormente. Puedes iniciar sesión
+              directamente.
+            </p>
+            <a
+              href="register.html"
+              class="btn btn--primary verify-state__action"
+            >
+              Iniciar sesión
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-marketing-panel">
+        <div class="auth-marketing-panel__content">
+          <div>
+            <p class="auth-marketing-panel__headline">
+              Un paso más para explorar el mercado.
+            </p>
+            <p class="auth-marketing-panel__subtitle text-body">
+              Verificamos tu correo para mantener tu cuenta segura.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="../assets/js/api/client.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/pages/verificar-correo.js"></script>
+  </body>
+</html>

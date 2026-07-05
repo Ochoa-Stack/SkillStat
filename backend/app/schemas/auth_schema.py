@@ -3,7 +3,7 @@ from marshmallow import Schema, fields, validate, pre_load, ValidationError
 
 
 def validate_password_strength(password):
-    # Reglas estandar de la industria: longitud minima ya la valida validate.Length por separado, aqui solo checamos composicion.
+    # Aplicamos longitud minima ya la valida validate.Length por separado, aqui solo checamos composicion.
     if not re.search(r"[A-Z]", password):
         raise ValidationError("La contraseña debe incluir al menos una mayúscula.")
     if not re.search(r"[a-z]", password):
@@ -35,7 +35,6 @@ class UserLoginSchema(Schema):
     password = fields.String(required=True, error_messages={"required": "La contraseña es obligatoria."})
 
 class UserResponseSchema(Schema):
-    # Exponemos la estructura desagregada del nombre y mantenemos la censura de la contraseña
     id = fields.Integer(dump_only=True)
     email = fields.Email(dump_only=True)
     first_name = fields.String(dump_only=True)
@@ -45,6 +44,25 @@ class UserResponseSchema(Schema):
 
 
 class ForgotPasswordSchema(Schema):
+    email = fields.Email(
+        required=True,
+        error_messages={
+            "required": "El correo es obligatorio.",
+            "invalid": "Formato de correo inválido.",
+        },
+    )
+
+    @pre_load
+    def normalize_email(self, data, **kwargs):
+        if "email" in data and isinstance(data["email"], str):
+            data["email"] = data["email"].lower().strip()
+        return data
+
+
+class EmailOnlySchema(Schema):
+    """Schema mínimo para endpoints que sólo necesitan un correo electrónico.
+    Independiente de ForgotPasswordSchema para evitar acoplamiento conceptual entre flujos distintos (resend-verification vs. forgot-password)"""
+
     email = fields.Email(
         required=True,
         error_messages={
