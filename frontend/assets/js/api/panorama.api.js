@@ -11,9 +11,13 @@ async function getCatalogs() {
 }
 
 async function getCompareSkills(skillIds) {
-  // La respuesta de /compare viene envuelta en { skills: [...] }, a diferencia de otros endpoints que devuelven el array directo.
+  // La respuesta de /compare viene envuelta en { skills: [...] }, a diferencia de otros endpoints que devuelven el array directo
   const result = await apiGet(
     `/panorama/compare?skill_ids=${skillIds.join(",")}`,
   );
   return result.skills;
+}
+
+async function getGeoDistribution(groupBy = "state") {
+  return apiGet(`/panorama/geo?group_by=${groupBy}`);
 }
