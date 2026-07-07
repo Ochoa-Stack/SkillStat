@@ -2,12 +2,12 @@ from sqlalchemy import inspect
 from app.extensions import db
 
 class BaseRepository:
-    # Repositorio genérico con soporte de instanciación dinámica y segura.
+    # Repositorio genérico con soporte de instanciación dinámica y segura
     model = None
 
     @classmethod
     def create(cls, data: dict):
-        # Extraemos solo las llaves que corresponden a columnas reales en la base de datos, ignorando cualquier metadato extra proveniente de APIs externas o DTOs mal alineados.
+        # Extraemos solo las llaves que corresponden a columnas reales en la base de datos, ignorando cualquier metadato extra proveniente de APIs externas o DTOs mal alineados
         mapper = inspect(cls.model)
         valid_keys = mapper.columns.keys()
         
@@ -24,7 +24,8 @@ class BaseRepository:
             return entity
         except Exception as e:
             db.session.rollback()
-            print(f"\n[ERROR DE PERSISTENCIA] Fallo al guardar en BD: {str(e)}\n")
+            safe_msg = str(e).encode("ascii", errors="replace").decode("ascii")
+            print(f"\n[ERROR DE PERSISTENCIA] Fallo al guardar en BD: {safe_msg}\n")
             return None
 
     @classmethod
