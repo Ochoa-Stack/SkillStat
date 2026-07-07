@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 
 
 class SkillTrendSchema(Schema):
-    # Representa una habilidad con su metrica de demanda actual. Usado en skills/top y como bloque base de otros endpoints.
+    # Representa una habilidad con su metrica de demanda actual. Usado en skills/top y como bloque base de otros endpoints
     skill_id = fields.Integer(dump_only=True)
     name = fields.String(dump_only=True)
     demand_count = fields.Integer(dump_only=True)
@@ -12,7 +12,7 @@ class SkillTrendSchema(Schema):
 
 
 class SummaryResponseSchema(Schema):
-    # KPIs globales del Panorama, totales y tendencias destacadas.
+    # KPIs globales del Panorama, totales y tendencias destacadas
     total_jobs = fields.Integer(dump_only=True)
     total_skills_tracked = fields.Integer(dump_only=True)
     total_companies = fields.Integer(dump_only=True)
@@ -32,13 +32,13 @@ class SkillOptionSchema(Schema):
 
 
 class CatalogsResponseSchema(Schema):
-    # Listas livianas para alimentar selectores del frontend.
+    # Listas livianas para alimentar selectores del frontend
     skills = fields.List(fields.Nested(SkillOptionSchema), dump_only=True)
     cities = fields.List(fields.Nested(CityOptionSchema), dump_only=True)
 
 
 class TrendPointSchema(Schema):
-    # Un punto en la serie temporal de una habilidad especifica.
+    # Un punto en la serie temporal de una habilidad especifica
     date = fields.Date(dump_only=True)
     demand_count = fields.Integer(dump_only=True)
 
@@ -50,10 +50,12 @@ class TrendsResponseSchema(Schema):
 
 
 class GeoDistributionSchema(Schema):
-    # Demanda de una habilidad agrupada por ciudad.
-    city_id = fields.Integer(dump_only=True)
-    city_name = fields.String(dump_only=True)
+    # Demanda de una habilidad agrupada por ciudad y estado, o solo por estado para vistas regionales
+    city_id = fields.Integer(dump_only=True, required=False)
+    city_name = fields.String(dump_only=True, required=False)
+    state = fields.String(dump_only=True)
     demand_count = fields.Integer(dump_only=True)
+    is_fallback = fields.Boolean(dump_only=True, required=False)
 
 
 class GeoResponseSchema(Schema):
@@ -63,7 +65,7 @@ class GeoResponseSchema(Schema):
 
 
 class SalaryResponseSchema(Schema):
-    # Cruce de habilidad contra rango salarial promedio.
+    # Cruce de habilidad contra rango salarial promedio
     skill_id = fields.Integer(dump_only=True)
     skill_name = fields.String(dump_only=True)
     avg_salary_min = fields.Decimal(dump_only=True, allow_none=True, as_string=True)
@@ -72,7 +74,7 @@ class SalaryResponseSchema(Schema):
 
 
 class CompareSkillBlockSchema(Schema):
-    # Bloque de metricas para una sola habilidad dentro de la comparacion.
+    # Bloque de metricas para una sola habilidad dentro de la comparacion
     skill_id = fields.Integer(dump_only=True)
     skill_name = fields.String(dump_only=True)
     demand_count = fields.Integer(dump_only=True)

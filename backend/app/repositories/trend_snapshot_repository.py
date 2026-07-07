@@ -17,8 +17,34 @@ class TrendSnapshotRepository(BaseRepository):
         ).scalar_one_or_none()
 
     @classmethod
+    def upsert(cls, data: dict):
+        from sqlalchemy.dialects.postgresql import insert
+        
+        stmt = insert(cls.model).values(**data)
+        
+        # Al chocar con la constraint única de (skill_id, city_id, date), actualizamos los valores. Esto permite que el generador de snapshots sea idempotente y actualice métricas el mismo día si entran nuevos jobs
+        stmt = stmt.on_conflict_do_update(
+            constraint="uq_trend_snapshot_skill_city_date",
+            set_={
+                "demand_count": stmt.excluded.demand_count,
+                "avg_salary": stmt.excluded.avg_salary,
+                "growth_rate": stmt.excluded.growth_rate,
+            }
+        )
+        
+        db.session.execute(stmt)
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            safe_msg = str(e).encode("ascii", errors="replace").decode("ascii")
+            print(f"\n[ERROR DE PERSISTENCIA] Fallo al upsertar TrendSnapshot en BD: {safe_msg}\n")
+            return False
+
+    @classmethod
     def get_top_skills(cls, limit: int = 10) -> list:
-        # Traemos los snapshots mas recientes ordenados por demanda para construir el ranking del endpoint skills/top.
+        # Traemos los snapshots mas recientes ordenados por demanda para construir el ranking del endpoint skills/top
         return db.session.execute(
             db.select(TrendSnapshot)
             .order_by(desc(TrendSnapshot.demand_count))
@@ -43,8 +69,7 @@ class TrendSnapshotRepository(BaseRepository):
 
     @classmethod
     def get_all_latest(cls) -> list:
-        # Subconsulta para obtener la fecha mas reciente por skill+city.
-        # Usamos esto para que summary y catalogs trabajen sobre datos actuales y no sobre historico acumulado.
+        # Subconsulta para obtener la fecha mas reciente por skill+city. Usamos esto para que summary y catalogs trabajen sobre datos actuales y no sobre historico acumulado
         from sqlalchemy import func
         subq = db.session.execute(
             db.select(
@@ -86,7 +111,7 @@ class TrendSnapshotRepository(BaseRepository):
             db.select(func.max(TrendSnapshot.date))
         ).scalar_one_or_none()
 
-        # Traemos el snapshot mas reciente por skill para identificar cual tiene mayor y menor demanda actual.
+        # Traemos el snapshot mas reciente por skill para identificar cual tiene mayor y menor demanda actual
         top_emerging = db.session.execute(
             db.select(TrendSnapshot, Skill.name)
             .join(Skill, Skill.id == TrendSnapshot.skill_id)
@@ -111,21 +136,35 @@ class TrendSnapshotRepository(BaseRepository):
         }
 
     @classmethod
-    def get_geo_distribution(cls, skill_id: int = None) -> list:
+    def get_geo_distribution(cls, skill_id: int = None, group_by: str = "city") -> list:
         from sqlalchemy import func
         from app.models.city import City
 
-        # Sumamos demand_count por ciudad. Si se filtra por skill_id, la suma queda acotada a esa habilidad especifica, de lo contrario agregamos la demanda total de todas las habilidades.
-        query = (
-            db.select(
-                City.id.label("city_id"),
-                City.name.label("city_name"),
-                func.sum(TrendSnapshot.demand_count).label("total_demand"),
+        if group_by == "state":
+            # Sumamos demand_count solo por estado
+            query = (
+                db.select(
+                    City.state.label("state"),
+                    func.sum(TrendSnapshot.demand_count).label("total_demand"),
+                    func.bool_or(City.id == 1).label("is_fallback"),
+                )
+                .join(City, City.id == TrendSnapshot.city_id)
+                .group_by(City.state)
+                .order_by(func.sum(TrendSnapshot.demand_count).desc())
             )
-            .join(City, City.id == TrendSnapshot.city_id)
-            .group_by(City.id, City.name)
-            .order_by(func.sum(TrendSnapshot.demand_count).desc())
-        )
+        else:
+            # Comportamiento original (city)
+            query = (
+                db.select(
+                    City.id.label("city_id"),
+                    City.name.label("city_name"),
+                    City.state.label("state"),
+                    func.sum(TrendSnapshot.demand_count).label("total_demand"),
+                )
+                .join(City, City.id == TrendSnapshot.city_id)
+                .group_by(City.id, City.name, City.state)
+                .order_by(func.sum(TrendSnapshot.demand_count).desc())
+            )
 
         if skill_id is not None:
             query = query.filter(TrendSnapshot.skill_id == skill_id)
