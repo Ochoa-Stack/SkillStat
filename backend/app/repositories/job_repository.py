@@ -1,5 +1,6 @@
 from app.models.job import Job
 from app.repositories.base_repository import BaseRepository
+from app.extensions import db
 
 class JobRepository(BaseRepository):
     model = Job
@@ -17,12 +18,14 @@ class JobRepository(BaseRepository):
         if "url" in mapped_data:
             del mapped_data["url"]
             
-        # Protección contra StringDataRightTruncation
+        # Inyectar la fuente de forma centralizada para que los consumidores de job_data no necesiten conocer el detalle del proveedor externo
         mapped_data["source"] = "Adzuna"
-        
-        if mapped_data.get("title"):
-            mapped_data["title"] = str(mapped_data["title"])[:150]
-        if mapped_data.get("company"):
-            mapped_data["company"] = str(mapped_data["company"])[:100]
-            
+
         return super().create(mapped_data)
+
+
+    @classmethod
+    def get_by_hash(cls, description_hash: str):
+        return db.session.execute(
+            db.select(Job).filter_by(description_hash=description_hash)
+        ).scalar_one_or_none()

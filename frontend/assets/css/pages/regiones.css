@@ -1,0 +1,51 @@
+.regions-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  height: 280px;
+  padding: var(--space-4);
+}
+
+.regions-chart__column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  flex: 0 0 72px;
+}
+
+.regions-chart__value {
+  margin-bottom: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.regions-chart__bar {
+  width: 100%;
+  max-width: 48px;
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: height var(--transition-base);
+}
+
+.regions-chart__bar--top {
+  background-color: var(--color-accent-orange);
+}
+
+.regions-chart__label {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  text-align: center;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .regions-chart {
+    height: 360px;
+    overflow-x: visible;
+  }
+
+  .regions-chart__column {
+    flex: 1;
+  }
+}

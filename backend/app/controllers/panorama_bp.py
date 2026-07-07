@@ -42,7 +42,7 @@ def get_catalogs():
 
 @panorama_bp.route("/summary", methods=["GET"])
 def get_summary():
-    # KPIs globales que alimentan las tarjetas superiores del Panorama.
+    # KPIs globales que alimentan las tarjetas superiores del Panorama
     data = TrendSnapshotRepository.get_summary_data()
 
     def build_skill_block(row):
@@ -72,9 +72,9 @@ def get_summary():
 
 @panorama_bp.route("/skills/top", methods=["GET"])
 def get_top_skills():
-    # Ranking de habilidades por demanda actual. El frontend lo usa para la grafica de barras principal del Panorama.
+    # Ranking de habilidades por demanda actual. El frontend lo usa para la grafica de barras principal del Panorama
     limit = request.args.get("limit", default=10, type=int)
-    # Acotamos el limite para evitar que un valor arbitrario en la query fuerce una consulta desproporcionada contra la base de datos.
+    # Acotamos el limite para evitar que un valor arbitrario en la query fuerce una consulta desproporcionada contra la base de datos
     limit = max(1, min(limit, 50))
 
     snapshots = TrendSnapshotRepository.get_top_skills(limit=limit)
@@ -97,7 +97,7 @@ def get_top_skills():
 
 @panorama_bp.route("/trends", methods=["GET"])
 def get_trends():
-    # Serie temporal de demanda para una habilidad especifica. El frontend la usa para la grafica de lineas de evolucion.
+    # Serie temporal de demanda para una habilidad especifica. El frontend la usa para la grafica de lineas de evolucion
     skill_id = request.args.get("skill_id", type=int)
 
     if not skill_id:
@@ -134,6 +134,14 @@ def get_trends():
 def get_geo():
     # Distribucion geografica de demanda. Si se filtra por skill_id devolvemos la distribucion de esa habilidad especifica, de lo contrario la demanda total agregada por ciudad.
     skill_id = request.args.get("skill_id", type=int)
+    group_by = request.args.get("group_by", default="city", type=str)
+
+    if group_by not in ["city", "state"]:
+        return error_response(
+            code="VALIDATION_ERROR",
+            message="El parametro group_by debe ser 'city' o 'state'.",
+            status_code=422,
+        )
 
     skill = None
     if skill_id is not None:
@@ -145,19 +153,28 @@ def get_geo():
                 status_code=404,
             )
 
-    rows = TrendSnapshotRepository.get_geo_distribution(skill_id=skill_id)
+    rows = TrendSnapshotRepository.get_geo_distribution(skill_id=skill_id, group_by=group_by)
+
+    distribution = []
+    for row in rows:
+        if group_by == "state":
+            distribution.append({
+                "state": row.state,
+                "demand_count": row.total_demand,
+                "is_fallback": row.is_fallback,
+            })
+        else:
+            distribution.append({
+                "city_id": row.city_id,
+                "city_name": row.city_name,
+                "state": row.state,
+                "demand_count": row.total_demand,
+            })
 
     payload = {
         "skill_id": skill.id if skill else None,
         "skill_name": skill.name if skill else None,
-        "distribution": [
-            {
-                "city_id": row.city_id,
-                "city_name": row.city_name,
-                "demand_count": row.total_demand,
-            }
-            for row in rows
-        ],
+        "distribution": distribution,
     }
 
     result = GeoResponseSchema().dump(payload)
@@ -200,7 +217,7 @@ def get_salaries():
 
 @panorama_bp.route("/compare", methods=["GET"])
 def get_compare():
-    # Comparacion lado a lado de multiples habilidades. El frontend la usa para la vista de comparar.html con grafica multi-linea.
+    # Comparacion lado a lado de multiples habilidades. El frontend la usa para la vista de comparar.html con grafica multi-linea
     raw_param = request.args.get("skill_ids", default="", type=str)
 
     if not raw_param.strip():
@@ -219,7 +236,7 @@ def get_compare():
             status_code=422,
         )
 
-    # Acotamos entre 2 y 5 habilidades, puesto que comparar una sola no tiene sentido funcional, y mas de 5 degrada la lectura de la grafica.
+    # Acotamos entre 2 y 5 habilidades, puesto que comparar una sola no tiene sentido funcional, y mas de 5 degrada la lectura de la grafica
     if len(skill_ids) < 2 or len(skill_ids) > 5:
         return error_response(
             code="VALIDATION_ERROR",

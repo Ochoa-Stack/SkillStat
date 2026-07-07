@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Habilidades del mercado laboral tecnológico en México. Descubre qué busca el mercado y agrega skills a tu perfil."
+      content="Distribución regional de la demanda tecnológica en México."
     />
-    <title>SkillStat - Habilidades</title>
+    <title>SkillStat - Regiones</title>
     <link
       rel="icon"
       type="image/svg+xml"
@@ -25,6 +25,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../assets/css/main.css" />
+    <link rel="stylesheet" href="../assets/css/pages/regiones.css" />
   </head>
   <body>
     <header class="site-header" role="banner">
@@ -60,18 +61,18 @@
           </li>
           <li><a href="comparar.html" class="navbar__link">Comparar</a></li>
           <li>
-            <a
-              href="habilidades.html"
-              class="navbar__link navbar__link--active"
-              aria-current="page"
-              >Habilidades</a
-            >
+            <a href="habilidades.html" class="navbar__link">Habilidades</a>
           </li>
           <li>
             <a href="salarios.html" class="navbar__link">Salarios</a>
           </li>
           <li>
-            <a href="regiones.html" class="navbar__link">Regiones</a>
+            <a
+              href="regiones.html"
+              class="navbar__link navbar__link--active"
+              aria-current="page"
+              >Regiones</a
+            >
           </li>
           <li>
             <a href="#" class="navbar__link" data-pending-page>Reportes</a>
@@ -162,18 +163,18 @@
           </li>
           <li><a href="comparar.html" class="nav-drawer__link">Comparar</a></li>
           <li>
-            <a
-              href="habilidades.html"
-              class="nav-drawer__link nav-drawer__link--active"
-              aria-current="page"
-              >Habilidades</a
-            >
+            <a href="habilidades.html" class="nav-drawer__link">Habilidades</a>
           </li>
           <li>
             <a href="salarios.html" class="nav-drawer__link">Salarios</a>
           </li>
           <li>
-            <a href="regiones.html" class="nav-drawer__link">Regiones</a>
+            <a
+              href="regiones.html"
+              class="nav-drawer__link nav-drawer__link--active"
+              aria-current="page"
+              >Regiones</a
+            >
           </li>
           <li>
             <a href="#" class="nav-drawer__link" data-pending-page>Reportes</a>
@@ -192,53 +193,30 @@
     </div>
 
     <main>
-      <section class="habilidades-header">
+      <section class="panorama-skills">
         <div class="container">
-          <h1>Habilidades del mercado tech</h1>
-        </div>
-      </section>
-
-      <section class="habilidades-content">
-        <div class="container">
-          <div class="habilidades-toolbar">
-            <div class="habilidades-search">
-              <i data-lucide="search" class="habilidades-search__icon"></i>
-              <input
-                type="text"
-                id="skill-search"
-                class="form-input"
-                placeholder="Buscar habilidad..."
-                aria-label="Buscar habilidad"
-              />
-            </div>
-            <div
-              class="habilidades-filters"
-              id="category-filters"
-              role="group"
-              aria-label="Filtrar por categoría"
-            >
-              <button
-                class="pill pill--active"
-                type="button"
-                data-category="all"
-              >
-                Todas
-              </button>
-            </div>
-          </div>
-
-          <div id="habilidades-loading" class="habilidades-state">
-            <p class="text-body">Cargando habilidades...</p>
-          </div>
-
-          <div id="habilidades-empty" class="habilidades-state" hidden>
-            <p class="text-body">
-              No se encontraron habilidades que coincidan con la búsqueda.
+          <div class="panorama-skills__header">
+            <h1>Regiones</h1>
+            <p class="panorama-skills__subtitle text-body-sm">
+              Demanda agregada por estado
             </p>
           </div>
 
-          <div id="habilidades-list" class="habilidades-list">
-            <!-- Items generados dinámicamente -->
+          <div class="regions-chart surface scroll-row" data-regions-chart>
+            <!-- Renderizado por JS -->
+          </div>
+
+          <div
+            class="regions-unmapped text-body-sm"
+            data-regions-unmapped
+            style="
+              display: none;
+              text-align: center;
+              margin-top: var(--space-4);
+              color: var(--color-text-secondary);
+            "
+          >
+            <!-- Renderizado por JS -->
           </div>
         </div>
       </section>
@@ -250,6 +228,6 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="../assets/js/components/icons.init.js"></script>
     <script src="../assets/js/components/navbar.js"></script>
-    <script src="../assets/js/pages/habilidades.js"></script>
+    <script src="../assets/js/pages/regiones.js"></script>
   </body>
 </html>
