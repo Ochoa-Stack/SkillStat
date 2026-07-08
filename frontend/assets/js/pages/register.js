@@ -23,36 +23,6 @@ function initAuthToggle() {
   });
 }
 
-const PASSWORD_RULES = {
-  length: (value) => value.length >= 8,
-  upper: (value) => /[A-Z]/.test(value),
-  number: (value) => /\d/.test(value),
-  special: (value) => /[^A-Za-z0-9]/.test(value),
-};
-
-function updatePasswordChecklist(password) {
-  Object.entries(PASSWORD_RULES).forEach(([rule, check]) => {
-    const item = document.querySelector(`[data-rule="${rule}"]`);
-    if (!item) return;
-    item.classList.toggle("is-valid", check(password));
-  });
-}
-
-function splitFullName(fullName) {
-  const trimmed = fullName.trim();
-  const firstSpaceIndex = trimmed.indexOf(" ");
-
-  // Si no hay espacio, usamos el nombre completo como first_name y dejamos last_name vacio en blanco no es opcion porque el backend lo exige; en ese caso repetimos el nombre como apellido temporal.
-  if (firstSpaceIndex === -1) {
-    return { firstName: trimmed, lastName: trimmed };
-  }
-
-  return {
-    firstName: trimmed.slice(0, firstSpaceIndex),
-    lastName: trimmed.slice(firstSpaceIndex + 1),
-  };
-}
-
 function updateRegisterSubmitState() {
   const form = document.querySelector("[data-register-form]");
   if (!form) return;
@@ -70,6 +40,21 @@ function updateRegisterSubmitState() {
     passwordsMatch &&
     termsAccepted
   );
+}
+
+function splitFullName(fullName) {
+  const trimmed = fullName.trim();
+  const firstSpaceIndex = trimmed.indexOf(" ");
+
+  // Si no hay espacio, usamos el nombre completo como first_name y dejamos last_name vacio en blanco no es opcion porque el backend lo exige; en ese caso repetimos el nombre como apellido temporal.
+  if (firstSpaceIndex === -1) {
+    return { firstName: trimmed, lastName: trimmed };
+  }
+
+  return {
+    firstName: trimmed.slice(0, firstSpaceIndex),
+    lastName: trimmed.slice(firstSpaceIndex + 1),
+  };
 }
 
 function showRegisterConfirmation(email) {
@@ -103,7 +88,7 @@ function showRegisterConfirmation(email) {
       resendBtn.disabled = true;
       resendBtn.textContent = "Enviando...";
       try {
-        await apiPost("/auth/resend-verification", { email });
+        await resendVerificationEmail(email);
         resendBtn.textContent = "¡Enviado!";
       } catch {
         resendBtn.textContent = "Error al reenviar";
@@ -139,7 +124,7 @@ function showUnverifiedBanner(form, email) {
       resendBtn.disabled = true;
       resendBtn.textContent = "Enviando...";
       try {
-        await apiPost("/auth/resend-verification", { email });
+        await resendVerificationEmail(email);
         resendBtn.textContent = "¡Enviado! Revisa tu bandeja.";
       } catch {
         resendBtn.textContent = "Error al reenviar. Intenta de nuevo.";
@@ -165,7 +150,7 @@ async function handleRegisterSubmit(event) {
   const email = form.email.value;
 
   try {
-    await apiPost("/auth/register", {
+    await registerUser({
       first_name: firstName,
       last_name: lastName,
       email: email,
@@ -211,7 +196,7 @@ async function handleLoginSubmit(event) {
   submitButton.textContent = "Iniciando sesión...";
 
   try {
-    await apiPost("/auth/login", {
+    await loginUser({
       email: form.email.value,
       password: form.password.value,
     });
@@ -232,20 +217,6 @@ function initLoginForm() {
   const form = document.querySelector("[data-login-form]");
   if (!form) return;
   form.addEventListener("submit", handleLoginSubmit);
-}
-
-function initAuthClose() {
-  // Esta pantalla no es un overlay real sobre otra pagina, asi que cerrar significa volver al historial si existe, o caer a index.html si el usuario llego aqui directamente (ej. por un enlace compartido).
-  const closeButton = document.querySelector("[data-auth-close]");
-  if (!closeButton) return;
-
-  closeButton.addEventListener("click", () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = "index.html";
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {

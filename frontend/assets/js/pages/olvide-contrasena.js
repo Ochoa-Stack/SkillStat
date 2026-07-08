@@ -30,9 +30,7 @@ async function handleForgotSubmit(event) {
   submitButton.textContent = "Enviando...";
 
   try {
-    const response = await apiPost("/auth/forgot-password", {
-      email: emailValue,
-    });
+    const response = await requestPasswordReset(emailValue);
     messageBox.textContent =
       response.message ||
       "Si el correo existe, recibirás un enlace de recuperación.";
@@ -49,19 +47,6 @@ async function handleForgotSubmit(event) {
     submitButton.disabled = false;
     submitButton.textContent = originalText;
   }
-}
-
-function initAuthClose() {
-  const closeButton = document.querySelector("[data-auth-close]");
-  if (!closeButton) return;
-
-  closeButton.addEventListener("click", () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = "index.html";
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -49,9 +49,7 @@ async function verifyToken() {
 
   try {
     // Consumimos el endpoint con GET para asegurar que no se produzcan efectos secundarios; la librería cliente extrae el payload automáticamente
-    const result = await apiGet(
-      `/auth/verify-email?token=${encodeURIComponent(token)}`,
-    );
+    const result = await verifyEmailToken(token);
 
     const subtitle = document.getElementById("verify-confirm-subtitle");
     if (subtitle && result.email) {
@@ -93,7 +91,7 @@ async function confirmVerification(token) {
   }
 
   try {
-    await apiPost("/auth/verify-email", { token });
+    await confirmEmailVerification(token);
     showState("verify-success");
   } catch (error) {
     // Capturamos el error específico por si el token se consumió en paralelo durante el intervalo entre la validación inicial y el clic manual.
@@ -138,9 +136,7 @@ async function handleResendSubmit(event) {
 
   try {
     // Asumimos un resultado exitoso constante para prevenir que un atacante descubra cuáles correos están registrados en nuestro sistema.
-    const result = await apiPost("/auth/resend-verification", {
-      email: form.email.value.trim(),
-    });
+    const result = await resendVerificationEmail(form.email.value.trim());
     okBox.textContent =
       result.message ||
       "Si el correo existe y no ha sido verificado, se envió un nuevo enlace.";
@@ -154,19 +150,6 @@ async function handleResendSubmit(event) {
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;
   }
-}
-
-function initAuthClose() {
-  const closeButton = document.querySelector("[data-auth-close]");
-  if (!closeButton) return;
-
-  closeButton.addEventListener("click", () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = "index.html";
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
