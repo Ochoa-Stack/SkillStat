@@ -22,23 +22,14 @@ async function initPanoramaPage() {
   try {
     const summary = await getSummary();
 
-    document.querySelector('[data-metric="active-jobs"]').textContent =
-      formatNumber(summary.total_jobs);
-    document.querySelector('[data-metric="active-jobs-detail"]').textContent =
-      "Tecnología · México";
-
-    document.querySelector('[data-metric="active-companies"]').textContent =
-      formatNumber(summary.total_companies);
-    document.querySelector(
-      '[data-metric="active-companies-detail"]',
-    ).textContent = "Empresas únicas registradas";
-
-    document.querySelector(
-      '[data-metric="skills-tracked-panorama"]',
-    ).textContent = formatNumber(summary.total_skills_tracked);
-    document.querySelector(
-      '[data-metric="skills-tracked-panorama-detail"]',
-    ).textContent = "Catalogadas y actualizadas a diario";
+    renderMarketMetrics(summary, {
+      activeJobs: '[data-metric="active-jobs"]',
+      activeJobsDetail: '[data-metric="active-jobs-detail"]',
+      activeCompanies: '[data-metric="active-companies"]',
+      activeCompaniesDetail: '[data-metric="active-companies-detail"]',
+      skillsTracked: '[data-metric="skills-tracked-panorama"]',
+      skillsTrackedDetail: '[data-metric="skills-tracked-panorama-detail"]',
+    });
 
     await loadSkillsChart(5);
     bindSkillsFilters();

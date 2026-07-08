@@ -1,0 +1,197 @@
+.reporte-header {
+  padding-block: var(--space-8) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reporte-header__meta {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.reporte-header__subtitle {
+  color: var(--color-text-secondary);
+}
+
+.reporte-header__date {
+  color: var(--color-text-secondary);
+}
+
+.reporte-header__actions {
+  margin-top: var(--space-4);
+}
+
+.reporte-metrics {
+  padding-block: var(--space-6) var(--space-8);
+}
+
+.reporte-metrics__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.reporte-metrics__card {
+  /* hereda .surface y .metric-card del sistema global */
+}
+
+.reporte-skills {
+  padding-block: var(--space-8);
+}
+
+.reporte-skills__header {
+  margin-bottom: var(--space-4);
+}
+
+.reporte-skills__subtitle {
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+}
+
+.reporte-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.reporte-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.reporte-table thead {
+  background-color: var(--color-surface-raised);
+}
+
+.reporte-table th {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.reporte-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.reporte-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reporte-table tbody tr:hover {
+  background-color: var(--color-surface-raised);
+}
+
+.reporte-table__rank {
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.reporte-table__skill {
+  font-weight: var(--font-weight-medium);
+}
+
+.reporte-table__skill--top {
+  color: var(--color-accent-orange);
+}
+
+.reporte-table__mentions {
+  font-variant-numeric: tabular-nums;
+}
+
+.reporte-table__pct {
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 768px) {
+  .reporte-header__meta {
+    flex-direction: row;
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .reporte-metrics__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .reporte-table {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (min-width: 1024px) {
+  .reporte-header__actions {
+    margin-top: var(--space-6);
+  }
+}
+
+@media print {
+  .site-header,
+  .nav-drawer,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  /* Forzamos blanco y negro porque la impresión no debe heredar el tema oscuro del usuario. */
+  body,
+  .reporte-header,
+  .reporte-metrics,
+  .reporte-skills,
+  .surface,
+  .metric-card {
+    background-color: #ffffff !important;
+    color: #111111 !important;
+    box-shadow: none !important;
+    border-color: #cccccc !important;
+  }
+
+  .reporte-metrics__card,
+  .metric-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .reporte-table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .reporte-table thead {
+    display: table-header-group;
+  }
+
+  .reporte-skills__header,
+  .reporte-metrics h2 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .reporte-metrics__grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12pt;
+  }
+
+  .reporte-table th,
+  .reporte-table td,
+  .reporte-table__skill--top,
+  .reporte-table__pct,
+  .reporte-table__rank {
+    color: #111111 !important;
+  }
+
+  .reporte-table thead {
+    background-color: #f0f0f0 !important;
+  }
+
+  .reporte-table-wrapper {
+    overflow-x: visible;
+    border: 1px solid #cccccc;
+  }
+}
