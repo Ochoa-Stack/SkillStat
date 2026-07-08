@@ -1,1 +1,0 @@
-﻿# adzuna_client — SkillStat
