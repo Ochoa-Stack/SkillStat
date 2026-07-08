@@ -1,18 +1,3 @@
-const PASSWORD_RULES = {
-  length: (value) => value.length >= 8,
-  upper: (value) => /[A-Z]/.test(value),
-  number: (value) => /\d/.test(value),
-  special: (value) => /[^A-Za-z0-9]/.test(value),
-};
-
-function updatePasswordChecklist(password) {
-  Object.entries(PASSWORD_RULES).forEach(([rule, check]) => {
-    const item = document.querySelector(`[data-rule="${rule}"]`);
-    if (!item) return;
-    item.classList.toggle("is-valid", check(password));
-  });
-}
-
 function updateResetSubmitState() {
   const form = document.querySelector("[data-reset-form]");
   if (!form) return;
@@ -71,10 +56,7 @@ async function handleResetSubmit(event) {
   submitButton.textContent = "Actualizando...";
 
   try {
-    const response = await apiPost("/auth/reset-password", {
-      token: token,
-      new_password: form.password.value,
-    });
+    const response = await resetPassword(token, form.password.value);
 
     // Si todo sale bien solo ocultamos form y mostramos link de login
     showTerminalState(
@@ -113,19 +95,6 @@ function initResetForm() {
     updateResetSubmitState();
   });
   form.confirmPassword.addEventListener("input", updateResetSubmitState);
-}
-
-function initAuthClose() {
-  const closeButton = document.querySelector("[data-auth-close]");
-  if (!closeButton) return;
-
-  closeButton.addEventListener("click", () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = "index.html";
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
