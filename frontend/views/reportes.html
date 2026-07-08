@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Reporte del mercado laboral tecnológico en México: vacantes activas, empresas contratando y habilidades más demandadas generado desde SkillStat."
+    />
+    <title>SkillStat - Reporte de Mercado</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <button
+          class="navbar__menu-toggle"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          data-nav-drawer-open
+        >
+          <i data-lucide="menu"></i>
+        </button>
+
+        <a
+          href="../views/index.html"
+          class="navbar__logo"
+          aria-label="SkillStat - Inicio"
+        >
+          <img
+            src="../assets/images/brand/skillstat-logo-compact.svg"
+            alt="SkillStat"
+            width="32"
+            height="32"
+            class="navbar__logo-img"
+          />
+          SkillStat
+        </a>
+
+        <ul class="navbar__links" role="list">
+          <li>
+            <a href="panorama.html" class="navbar__link">Panorama</a>
+          </li>
+          <li><a href="comparar.html" class="navbar__link">Comparar</a></li>
+          <li>
+            <a href="habilidades.html" class="navbar__link">Habilidades</a>
+          </li>
+          <li>
+            <a href="salarios.html" class="navbar__link">Salarios</a>
+          </li>
+          <li>
+            <a href="regiones.html" class="navbar__link">Regiones</a>
+          </li>
+          <li>
+            <a
+              href="reportes.html"
+              class="navbar__link navbar__link--active"
+              aria-current="page"
+              >Reportes</a
+            >
+          </li>
+        </ul>
+
+        <div class="navbar__actions">
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Cambiar tema"
+          >
+            <i
+              data-lucide="sun"
+              class="theme-toggle__icon theme-toggle__icon--sun"
+            ></i>
+            <i
+              data-lucide="moon"
+              class="theme-toggle__icon theme-toggle__icon--moon"
+            ></i>
+          </button>
+          <button
+            class="navbar__logout"
+            type="button"
+            aria-label="Cerrar sesión"
+            data-auth-action="logout"
+          >
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <div class="nav-drawer" data-nav-drawer aria-hidden="true">
+      <div class="nav-drawer__backdrop" data-nav-drawer-close></div>
+      <div
+        class="nav-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+      >
+        <div class="nav-drawer__header">
+          <a
+            href="../views/index.html"
+            class="navbar__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo-compact.svg"
+              alt="SkillStat"
+              width="28"
+              height="28"
+              class="navbar__logo-img"
+            />
+            SkillStat
+          </a>
+          <div class="nav-drawer__header-actions">
+            <button
+              class="theme-toggle"
+              type="button"
+              data-theme-toggle
+              aria-label="Cambiar tema"
+            >
+              <i
+                data-lucide="sun"
+                class="theme-toggle__icon theme-toggle__icon--sun"
+              ></i>
+              <i
+                data-lucide="moon"
+                class="theme-toggle__icon theme-toggle__icon--moon"
+              ></i>
+            </button>
+            <button
+              class="nav-drawer__close"
+              type="button"
+              aria-label="Cerrar menú"
+              data-nav-drawer-close
+            >
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav-drawer__links" role="list">
+          <li>
+            <a href="panorama.html" class="nav-drawer__link">Panorama</a>
+          </li>
+          <li><a href="comparar.html" class="nav-drawer__link">Comparar</a></li>
+          <li>
+            <a href="habilidades.html" class="nav-drawer__link">Habilidades</a>
+          </li>
+          <li>
+            <a href="salarios.html" class="nav-drawer__link">Salarios</a>
+          </li>
+          <li>
+            <a href="regiones.html" class="nav-drawer__link">Regiones</a>
+          </li>
+          <li>
+            <a
+              href="reportes.html"
+              class="nav-drawer__link nav-drawer__link--active"
+              aria-current="page"
+              >Reportes</a
+            >
+          </li>
+        </ul>
+
+        <button
+          class="nav-drawer__logout"
+          type="button"
+          data-auth-action="logout"
+        >
+          <i data-lucide="log-out"></i>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <main>
+      <section class="reporte-header">
+        <div class="container">
+          <h1>Reporte de Mercado Laboral Tech</h1>
+          <div class="reporte-header__meta">
+            <p class="reporte-header__subtitle text-body">
+              Inteligencia de mercado · México · Tecnología
+            </p>
+            <p class="reporte-header__date text-body-sm">
+              Generado el <span data-report-date>—</span>
+            </p>
+          </div>
+          <div class="reporte-header__actions" data-no-print>
+            <button
+              class="btn btn--primary"
+              type="button"
+              data-print-btn
+              id="reporte-print-btn"
+            >
+              <i data-lucide="printer"></i>
+              Exportar / Imprimir
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="reporte-metrics">
+        <div class="container">
+          <div class="reporte-metrics__grid">
+            <article
+              class="metric-card surface reporte-metrics__card"
+              aria-label="Vacantes activas"
+            >
+              <div class="card-header">
+                <span class="metric-card__label text-label"
+                  >Vacantes activas</span
+                >
+                <span class="metric-card__live" aria-label="Datos actualizados"
+                  >Actualizado</span
+                >
+              </div>
+              <p
+                class="metric-card__value text-metric"
+                data-metric="reporte-active-jobs"
+              >
+                —
+              </p>
+              <p
+                class="metric-card__detail text-body-sm"
+                data-metric="reporte-active-jobs-detail"
+              >
+                Cargando datos...
+              </p>
+            </article>
+
+            <article
+              class="metric-card surface reporte-metrics__card"
+              aria-label="Empresas contratando"
+            >
+              <div class="card-header">
+                <span class="metric-card__label text-label"
+                  >Empresas contratando</span
+                >
+                <span class="metric-card__live" aria-label="Datos actualizados"
+                  >Actualizado</span
+                >
+              </div>
+              <p
+                class="metric-card__value text-metric"
+                data-metric="reporte-active-companies"
+              >
+                —
+              </p>
+              <p
+                class="metric-card__detail text-body-sm"
+                data-metric="reporte-active-companies-detail"
+              >
+                Cargando datos...
+              </p>
+            </article>
+
+            <article
+              class="metric-card surface reporte-metrics__card"
+              aria-label="Habilidades rastreadas"
+            >
+              <div class="card-header">
+                <span class="metric-card__label text-label"
+                  >Habilidades rastreadas</span
+                >
+                <span class="metric-card__live" aria-label="Datos actualizados"
+                  >Actualizado</span
+                >
+              </div>
+              <p
+                class="metric-card__value text-metric"
+                data-metric="reporte-skills-tracked"
+              >
+                —
+              </p>
+              <p
+                class="metric-card__detail text-body-sm"
+                data-metric="reporte-skills-tracked-detail"
+              >
+                Cargando datos...
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="reporte-skills">
+        <div class="container">
+          <div class="reporte-skills__header">
+            <h2>Top 15 habilidades más demandadas</h2>
+            <p class="reporte-skills__subtitle text-body-sm">
+              Menciones en vacantes activas · México · Tecnología
+            </p>
+          </div>
+
+          <div class="reporte-table-wrapper">
+            <table
+              class="reporte-table"
+              aria-label="Habilidades más demandadas"
+            >
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Habilidad</th>
+                  <th scope="col">Menciones</th>
+                  <th scope="col">% relativo</th>
+                </tr>
+              </thead>
+              <tbody data-skills-tbody>
+                <tr>
+                  <td
+                    colspan="4"
+                    style="
+                      text-align: center;
+                      padding: var(--space-6);
+                      color: var(--color-text-secondary);
+                    "
+                  >
+                    Cargando datos...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="../assets/js/utils/formatters.js"></script>
+    <script src="../assets/js/api/client.js"></script>
+    <script src="../assets/js/api/panorama.api.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/pages/reportes.js"></script>
+  </body>
+</html>
