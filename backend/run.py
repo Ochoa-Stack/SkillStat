@@ -56,3 +56,16 @@ def generate_snapshots_cmd():
 
     count = MarketTrendsService.generate_snapshots()
     click.echo(f"Snapshots generados: {count}")
+
+
+@app.cli.command("evaluate-alerts")
+def evaluate_alerts_cmd():
+    """Evalúa todas las alertas activas contra los snapshots más recientes y envía notificaciones por correo a los usuarios cuyo umbral fue superado"""
+    import sys
+    if sys.stdout.encoding.lower() != 'utf-8':
+        sys.stdout.reconfigure(encoding='utf-8')
+
+    from app.services.alerts_service import AlertsService
+
+    sent = AlertsService.evaluate_and_notify()
+    click.echo(f"Notificaciones enviadas: {sent}")
