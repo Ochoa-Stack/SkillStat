@@ -2,7 +2,7 @@ from app.repositories.alert_repository import AlertRepository
 from app.repositories.trend_snapshot_repository import TrendSnapshotRepository
 from app.repositories.user_repository import UserRepository
 from app.repositories.skill_repository import SkillRepository
-from app.clients.sendgrid_client import EmailClient
+from app.services.email_service import send_alert_email
 from app.utils.errors import AppError
 
 class AlertsService:
@@ -38,11 +38,10 @@ class AlertsService:
             """
 
             try:
-                # Delegamos el envío al cliente Wrapper. 
+                # Delegamos el envío al servicio de correo unificado. 
                 # Atrapamos errores para evitar que el fallo de un email cancele el ciclo entero.
-                success = EmailClient.send_alert_email(user.email, subject, html_content)
-                if success:
-                    notifications_sent += 1
+                send_alert_email(user.email, subject, html_content)
+                notifications_sent += 1
             except AppError:
                 continue
 
