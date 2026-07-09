@@ -28,7 +28,7 @@
 @import url("pages/_index.css");
 @import url("pages/_panorama.css");
 @import url("pages/_auth.css");
-/* @import url('pages/_alertas.css'); */
+@import url("pages/_alertas.css");
 @import url("pages/_comparar.css");
 @import url("pages/_perfil.css");
 @import url("pages/_habilidades.css");
