@@ -191,9 +191,7 @@ def google_login():
 
 
 def _validate_verification_token(token: str):
-    """Valida un token de verificación sin mutar ningún estado.
-    Retorna (token_row, user, None) si el token es válido; retorna (None, None, response_tuple) con el error correspondiente si no lo es.
-    Esta función es segura para llamarse desde un GET, no escribe en base de datos"""
+    """Valida un token de verificación sin mutar ningún estado. Retorna (token_row, user, None) si el token es válido; retorna (None, None, response_tuple) con el error correspondiente si no lo es. Esta función es segura para llamarse desde un GET, no escribe en base de datos"""
     token_hash = hashlib.sha256(token.encode()).hexdigest()
     token_row = EmailVerificationTokenRepository.get_by_token_hash(token_hash)
 
@@ -230,9 +228,7 @@ def _validate_verification_token(token: str):
 
 @auth_bp.route("/verify-email", methods=["GET"])
 def verify_email_check():
-    """GET solo valida el token, sin marcar nada como usado ni verificar la cuenta.
-    Seguro para ser prefetcheado por escáneres de correo, no tiene efectos secundarios.
-    Responde 200 con {valid: true, email} si el token sigue siendo válido"""
+    """GET solo valida el token, sin marcar nada como usado ni verificar la cuenta. Seguro para ser prefetcheado por escáneres de correo, no tiene efectos secundarios. Responde 200 con {valid: true, email} si el token sigue siendo válido"""
     token = request.args.get("token")
     if not token:
         return error_response(
@@ -253,9 +249,7 @@ def verify_email_check():
 
 @auth_bp.route("/verify-email", methods=["POST"])
 def verify_email_confirm():
-    """POST ejecuta la verificación real tras la confirmación explícita del usuario.
-    Vuelve a validar el token para cubrir la ventana entre el GET y el clic del usuario (race condition o token consumido en paralelo). Si sigue siendo válido, muta el estado:
-    marca email_verified_at en el usuario y used_at en el token"""
+    """POST ejecuta la verificación real tras la confirmación explícita del usuario. Vuelve a validar el token para cubrir la ventana entre el GET y el clic del usuario (race condition o token consumido en paralelo). Si sigue siendo válido, muta el estado: marca email_verified_at en el usuario y used_at en el token"""
     data = request.get_json() or {}
     token = data.get("token")
     if not token:
@@ -349,9 +343,15 @@ def forgot_password():
         "expires_at": expires_at,
     })
 
-    # Stub de desarrollo. El envío real de este flujo (via Resend) queda pendiente de migración; ver deuda técnica documentada.
-    reset_url = f"{current_app.config['FRONTEND_BASE_URL']}/views/restablecer-contrasena.html?token={plain_token}"
+    from app.services.email_service import send_password_reset_email, EmailDeliveryError, build_password_reset_link
+
+    reset_url = build_password_reset_link(plain_token)
     logger.info("[DEV] Reset link para %s: %s", user.email, reset_url)
+    
+    try:
+        send_password_reset_email(user.email, plain_token)
+    except EmailDeliveryError as e:
+        logger.error(f"Error enviando correo de recuperación a {user.email}: {str(e)}")
 
     return generic_ok
 
