@@ -104,6 +104,30 @@
   color: var(--color-semantic-error);
 }
 
+.navbar__profile-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  transition: var(--transition-base);
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.navbar__profile-link:hover {
+  border-color: var(--color-primary-light);
+}
+
+.navbar__profile-link--active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 .navbar__link[data-pending-page],
 .nav-drawer__link[data-pending-page] {
   opacity: 0.5;
