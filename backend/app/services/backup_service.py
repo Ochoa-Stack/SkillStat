@@ -33,9 +33,9 @@ class BackupService:
 
         backup_record = BackupRepository.create({
             "filename": filename,
-            "filepath": filepath,
-            "status": "pending",
-            "requested_by": requested_by,
+            "storage_url": filepath,
+            "status": "PENDING",
+            "user_id": requested_by,
         })
 
         try:
@@ -65,19 +65,19 @@ class BackupService:
             file_size = os.path.getsize(filepath)
             BackupRepository.update(
                 backup_record.id,
-                {"status": "completed", "file_size_bytes": file_size},
+                {"status": "COMPLETED", "file_size_bytes": file_size},
             )
 
             return {"status": "success", "file": filename, "size": file_size}
 
         except subprocess.CalledProcessError as e:
-            BackupRepository.update(backup_record.id, {"status": "failed"})
+            BackupRepository.update(backup_record.id, {"status": "FAILED"})
             raise AppError(
                 f"Fallo en ejecucion de pg_dump: {e.stderr}",
                 code="BACKUP_ERROR",
             )
         except Exception as e:
-            BackupRepository.update(backup_record.id, {"status": "failed"})
+            BackupRepository.update(backup_record.id, {"status": "FAILED"})
             raise AppError(
                 f"Error interno durante respaldo: {str(e)}",
                 code="BACKUP_ERROR",

@@ -44,3 +44,16 @@ class BaseRepository:
             db.session.commit()
             return True
         return False
+
+    @classmethod
+    def update(cls, entity_id: int, data: dict):
+        # Localizamos la entidad, aplicamos solo las llaves que corresponden a columnas reales (mismo criterio que create) y persistimos vía save para mantener el mismo contrato de commit/rollback.
+        entity = cls.get_by_id(entity_id)
+        if not entity:
+            return None
+        mapper = inspect(cls.model)
+        valid_keys = mapper.columns.keys()
+        for key, value in data.items():
+            if key in valid_keys:
+                setattr(entity, key, value)
+        return cls.save(entity)
