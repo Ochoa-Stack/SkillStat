@@ -1,1 +1,294 @@
-﻿<!-- admin/usuarios — SkillStat -->
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Panel de administración de SkillStat: listado de usuarios registrados en la plataforma."
+    />
+    <title>SkillStat - Usuarios</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <button
+          class="navbar__menu-toggle"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          data-nav-drawer-open
+        >
+          <i data-lucide="menu"></i>
+        </button>
+
+        <a
+          href="../../views/index.html"
+          class="navbar__logo"
+          aria-label="SkillStat - Inicio"
+        >
+          <img
+            src="../../assets/images/brand/skillstat-logo-compact.svg"
+            alt="SkillStat"
+            width="32"
+            height="32"
+            class="navbar__logo-img"
+          />
+          SkillStat
+        </a>
+
+        <ul class="navbar__links" role="list">
+          <li>
+            <a href="../panorama.html" class="navbar__link">Panorama</a>
+          </li>
+          <li><a href="../comparar.html" class="navbar__link">Comparar</a></li>
+          <li>
+            <a href="../habilidades.html" class="navbar__link">Habilidades</a>
+          </li>
+          <li>
+            <a href="../salarios.html" class="navbar__link">Salarios</a>
+          </li>
+          <li>
+            <a href="../regiones.html" class="navbar__link">Regiones</a>
+          </li>
+          <li>
+            <a href="../reportes.html" class="navbar__link">Reportes</a>
+          </li>
+          <li>
+            <a href="../alertas.html" class="navbar__link">Alertas</a>
+          </li>
+          <li>
+            <a
+              href="usuarios.html"
+              class="navbar__link navbar__link--active"
+              aria-current="page"
+              >Admin</a
+            >
+          </li>
+        </ul>
+
+        <div class="navbar__actions">
+          <a
+            href="../perfil.html"
+            class="navbar__profile-link"
+            aria-label="Mi perfil"
+          >
+            <i data-lucide="user"></i>
+          </a>
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Cambiar tema"
+          >
+            <i
+              data-lucide="sun"
+              class="theme-toggle__icon theme-toggle__icon--sun"
+            ></i>
+            <i
+              data-lucide="moon"
+              class="theme-toggle__icon theme-toggle__icon--moon"
+            ></i>
+          </button>
+          <button
+            class="navbar__logout"
+            type="button"
+            aria-label="Cerrar sesión"
+            data-auth-action="logout"
+          >
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <div class="nav-drawer" data-nav-drawer aria-hidden="true">
+      <div class="nav-drawer__backdrop" data-nav-drawer-close></div>
+      <div
+        class="nav-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+      >
+        <div class="nav-drawer__header">
+          <a
+            href="../../views/index.html"
+            class="navbar__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../../assets/images/brand/skillstat-logo-compact.svg"
+              alt="SkillStat"
+              width="28"
+              height="28"
+              class="navbar__logo-img"
+            />
+            SkillStat
+          </a>
+          <div class="nav-drawer__header-actions">
+            <button
+              class="theme-toggle"
+              type="button"
+              data-theme-toggle
+              aria-label="Cambiar tema"
+            >
+              <i
+                data-lucide="sun"
+                class="theme-toggle__icon theme-toggle__icon--sun"
+              ></i>
+              <i
+                data-lucide="moon"
+                class="theme-toggle__icon theme-toggle__icon--moon"
+              ></i>
+            </button>
+            <button
+              class="nav-drawer__close"
+              type="button"
+              aria-label="Cerrar menú"
+              data-nav-drawer-close
+            >
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav-drawer__links" role="list">
+          <li>
+            <a href="../panorama.html" class="nav-drawer__link">Panorama</a>
+          </li>
+          <li>
+            <a href="../comparar.html" class="nav-drawer__link">Comparar</a>
+          </li>
+          <li>
+            <a href="../habilidades.html" class="nav-drawer__link"
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="../salarios.html" class="nav-drawer__link">Salarios</a>
+          </li>
+          <li>
+            <a href="../regiones.html" class="nav-drawer__link">Regiones</a>
+          </li>
+          <li>
+            <a href="../reportes.html" class="nav-drawer__link">Reportes</a>
+          </li>
+          <li>
+            <a href="../alertas.html" class="nav-drawer__link">Alertas</a>
+          </li>
+          <li>
+            <a
+              href="usuarios.html"
+              class="nav-drawer__link nav-drawer__link--active"
+              aria-current="page"
+              >Admin</a
+            >
+          </li>
+        </ul>
+
+        <button
+          class="nav-drawer__logout"
+          type="button"
+          data-auth-action="logout"
+        >
+          <i data-lucide="log-out"></i>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <div id="admin-loading" class="admin-loading">
+      <p class="text-body">Cargando usuarios...</p>
+    </div>
+
+    <main id="admin-main" hidden>
+      <section class="panorama-header">
+        <div class="container">
+          <h1>Usuarios registrados</h1>
+        </div>
+      </section>
+
+      <section class="admin-subnav">
+        <div class="container">
+          <nav
+            class="admin-subnav__pills"
+            aria-label="Secciones de administración"
+          >
+            <a href="respaldos.html" class="pill">Respaldos</a>
+            <a href="usuarios.html" class="pill pill--active">Usuarios</a>
+          </nav>
+        </div>
+      </section>
+
+      <div class="container">
+        <section class="admin-list-section">
+          <p id="admin-empty" class="admin-empty text-body" hidden>
+            No hay usuarios registrados todavía.
+          </p>
+          <div id="admin-table-wrapper" class="admin-table-wrapper" hidden>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Nombre completo</th>
+                  <th scope="col">Correo</th>
+                  <th scope="col">Rol</th>
+                  <th scope="col">Registrado el</th>
+                </tr>
+              </thead>
+              <tbody id="admin-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="admin-pagination" id="admin-pagination">
+            <button
+              type="button"
+              class="btn btn--ghost btn--sm"
+              id="admin-btn-prev"
+              disabled
+            >
+              Anterior
+            </button>
+            <span class="admin-page-info text-body-sm" id="admin-page-info">
+              Página 1 de 1
+            </span>
+            <button
+              type="button"
+              class="btn btn--ghost btn--sm"
+              id="admin-btn-next"
+              disabled
+            >
+              Siguiente
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="../../assets/js/utils/formatters.js"></script>
+    <script src="../../assets/js/api/client.js"></script>
+    <script src="../../assets/js/api/admin.api.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../../assets/js/components/icons.init.js"></script>
+    <script src="../../assets/js/components/navbar.js"></script>
+    <script src="../../assets/js/components/navbar-role.js"></script>
+    <script src="../../assets/js/pages/admin-usuarios.js"></script>
+  </body>
+</html>
