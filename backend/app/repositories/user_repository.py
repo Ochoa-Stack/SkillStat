@@ -29,6 +29,18 @@ class UserRepository:
         return db.session.execute(db.select(User)).scalars().all()
 
     @classmethod
+    def get_paginated(cls, page: int = 1, per_page: int = 20):
+        # Ordenamos descendente por fecha de creación para que los usuarios más recientes aparezcan primero
+        query = db.select(User).order_by(User.created_at.desc())
+        total = db.session.execute(
+            db.select(db.func.count()).select_from(User)
+        ).scalar_one()
+        items = db.session.execute(
+            query.limit(per_page).offset((page - 1) * per_page)
+        ).scalars().all()
+        return items, total
+
+    @classmethod
     def save(cls, user: User) -> User:
         # Persiste cambios en una entidad ya existente, como el reseteo de password_hash; no crea un nuevo registro, solo hace commit.
         db.session.add(user)
