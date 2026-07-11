@@ -61,8 +61,9 @@ def list_backups():
                 "status": b.status,
                 "created_at": b.created_at.isoformat() if b.created_at else None,
                 "user_id": b.user_id,
+                "user_email": email,
             }
-            for b in items
+            for b, email in items
         ],
         "total": total,
         "page": page,

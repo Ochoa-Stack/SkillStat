@@ -65,7 +65,7 @@ function renderBackups(data) {
       <td data-label="ID">${backup.id}</td>
       <td data-label="Archivo">${backup.filename || "—"}</td>
       <td data-label="Estado">${formatStatus(backup.status)}</td>
-      <td data-label="Generado por">Usuario #${backup.user_id}</td>
+      <td data-label="Generado por">${backup.user_email || `Usuario #${backup.user_id}`}</td>
       <td data-label="Fecha">${fecha}</td>
     `;
     tbody.appendChild(tr);
