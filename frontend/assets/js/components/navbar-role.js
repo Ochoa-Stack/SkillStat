@@ -8,6 +8,7 @@
       return;
     }
     if (user.role !== "ADMIN") return;
+    if (window.location.pathname.includes("/views/admin/")) return;
     const navbarList = document.querySelector(".navbar__links");
     const drawerList = document.querySelector(".nav-drawer__links");
     if (navbarList) {
