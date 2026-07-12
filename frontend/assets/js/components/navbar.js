@@ -23,7 +23,7 @@
       // Si esta pagina tiene el boton de Google renderizado, lo
       // volvemos a dibujar con el tema correcto — la libreria de Google
       // no sincroniza su propio tema automaticamente con el nuestro.
-      if (typeof window.refreshGoogleButtonTheme === 'function') {
+      if (typeof window.refreshGoogleButtonTheme === "function") {
         window.refreshGoogleButtonTheme();
       }
     });
@@ -71,21 +71,27 @@
 
 // Cierra la sesion real contra el backend y limpia la cookie httpOnly antes de regresar al usuario a la pagina publica. Centralizado aqui porque el boton de logout vive en el navbar compartido entre las vistas autenticadas, no en cada pagina por separado.
 (function () {
-  const logoutButtons = document.querySelectorAll('[data-auth-action="logout"]');
+  const logoutButtons = document.querySelectorAll(
+    '[data-auth-action="logout"]',
+  );
   if (logoutButtons.length === 0) return;
 
   async function handleLogout() {
     try {
-      await apiPost('/auth/logout', {});
+      await apiPost("/auth/logout", {});
     } catch (error) {
-      console.error('No se pudo cerrar la sesión en el servidor:', error);
+      console.error("No se pudo cerrar la sesión en el servidor:", error);
     } finally {
       // Aunque la peticion falle, regresamos a index.html; desde la perspectiva del usuario, salir debe funcionar siempre.
-      window.location.href = '../views/index.html';
+      const logoLink = document.querySelector(".navbar__logo");
+      const indexHref = logoLink
+        ? logoLink.getAttribute("href")
+        : "../views/index.html";
+      window.location.href = indexHref;
     }
   }
 
   logoutButtons.forEach(function (button) {
-    button.addEventListener('click', handleLogout);
+    button.addEventListener("click", handleLogout);
   });
 })();

@@ -1,11 +1,13 @@
+import logging
 from functools import wraps
 from flask_jwt_extended import get_jwt_identity
 from app.utils.response import error_response
 
+logger = logging.getLogger(__name__)
+
 
 def role_required(*allowed_roles):
-    """Decorador de autorización por rol para rutas de la API.
-    Debe aplicarse siempre después de @jwt_required() en el orden de decoradores, es decir, @jwt_required() va encima y @role_required(...) va debajo. Esto es necesario porque jwt_required debe ejecutarse primero: sin él no existe identidad verificada que este decorador pueda consultar.
+    """Decorador de autorización por rol para rutas de la API. Debe aplicarse siempre después de @jwt_required() en el orden de decoradores, es decir, @jwt_required() va encima y @role_required(...) va debajo. Esto es necesario porque jwt_required debe ejecutarse primero, sin él no existe identidad verificada que este decorador pueda consultar.
 
     Uso:
         @jwt_required()
@@ -23,6 +25,13 @@ def role_required(*allowed_roles):
             user = UserRepository.get_by_id(int(user_id)) if user_id else None
 
             if not user or user.role not in allowed_roles:
+                # Solo logeamos cuando el usuario existe pero su rol no es suficiente; un user=None indica que el token no correspondía a un usuario válido, lo cual ya maneja flask-jwt-extended.
+                if user and user.role not in allowed_roles:
+                    logger.warning(
+                        f"Acceso denegado: usuario {user.id} ({user.email}) con rol "
+                        f"{user.role} intentó acceder a un recurso que requiere "
+                        f"{allowed_roles}."
+                    )
                 return error_response(
                     code="FORBIDDEN",
                     message="No tienes permiso para acceder a este recurso.",
