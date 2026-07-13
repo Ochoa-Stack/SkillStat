@@ -78,6 +78,7 @@ class CompareSkillBlockSchema(Schema):
     skill_id = fields.Integer(dump_only=True)
     skill_name = fields.String(dump_only=True)
     demand_count = fields.Integer(dump_only=True)
+    growth_rate = fields.Decimal(dump_only=True, allow_none=True, as_string=True)
     avg_salary = fields.Decimal(dump_only=True, allow_none=True, as_string=True)
     series = fields.List(fields.Nested(TrendPointSchema), dump_only=True)
 
