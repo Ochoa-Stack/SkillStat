@@ -50,3 +50,12 @@ class UserRepository:
         except Exception:
             db.session.rollback()
             return None
+
+    @classmethod
+    def count_active_admins(cls) -> int:
+        # Cuenta administradores activos para proteger contra que una operación deje al sistema sin ningún ADMIN capaz de operar el panel.
+        return db.session.execute(
+            db.select(db.func.count()).select_from(User).filter_by(
+                role="ADMIN", is_active=True
+            )
+        ).scalar_one()
