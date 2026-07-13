@@ -1,12 +1,15 @@
 let currentPage = 1;
 const perPage = 10;
+// Id del admin autenticado; se carga en initAdminUsuariosPage y se usa en renderUsers para deshabilitar los controles de la propia fila del actor.
+let currentAdminId = null;
 
-function formatRole(role) {
-  if (role === "ADMIN") {
-    return `<span style="color: var(--color-accent-orange); font-weight: 500;">Admin</span>`;
-  }
-  // REGISTERED u otro valor
-  return `<span style="color: var(--color-text-secondary);">${role}</span>`;
+function showRowError(spanEl, message) {
+  spanEl.textContent = message;
+  spanEl.hidden = false;
+  setTimeout(() => {
+    spanEl.hidden = true;
+    spanEl.textContent = "";
+  }, 4000);
 }
 
 function renderUsers(data) {
@@ -45,15 +48,100 @@ function renderUsers(data) {
         })
       : "—";
 
+    const isSelf = user.id === currentAdminId;
+    const selfTitle = isSelf
+      ? ' title="No puedes modificar tu propia cuenta"'
+      : "";
+    const disabledAttr = isSelf ? " disabled" : "";
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td data-label="ID">${user.id}</td>
       <td data-label="Nombre completo">${nombre}</td>
       <td data-label="Correo">${user.email || "—"}</td>
-      <td data-label="Rol">${formatRole(user.role)}</td>
+      <td data-label="Rol">
+        <select
+          class="admin-role-select"
+          data-user-id="${user.id}"
+          data-user-name="${nombre}"
+          aria-label="Rol de ${nombre}"
+          ${disabledAttr}${selfTitle}
+        >
+          <option value="REGISTERED"${user.role === "REGISTERED" ? " selected" : ""}>Registered</option>
+          <option value="ADMIN"${user.role === "ADMIN" ? " selected" : ""}>Admin</option>
+        </select>
+      </td>
+      <td data-label="Activo">
+        <label class="admin-status-label"${selfTitle}>
+          <input
+            type="checkbox"
+            class="admin-status-checkbox"
+            data-user-id="${user.id}"
+            data-user-name="${nombre}"
+            ${user.is_active !== false ? "checked" : ""}
+            ${disabledAttr}
+            aria-label="Estado activo de ${nombre}"
+          />
+          <span class="admin-status-text">${user.is_active !== false ? "Activo" : "Inactivo"}</span>
+        </label>
+      </td>
       <td data-label="Registrado el">${fecha}</td>
+      <td data-label="">
+        <span class="form-error admin-row-error" hidden></span>
+      </td>
     `;
     tbody.appendChild(tr);
+
+    // Listeners de mutación, aplica solo para filas que no son el propio admin
+    if (!isSelf) {
+      const roleSelect = tr.querySelector(".admin-role-select");
+      const statusCheckbox = tr.querySelector(".admin-status-checkbox");
+      const errorSpan = tr.querySelector(".admin-row-error");
+
+      roleSelect.addEventListener("change", async () => {
+        const newRole = roleSelect.value;
+        const previousRole = newRole === "ADMIN" ? "REGISTERED" : "ADMIN";
+        const confirmed = window.confirm(
+          `¿Cambiar el rol de ${nombre} a ${newRole === "ADMIN" ? "Admin" : "Registered"}?`,
+        );
+        if (!confirmed) {
+          roleSelect.value = previousRole;
+          return;
+        }
+        roleSelect.disabled = true;
+        try {
+          await updateUserRole(user.id, newRole);
+        } catch (err) {
+          roleSelect.value = previousRole;
+          showRowError(errorSpan, err.message);
+        } finally {
+          roleSelect.disabled = false;
+        }
+      });
+
+      statusCheckbox.addEventListener("change", async () => {
+        const newStatus = statusCheckbox.checked;
+        const statusLabel = tr.querySelector(".admin-status-text");
+        const confirmed = window.confirm(
+          `¿${newStatus ? "Activar" : "Desactivar"} la cuenta de ${nombre}?`,
+        );
+        if (!confirmed) {
+          statusCheckbox.checked = !newStatus;
+          return;
+        }
+        statusCheckbox.disabled = true;
+        try {
+          await updateUserStatus(user.id, newStatus);
+          statusLabel.textContent = newStatus ? "Activo" : "Inactivo";
+        } catch (err) {
+          statusCheckbox.checked = !newStatus;
+          statusLabel.textContent = !newStatus ? "Activo" : "Inactivo";
+          showRowError(errorSpan, err.message);
+        } finally {
+          statusCheckbox.disabled = false;
+        }
+      });
+    }
   });
 }
 
@@ -75,7 +163,12 @@ function bindControls() {
 
 async function initAdminUsuariosPage() {
   try {
-    const data = await listUsers(1, perPage);
+    // Obtenemos el usuario actual con el mismo patrón que navbar-role.js para saber el id del admin logueado y deshabilitar su propia fila.
+    const [me, data] = await Promise.all([
+      apiGet("/auth/me"),
+      listUsers(1, perPage),
+    ]);
+    currentAdminId = me.id;
 
     document.getElementById("admin-loading").style.display = "none";
     document.getElementById("admin-main").hidden = false;
@@ -86,7 +179,7 @@ async function initAdminUsuariosPage() {
     if (error.status === 401) {
       window.location.href = "../register.html";
     } else if (error.status === 403) {
-      // Sesión válida pero sin rol ADMIN: redirige silenciosamente sin mensaje
+      // Sesión válida pero sin rol ADMIN que redirige silenciosamente sin mensaje
       window.location.href = "../panorama.html";
     } else {
       console.error("Error cargando usuarios:", error);
