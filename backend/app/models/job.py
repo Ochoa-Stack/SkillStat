@@ -19,7 +19,7 @@ class Job(db.Model):
     description_hash = db.Column(db.String(64), nullable=False, unique=True)
     processed = db.Column(db.Boolean, default=False, nullable=False)
 
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc),

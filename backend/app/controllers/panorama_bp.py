@@ -270,6 +270,7 @@ def get_compare():
             "skill_id": skill.id,
             "skill_name": skill.name,
             "demand_count": latest.demand_count if latest else 0,
+            "growth_rate": latest.growth_rate if latest else None,
             "avg_salary": latest.avg_salary if latest else None,
             "series": [
                 {"date": s.date, "demand_count": s.demand_count}
