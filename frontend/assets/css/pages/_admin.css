@@ -142,3 +142,42 @@
     display: none;
   }
 }
+
+.admin-role-select {
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.admin-role-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-role-select option[value="ADMIN"] {
+  color: var(--color-accent-orange);
+}
+
+.admin-status-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.admin-status-label:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-row-error {
+  display: block;
+  font-size: var(--text-xs);
+  max-width: 180px;
+}
