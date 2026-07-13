@@ -56,6 +56,14 @@ def _register_jwt_handlers(app: Flask) -> None:
             status_code=401,
         )
 
+    @jwt.revoked_token_loader
+    def handle_revoked_token(jwt_header, jwt_payload):
+        return error_response(
+            code="TOKEN_REVOKED",
+            message="La sesión ha sido revocada.",
+            status_code=401,
+        )
+
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
         # Importación diferida para evitar ciclo de importación con db/User.
@@ -67,8 +75,16 @@ def _register_jwt_handlers(app: Flask) -> None:
             return False
 
         user = UserRepository.get_by_id(int(user_id))
-        if not user or user.password_changed_at is None:
-            # Usuario no encontrado o exclusivamente OAuth (sin contraseña), no aplicamos invalidación por cambio de contraseña.
+        if not user:
+            # Si Usuario no encontrado, entonces no podemos validar nada, dejamos pasar (flask-jwt-extended ya maneja tokens huérfanos en otros callbacks).
+            return False
+
+        if not user.is_active:
+            # Si Usuario desactivado, entonces revocamos inmediatamente todas sus sesiones activas sin importar cuándo fue emitido el token.
+            return True
+
+        if user.password_changed_at is None:
+            # Si Usuario exclusivamente OAuth (sin contraseña propia), no aplicamos invalidación por cambio de contraseña.
             return False
 
         # El claim "iat" (issued-at) es un timestamp Unix con precisión de segundos. password_changed_at tiene microsegundos; truncamos al segundo para que un token emitido en el mismo segundo que el reset no quede bloqueado falsamente. El ataque de "token emitido justo antes del reset" sigue bloqueado correctamente porque iat < pca_floor cuando la diferencia es de al menos 1 segundo completo.
