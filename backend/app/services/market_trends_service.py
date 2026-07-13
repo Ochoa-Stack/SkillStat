@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from app.repositories.job_skill_repository import JobSkillRepository
 from app.repositories.trend_snapshot_repository import TrendSnapshotRepository
 from app.utils.errors import AppError
@@ -9,7 +9,7 @@ class MarketTrendsService:
 
     @classmethod
     def generate_snapshots(cls) -> int:
-        raw_data = JobSkillRepository.get_all()
+        raw_data = JobSkillRepository.get_active(days=30)
 
         if not raw_data:
             return 0
@@ -45,12 +45,27 @@ class MarketTrendsService:
             else:
                 avg_salary_value = float(avg_salary_value)
 
+            skill_id = int(row["skill_id"])
+            city_id = int(row["city_id"])
+            nuevo_demand_count = int(row["demand_count"])
+
+            target_date = today - timedelta(days=7)
+            prev_snapshot = TrendSnapshotRepository.get_by_skill_city_date(skill_id, city_id, target_date)
+
+            if not prev_snapshot or not prev_snapshot.demand_count:
+                growth_rate = None
+            else:
+                previo_demand_count = prev_snapshot.demand_count
+                growth_rate = round(((nuevo_demand_count - previo_demand_count) / previo_demand_count) * 100, 2)
+                growth_rate = max(min(growth_rate, 999.99), -999.99)
+
             snapshot_data = {
-                "skill_id": int(row["skill_id"]),
-                "city_id": int(row["city_id"]),
+                "skill_id": skill_id,
+                "city_id": city_id,
                 "date": today,
-                "demand_count": int(row["demand_count"]),
+                "demand_count": nuevo_demand_count,
                 "avg_salary": avg_salary_value,
+                "growth_rate": growth_rate,
             }
 
             result = TrendSnapshotRepository.upsert(snapshot_data)

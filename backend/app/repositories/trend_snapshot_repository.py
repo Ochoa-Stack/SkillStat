@@ -17,6 +17,13 @@ class TrendSnapshotRepository(BaseRepository):
         ).scalar_one_or_none()
 
     @classmethod
+    def get_by_skill_city_date(cls, skill_id: int, city_id: int, target_date):
+        return db.session.execute(
+            db.select(TrendSnapshot)
+            .filter_by(skill_id=skill_id, city_id=city_id, date=target_date)
+        ).scalar_one_or_none()
+
+    @classmethod
     def upsert(cls, data: dict):
         from sqlalchemy.dialects.postgresql import insert
         
