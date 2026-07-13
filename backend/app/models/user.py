@@ -12,13 +12,15 @@ class User(db.Model):
     # Nullable porque un usuario que entra solo via Google/GitHub/Apple nunca define una contrasena propia.
     password_hash = db.Column(db.String(255), nullable=True)
     role = db.Column(db.String(20), nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     # Null para usuarios exclusivamente OAuth (sin contraseña propia). El blocklist callback trata null como "sin restricción"; esos usuarios nunca se desloguean por este mecanismo porque no tienen contraseña que cambiar.
     password_changed_at = db.Column(db.DateTime, nullable=True)
     # Null es el estado valido para "sin definir"; el valor se puede completar mas adelante desde el perfil.
     intent = db.Column(db.String(20), nullable=True)
     # Fecha de verificacion de correo, null si no esta verificado
     email_verified_at = db.Column(db.DateTime, nullable=True)
+    # Soft-delete / desactivación de cuenta. False bloquea todas las sesiones activas via token_in_blocklist_loader sin eliminar el registro.
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     alerts = db.relationship("Alert", backref="user", lazy=True)
     backups = db.relationship("Backup", backref="user", lazy=True)
