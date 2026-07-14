@@ -211,11 +211,7 @@
       <div class="container grid-2-col">
         <section class="alertas-form-section">
           <h2>Nueva alerta</h2>
-          <form
-            id="crear-alerta-form"
-            class="alertas-form"
-            novalidate
-          >
+          <form id="crear-alerta-form" class="alertas-form" novalidate>
             <p class="form-error" id="crear-alerta-msg" role="alert" hidden></p>
             <div class="form-group">
               <label class="form-label" for="alert-skill-select"
@@ -231,6 +227,28 @@
               </select>
             </div>
             <div class="form-group">
+              <label class="form-label">Tipo de alerta</label>
+              <div
+                class="alert-type-toggle"
+                role="radiogroup"
+                aria-label="Tipo de alerta"
+              >
+                <label class="alert-type-option">
+                  <input
+                    type="radio"
+                    name="alert_type"
+                    value="ABSOLUTE"
+                    checked
+                  />
+                  Umbral de vacantes
+                </label>
+                <label class="alert-type-option">
+                  <input type="radio" name="alert_type" value="TREND" />
+                  Tendencia de crecimiento
+                </label>
+              </div>
+            </div>
+            <div class="form-group" id="threshold-value-group">
               <label class="form-label" for="alert-threshold"
                 >Umbral de vacantes activas</label
               >
@@ -242,7 +260,20 @@
                 min="1"
                 step="1"
                 placeholder="Ej. 50"
-                required
+              />
+            </div>
+            <div class="form-group" id="threshold-percentage-group" hidden>
+              <label class="form-label" for="alert-percentage"
+                >Porcentaje mínimo de crecimiento semanal</label
+              >
+              <input
+                type="number"
+                id="alert-percentage"
+                name="threshold_percentage"
+                class="form-input"
+                min="0.01"
+                step="0.01"
+                placeholder="Ej. 15"
               />
             </div>
             <button
