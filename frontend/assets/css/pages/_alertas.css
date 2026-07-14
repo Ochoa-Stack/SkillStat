@@ -130,3 +130,24 @@
   justify-content: center;
   min-height: 40vh;
 }
+
+.alert-type-toggle {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.alert-type-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.alert-type-option input[type="radio"] {
+  accent-color: var(--color-primary);
+  width: 1.25rem;
+  height: 1.25rem;
+}

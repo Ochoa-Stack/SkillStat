@@ -45,10 +45,15 @@ function renderAlerts(alerts) {
         })
       : "—";
 
+    const thresholdLabel =
+      alert.alert_type === "TREND"
+        ? `≥ ${alert.threshold_percentage}% de crecimiento`
+        : `≥ ${alert.threshold_value} vacantes`;
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td data-label="Habilidad">${skillName}</td>
-      <td data-label="Umbral">${alert.threshold_value} vacantes</td>
+      <td data-label="Umbral">${thresholdLabel}</td>
       <td data-label="Creada el">${createdAt}</td>
       <td data-label="">
         <button
@@ -92,14 +97,40 @@ async function loadAlerts() {
 
 function validateCreateForm(form) {
   const skillId = parseInt(form.skill_id.value);
-  const thresholdValue = parseInt(form.threshold_value.value);
-  return skillId > 0 && Number.isInteger(thresholdValue) && thresholdValue > 0;
+  const alertType = form.alert_type.value;
+  if (!(skillId > 0)) return false;
+  if (alertType === "ABSOLUTE") {
+    const thresholdValue = parseInt(form.threshold_value.value);
+    return Number.isInteger(thresholdValue) && thresholdValue > 0;
+  }
+  if (alertType === "TREND") {
+    const thresholdPercentage = parseFloat(form.threshold_percentage.value);
+    return !isNaN(thresholdPercentage) && thresholdPercentage > 0;
+  }
+  return false;
 }
 
 function bindCreateForm() {
   const form = document.getElementById("crear-alerta-form");
   const btn = document.getElementById("btn-crear-alerta");
   const msg = document.getElementById("crear-alerta-msg");
+
+  function toggleThresholdFields(form) {
+    const alertType = form.alert_type.value;
+    const valueGroup = document.getElementById("threshold-value-group");
+    const percentageGroup = document.getElementById(
+      "threshold-percentage-group",
+    );
+    if (alertType === "ABSOLUTE") {
+      valueGroup.hidden = false;
+      percentageGroup.hidden = true;
+      form.threshold_percentage.value = "";
+    } else {
+      valueGroup.hidden = true;
+      percentageGroup.hidden = false;
+      form.threshold_value.value = "";
+    }
+  }
 
   // Deshabilita el botón en tiempo real para que el usuario tenga feedback inmediato de validez del formulario antes de intentar enviarlo
   function updateSubmitState() {
@@ -108,12 +139,27 @@ function bindCreateForm() {
 
   form.skill_id.addEventListener("change", updateSubmitState);
   form.threshold_value.addEventListener("input", updateSubmitState);
+  form.threshold_percentage.addEventListener("input", updateSubmitState);
+
+  form.querySelectorAll('input[name="alert_type"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      toggleThresholdFields(form);
+      updateSubmitState();
+    });
+  });
+
   updateSubmitState();
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const skillId = parseInt(form.skill_id.value);
-    const thresholdValue = parseInt(form.threshold_value.value);
+    const alertType = form.alert_type.value;
+    const thresholdValue =
+      alertType === "ABSOLUTE" ? parseInt(form.threshold_value.value) : null;
+    const thresholdPercentage =
+      alertType === "TREND"
+        ? parseFloat(form.threshold_percentage.value)
+        : null;
 
     const originalText = btn.textContent;
     btn.textContent = "Creando...";
@@ -121,7 +167,12 @@ function bindCreateForm() {
     msg.hidden = true;
 
     try {
-      await createAlert(skillId, thresholdValue);
+      await createAlert(
+        skillId,
+        alertType,
+        thresholdValue,
+        thresholdPercentage,
+      );
       showInlineMessage(msg, "Alerta creada correctamente.", true);
       form.reset();
       updateSubmitState();
