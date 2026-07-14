@@ -67,8 +67,21 @@ function renderBackups(data) {
       <td data-label="Estado">${formatStatus(backup.status)}</td>
       <td data-label="Generado por">${backup.user_email || `Usuario #${backup.user_id}`}</td>
       <td data-label="Fecha">${fecha}</td>
+      <td data-label="Acciones">
+        ${
+          backup.status === "COMPLETED"
+            ? `<button class="btn btn--ghost btn--sm" data-action="restore-backup" data-id="${backup.id}" data-filename="${backup.filename}">Restaurar</button>`
+            : ""
+        }
+      </td>
     `;
     tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('[data-action="restore-backup"]').forEach((btn) => {
+    btn.addEventListener("click", () =>
+      openRestoreDialog(btn.dataset.id, btn.dataset.filename),
+    );
   });
 }
 
@@ -104,6 +117,57 @@ async function handleGenerarRespaldo() {
   }
 }
 
+function openRestoreDialog(backupId, filename) {
+  const dialog = document.getElementById("restore-confirm-dialog");
+  const filenameEl = document.getElementById("restore-dialog-filename");
+  const input = document.getElementById("restore-confirm-input");
+  const confirmBtn = document.getElementById("restore-dialog-confirm");
+  const msg = document.getElementById("restore-dialog-msg");
+
+  filenameEl.textContent = filename;
+  input.value = "";
+  confirmBtn.disabled = true;
+  msg.hidden = true;
+  dialog.dataset.backupId = backupId;
+  dialog.dataset.filename = filename;
+
+  input.oninput = () => {
+    confirmBtn.disabled = input.value !== filename;
+  };
+
+  dialog.showModal();
+}
+
+async function handleConfirmRestore() {
+  const dialog = document.getElementById("restore-confirm-dialog");
+  const confirmBtn = document.getElementById("restore-dialog-confirm");
+  const msg = document.getElementById("restore-dialog-msg");
+  const backupId = dialog.dataset.backupId;
+  const filename = dialog.dataset.filename;
+
+  const originalText = confirmBtn.textContent;
+  confirmBtn.textContent = "Restaurando...";
+  confirmBtn.disabled = true;
+  msg.hidden = true;
+
+  try {
+    const result = await restoreBackup(backupId, filename);
+    dialog.close();
+    showInlineMessage(
+      document.getElementById("admin-action-msg"),
+      `Restauración completada. Se generó un respaldo de seguridad: ${result.safety_backup}.`,
+      true,
+    );
+    await loadPage(currentPage);
+  } catch (error) {
+    msg.textContent = error.message || "No se pudo completar la restauración.";
+    msg.hidden = false;
+    confirmBtn.disabled = false;
+  } finally {
+    confirmBtn.textContent = originalText;
+  }
+}
+
 function bindControls() {
   document
     .getElementById("btn-generar-respaldo")
@@ -116,6 +180,15 @@ function bindControls() {
   document.getElementById("admin-btn-next").addEventListener("click", () => {
     loadPage(currentPage + 1);
   });
+
+  document
+    .getElementById("restore-dialog-cancel")
+    .addEventListener("click", () => {
+      document.getElementById("restore-confirm-dialog").close();
+    });
+  document
+    .getElementById("restore-dialog-confirm")
+    .addEventListener("click", handleConfirmRestore);
 }
 
 async function initAdminRespaldosPage() {

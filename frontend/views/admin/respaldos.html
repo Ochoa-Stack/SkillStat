@@ -267,6 +267,7 @@
                   <th scope="col">Estado</th>
                   <th scope="col">Generado por</th>
                   <th scope="col">Fecha</th>
+                  <th scope="col">Acciones</th>
                 </tr>
               </thead>
               <tbody id="admin-tbody"></tbody>
@@ -296,6 +297,51 @@
           </div>
         </section>
       </div>
+
+      <dialog id="restore-confirm-dialog" class="restore-dialog">
+        <form method="dialog" id="restore-confirm-form">
+          <h2>Confirmar restauración</h2>
+          <p class="text-body">
+            Esta acción reemplazará <strong>TODOS</strong> los datos actuales de
+            la base de datos con el contenido del respaldo
+            <strong id="restore-dialog-filename"></strong>, incluyendo el propio
+            historial de respaldos: registros de respaldos generados después de
+            ese momento dejarán de aparecer en esta lista (aunque sus archivos
+            físicos permanecen en el servidor). Se generará un respaldo de
+            seguridad automático antes de proceder, pero esta acción no se puede
+            deshacer de ninguna otra forma.
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="restore-confirm-input">
+              Escribe el nombre exacto del archivo para confirmar:
+            </label>
+            <input
+              type="text"
+              id="restore-confirm-input"
+              class="form-input"
+              autocomplete="off"
+            />
+          </div>
+          <p class="form-error" id="restore-dialog-msg" role="alert" hidden></p>
+          <div class="restore-dialog-actions">
+            <button
+              type="button"
+              class="btn btn--ghost"
+              id="restore-dialog-cancel"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn--primary"
+              id="restore-dialog-confirm"
+              disabled
+            >
+              Restaurar de todas formas
+            </button>
+          </div>
+        </form>
+      </dialog>
     </main>
 
     <script src="../../assets/js/utils/formatters.js"></script>
