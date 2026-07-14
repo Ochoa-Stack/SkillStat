@@ -7,7 +7,7 @@ from app.services.ingestion_service import IngestionService
 from app.services.backup_service import BackupService
 from app.repositories.backup_repository import BackupRepository
 from app.repositories.user_repository import UserRepository
-from app.schemas.admin_schema import UserRoleSchema, UserStatusSchema
+from app.schemas.admin_schema import UserRoleSchema, UserStatusSchema, BackupRestoreConfirmSchema
 from app.utils.response import success_response, error_response
 from app.utils.decorators import role_required
 
@@ -77,6 +77,44 @@ def list_backups():
         "total_pages": (total + per_page - 1) // per_page if total > 0 else 0,
     }
 
+    return success_response(data=result, status_code=200)
+
+from app.utils.errors import AppError
+
+@admin_bp.route("/backups/<int:backup_id>/restore", methods=["POST"])
+@jwt_required()
+@role_required("ADMIN")
+def restore_backup(backup_id):
+    actor_id = int(get_jwt_identity())
+    try:
+        payload = BackupRestoreConfirmSchema().load(request.get_json() or {})
+    except ValidationError as err:
+        return error_response(code="VALIDATION_ERROR", message=err.messages, status_code=422)
+    backup = BackupRepository.get_by_id(backup_id)
+    if not backup:
+        return error_response(code="NOT_FOUND", message="El respaldo no existe.", status_code=404)
+    if payload["confirm_filename"] != backup.filename:
+        logger.warning(
+            "Intento de restauracion con nombre de archivo no coincidente: admin %s intento restaurar backup %s con confirmacion '%s'.",
+            actor_id, backup_id, payload["confirm_filename"]
+        )
+        return error_response(
+            code="FILENAME_MISMATCH",
+            message="El nombre de archivo no coincide con el respaldo seleccionado.",
+            status_code=422,
+        )
+    try:
+        result = BackupService.restore_database_backup(backup_id=backup_id, requested_by=actor_id)
+    except AppError as e:
+        logger.error(
+            "Restauracion fallida: admin %s intento restaurar backup %s (%s). Error: %s",
+            actor_id, backup_id, backup.filename, str(e)
+        )
+        return error_response(code=e.code or "RESTORE_ERROR", message=str(e), status_code=e.status_code or 500)
+    logger.info(
+        "Restauracion exitosa: admin %s restauro backup %s (%s). Backup de seguridad generado: %s.",
+        actor_id, backup_id, backup.filename, result.get("safety_backup")
+    )
     return success_response(data=result, status_code=200)
 
 

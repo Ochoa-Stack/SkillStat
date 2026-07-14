@@ -17,3 +17,9 @@ class UserStatusSchema(Schema):
         required=True,
         error_messages={"required": "El campo is_active es obligatorio."},
     )
+
+class BackupRestoreConfirmSchema(Schema):
+    confirm_filename = fields.String(
+        required=True,
+        error_messages={"required": "Debes confirmar el nombre del archivo a restaurar."}
+    )
