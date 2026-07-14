@@ -2,6 +2,7 @@ import os
 import subprocess
 from datetime import datetime
 from flask import current_app
+from app.extensions import db
 from app.repositories.backup_repository import BackupRepository
 from app.utils.errors import AppError
 
@@ -20,7 +21,7 @@ class BackupService:
                 status_code=500,
             )
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
         filename = f"skillstat_backup_{timestamp}.sql"
 
         base_dir = os.path.dirname(
@@ -81,4 +82,77 @@ class BackupService:
             raise AppError(
                 f"Error interno durante respaldo: {str(e)}",
                 code="BACKUP_ERROR",
+            )
+
+    @classmethod
+    def restore_database_backup(cls, backup_id: int, requested_by: int) -> dict:
+        from urllib.parse import urlparse
+        backup = BackupRepository.get_by_id(backup_id)
+        if not backup:
+            raise AppError("El respaldo solicitado no existe.", code="NOT_FOUND", status_code=404)
+        if backup.status != "COMPLETED":
+            raise AppError(
+                "Solo se pueden restaurar respaldos con estado COMPLETED.",
+                code="INVALID_BACKUP_STATE",
+                status_code=422,
+            )
+        if not os.path.exists(backup.storage_url):
+            raise AppError(
+                "El archivo de respaldo no existe en el almacenamiento local.",
+                code="BACKUP_FILE_MISSING",
+                status_code=404,
+            )
+
+        # Extraemos TODOS los valores primitivos que necesitamos del objeto backup ANTES de generar el backup de seguridad. Esto es critico porque cualquier acceso a un atributo del ORM despues del commit de execute_database_backup() dispara un lazy-load que abre una transaccion implicita nueva, la cual retiene un lock compartido sobre la tabla backups y causa un deadlock real con pg_restore, que necesita un lock exclusivo sobre esa misma tabla para hacer DROP CONSTRAINT/DROP TABLE. Confirmado con evidencia de pg_stat_activity durante el diagnostico de esta rama.
+        backup_filepath = backup.storage_url
+        backup_filename = backup.filename
+
+        # Generamos el respaldo de seguridad ANTES de tocar la base de datos. Si esto falla, abortamos toda la operacion.
+        safety_backup = cls.execute_database_backup(requested_by=requested_by)
+
+        # Verificacion de defensa en profundidad, confirmamos que el archivo a restaurar sigue siendo distinto al respaldo de seguridad recien generado.
+        if safety_backup["file"] == backup_filename:
+            raise AppError(
+                "Colision de nombre de archivo detectada entre el respaldo "
+                "a restaurar y el respaldo de seguridad. Restauracion abortada "
+                "por seguridad.",
+                code="FILENAME_COLLISION",
+                status_code=500,
+            )
+
+        db_url = current_app.config.get("SQLALCHEMY_DATABASE_URI", "")
+        parsed = urlparse(db_url)
+        user = parsed.username
+        password = parsed.password or ""
+        host = parsed.hostname
+        port = str(parsed.port or 5432)
+        db_name = parsed.path.lstrip("/")
+        env = os.environ.copy()
+        env["PGPASSWORD"] = password
+        command = [
+            "pg_restore",
+            "--clean",
+            "--if-exists",
+            "-h", host,
+            "-p", port,
+            "-U", user,
+            "-d", db_name,
+            backup_filepath,
+        ]
+
+        # Cerramos explicitamente la sesion de SQLAlchemy antes de lanzar pg_restore, como capa adicional de seguridad. Esto libera cualquier lock que la sesion actual pudiera estar reteniendo sobre la base de datos, incluso si no anticipamos su origen.
+        db.session.remove()
+
+        try:
+            subprocess.run(command, env=env, capture_output=True, text=True, check=True)
+            return {
+                "status": "success",
+                "restored_from": backup_filename,
+                "safety_backup": safety_backup["file"],
+            }
+        except subprocess.CalledProcessError as e:
+            raise AppError(
+                f"Fallo en ejecucion de pg_restore: {e.stderr}",
+                code="RESTORE_ERROR",
+                status_code=500,
             )
