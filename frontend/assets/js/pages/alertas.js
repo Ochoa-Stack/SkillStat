@@ -50,9 +50,11 @@ function renderAlerts(alerts) {
         ? `≥ ${alert.threshold_percentage}% de crecimiento`
         : `≥ ${alert.threshold_value} vacantes`;
 
+    const skillNameSeguro = escapeHtml(skillName);
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td data-label="Habilidad">${skillName}</td>
+      <td data-label="Habilidad">${skillNameSeguro}</td>
       <td data-label="Umbral">${thresholdLabel}</td>
       <td data-label="Creada el">${createdAt}</td>
       <td data-label="">
@@ -61,7 +63,7 @@ function renderAlerts(alerts) {
           type="button"
           data-action="delete-alert"
           data-id="${alert.id}"
-          aria-label="Eliminar alerta para ${skillName}"
+          aria-label="Eliminar alerta para ${skillNameSeguro}"
         >
           <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
         </button>

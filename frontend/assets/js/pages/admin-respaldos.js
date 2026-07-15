@@ -60,17 +60,22 @@ function renderBackups(data) {
         })
       : "—";
 
+    const filenameSeguro = escapeHtml(backup.filename || "—");
+    const userEmailSeguro = escapeHtml(
+      backup.user_email || `Usuario #${backup.user_id}`,
+    );
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td data-label="ID">${backup.id}</td>
-      <td data-label="Archivo">${backup.filename || "—"}</td>
+      <td data-label="Archivo">${filenameSeguro}</td>
       <td data-label="Estado">${formatStatus(backup.status)}</td>
-      <td data-label="Generado por">${backup.user_email || `Usuario #${backup.user_id}`}</td>
+      <td data-label="Generado por">${userEmailSeguro}</td>
       <td data-label="Fecha">${fecha}</td>
       <td data-label="Acciones">
         ${
           backup.status === "COMPLETED"
-            ? `<button class="btn btn--ghost btn--sm" data-action="restore-backup" data-id="${backup.id}" data-filename="${backup.filename}">Restaurar</button>`
+            ? `<button class="btn btn--ghost btn--sm" data-action="restore-backup" data-id="${backup.id}" data-filename="${escapeHtml(backup.filename)}">Restaurar</button>`
             : ""
         }
       </td>

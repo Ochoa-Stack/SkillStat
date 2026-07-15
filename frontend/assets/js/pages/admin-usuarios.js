@@ -54,17 +54,20 @@ function renderUsers(data) {
       : "";
     const disabledAttr = isSelf ? " disabled" : "";
 
+    const nombreSeguro = escapeHtml(nombre);
+    const emailSeguro = escapeHtml(user.email || "—");
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td data-label="ID">${user.id}</td>
-      <td data-label="Nombre completo">${nombre}</td>
-      <td data-label="Correo">${user.email || "—"}</td>
+      <td data-label="Nombre completo">${nombreSeguro}</td>
+      <td data-label="Correo">${emailSeguro}</td>
       <td data-label="Rol">
         <select
           class="admin-role-select"
           data-user-id="${user.id}"
-          data-user-name="${nombre}"
-          aria-label="Rol de ${nombre}"
+          data-user-name="${nombreSeguro}"
+          aria-label="Rol de ${nombreSeguro}"
           ${disabledAttr}${selfTitle}
         >
           <option value="REGISTERED"${user.role === "REGISTERED" ? " selected" : ""}>Registered</option>
@@ -77,10 +80,10 @@ function renderUsers(data) {
             type="checkbox"
             class="admin-status-checkbox"
             data-user-id="${user.id}"
-            data-user-name="${nombre}"
+            data-user-name="${nombreSeguro}"
             ${user.is_active !== false ? "checked" : ""}
             ${disabledAttr}
-            aria-label="Estado activo de ${nombre}"
+            aria-label="Estado activo de ${nombreSeguro}"
           />
           <span class="admin-status-text">${user.is_active !== false ? "Activo" : "Inactivo"}</span>
         </label>
