@@ -5,6 +5,9 @@ from flask import current_app
 from app.extensions import db
 from app.repositories.backup_repository import BackupRepository
 from app.utils.errors import AppError
+import logging
+
+logger = logging.getLogger(__name__)
 
 class BackupService:
     # Encapsula la ejecución de comandos del sistema operativo (pg_dump). Requisito obligatorio de infraestructura y recuperación.
@@ -72,13 +75,25 @@ class BackupService:
             return {"status": "success", "file": filename, "size": file_size}
 
         except subprocess.CalledProcessError as e:
-            BackupRepository.update(backup_record.id, {"status": "FAILED"})
+            try:
+                BackupRepository.update(backup_record.id, {"status": "FAILED"})
+            except AppError as update_err:
+                logger.error(
+                    "No se pudo marcar el backup %s como FAILED tras error de pg_dump: %s",
+                    backup_record.id, update_err.message
+                )
             raise AppError(
                 f"Fallo en ejecucion de pg_dump: {e.stderr}",
                 code="BACKUP_ERROR",
             )
         except Exception as e:
-            BackupRepository.update(backup_record.id, {"status": "FAILED"})
+            try:
+                BackupRepository.update(backup_record.id, {"status": "FAILED"})
+            except AppError as update_err:
+                logger.error(
+                    "No se pudo marcar el backup %s como FAILED tras error interno: %s",
+                    backup_record.id, update_err.message
+                )
             raise AppError(
                 f"Error interno durante respaldo: {str(e)}",
                 code="BACKUP_ERROR",
