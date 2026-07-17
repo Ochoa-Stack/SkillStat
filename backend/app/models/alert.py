@@ -21,8 +21,8 @@ class Alert(db.Model):
             "alert_type IN ('ABSOLUTE', 'TREND')", name="chk_alerts_type"
         ),
         db.CheckConstraint(
-            "(alert_type = 'ABSOLUTE' AND threshold_value IS NOT NULL) OR "
-            "(alert_type = 'TREND' AND threshold_percentage IS NOT NULL)",
+            "(alert_type = 'ABSOLUTE' AND threshold_value IS NOT NULL AND threshold_percentage IS NULL) OR "
+            "(alert_type = 'TREND' AND threshold_percentage IS NOT NULL AND threshold_value IS NULL)",
             name="chk_alerts_threshold_matches_type",
         ),
     )
