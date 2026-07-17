@@ -1,3 +1,4 @@
+import logging
 import hashlib
 import click
 from flask import current_app
@@ -8,6 +9,8 @@ from app.repositories.skill_repository import SkillRepository
 from app.repositories.job_skill_repository import JobSkillRepository
 from app.repositories.city_repository import CityRepository
 from app.utils.errors import AppError
+
+logger = logging.getLogger(__name__)
 
 # ID de "México Nacional", fila de fallback cuando la ubicación cruda no puede geocodificarse. Usamos una constante en lugar de una query extra por ejecución porque la fila es de solo lectura y su ID es estable
 MEXICO_NACIONAL_CITY_ID = 1
@@ -87,9 +90,10 @@ class IngestionService:
             "salary_max": float(salary_max) if salary_max is not None else None,
         }
 
-        job = JobRepository.create(job_data)
-        if not job:
-            # El repositorio atrapó un error SQL (diferente a duplicado, ya que esos los validamos antes)
+        try:
+            job = JobRepository.create(job_data)
+        except AppError:
+            # El repositorio ya hizo rollback y emitió el log; aquí solo contabilizamos el error de ingesta
             stats["errors"] += 1
             return
 
@@ -99,11 +103,18 @@ class IngestionService:
             skill_id = cls._get_or_create_skill(skill_name, known_skills)
             if skill_id:
                 # Inyectamos confidence_score asumiendo certeza determinista del EntityRuler
-                JobSkillRepository.create({
-                    "job_id": job.id,
-                    "skill_id": skill_id,
-                    "confidence_score": 0.95
-                })
+                try:
+                    JobSkillRepository.create({
+                        "job_id": job.id,
+                        "skill_id": skill_id,
+                        "confidence_score": 0.95
+                    })
+                except AppError as e:
+                    logger.warning(
+                        "No se pudo vincular skill_id=%s a job_id=%s: %s",
+                        skill_id, job.id, e.message
+                    )
+                    continue
 
         stats["processed"] += 1
 

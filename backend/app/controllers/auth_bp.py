@@ -24,12 +24,15 @@ from app.repositories.email_verification_token_repository import EmailVerificati
 from app.utils.hash import hash_password, verify_password
 from app.utils.security import generate_tokens
 from app.utils.response import success_response, error_response
+from app.utils.errors import AppError
+from app.extensions import limiter
 
 logger = logging.getLogger(__name__)
 
 auth_bp = Blueprint("auth_bp", __name__)
 
 @auth_bp.route("/register", methods=["POST"])
+@limiter.limit("5 per hour")
 def register():
     try:
         data = UserRegistrationSchema().load(request.get_json() or {})
@@ -65,6 +68,7 @@ def register():
         return success_response(data={"message": "Cuenta creada pero no pudimos enviar el correo. Intenta reenviarlo."}, status_code=201)
 
 @auth_bp.route("/login", methods=["POST"])
+@limiter.limit("10 per 15 minutes")
 def login():
     try:
         data = UserLoginSchema().load(request.get_json() or {})
@@ -170,17 +174,11 @@ def google_login():
                 "email_verified_at": datetime.now(timezone.utc),
             })
 
-        oauth_link = OAuthAccountRepository.create({
+        OAuthAccountRepository.create({
             "user_id": user.id,
             "provider": "google",
             "provider_user_id": google_user_id,
         })
-        if not oauth_link:
-            return error_response(
-                code="INTERNAL_ERROR",
-                message="No se pudo vincular la cuenta de Google.",
-                status_code=500,
-            )
 
     tokens = generate_tokens(user_id=user.id, role=user.role)
     result = UserResponseSchema().dump(user)
@@ -277,6 +275,7 @@ def verify_email_confirm():
 
 
 @auth_bp.route("/resend-verification", methods=["POST"])
+@limiter.limit("3 per hour")
 def resend_verification():
     try:
         data = EmailOnlySchema().load(request.get_json() or {})
@@ -297,25 +296,27 @@ def resend_verification():
     token_hash = hashlib.sha256(plain_token.encode()).hexdigest()
     expires_at = datetime.now(timezone.utc) + timedelta(hours=24)
 
-    EmailVerificationTokenRepository.create({
-        "user_id": user.id,
-        "token_hash": token_hash,
-        "expires_at": expires_at,
-    })
-
     from app.services.email_service import send_verification_email, build_verification_link
     try:
+        EmailVerificationTokenRepository.create({
+            "user_id": user.id,
+            "token_hash": token_hash,
+            "expires_at": expires_at,
+        })
         logger.info(f"[DEV] Verification link para {user.email}: {build_verification_link(plain_token)}")
         send_verification_email(user.email, plain_token)
+    except AppError as e:
+        logger.error(f"Error creando token de verificacion para {user.email}: {e.message}")
     except Exception as e:
         logger.error(f"Error reenviando correo de verificación a {user.email}: {str(e)}")
-        
+
     return generic_ok, status_code
 
 
 
 
 @auth_bp.route("/forgot-password", methods=["POST"])
+@limiter.limit("3 per hour")
 def forgot_password():
     try:
         data = ForgotPasswordSchema().load(request.get_json() or {})
@@ -337,21 +338,20 @@ def forgot_password():
     token_hash = hashlib.sha256(plain_token.encode()).hexdigest()
     expires_at = datetime.now(timezone.utc) + timedelta(minutes=30)
 
-    PasswordResetTokenRepository.create({
-        "user_id": user.id,
-        "token_hash": token_hash,
-        "expires_at": expires_at,
-    })
-
     from app.services.email_service import send_password_reset_email, EmailDeliveryError, build_password_reset_link
-
-    reset_url = build_password_reset_link(plain_token)
-    logger.info("[DEV] Reset link para %s: %s", user.email, reset_url)
-    
     try:
+        PasswordResetTokenRepository.create({
+            "user_id": user.id,
+            "token_hash": token_hash,
+            "expires_at": expires_at,
+        })
+        reset_url = build_password_reset_link(plain_token)
+        logger.info("[DEV] Reset link para %s: %s", user.email, reset_url)
         send_password_reset_email(user.email, plain_token)
     except EmailDeliveryError as e:
         logger.error(f"Error enviando correo de recuperación a {user.email}: {str(e)}")
+    except AppError as e:
+        logger.error(f"Error creando token de recuperacion para {user.email}: {e.message}")
 
     return generic_ok
 

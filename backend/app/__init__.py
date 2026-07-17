@@ -3,7 +3,7 @@ import logging_config
 from flask import Flask
 
 from app.config import config_map
-from app.extensions import db, jwt, cors, migrate, scheduler
+from app.extensions import db, jwt, cors, migrate, scheduler, limiter
 
 def create_app(env: str = None) -> Flask:
     # Aplicamos el patrón Application Factory porque aislar la inicialización nos permite instanciar aplicaciones independientes durante las pruebas automatizadas, previniendo choques por estado global.
@@ -16,6 +16,7 @@ def create_app(env: str = None) -> Flask:
 
     _init_extensions(app)
     _register_jwt_handlers(app)
+    _register_error_handlers(app)
     _register_blueprints(app)
     _register_schedulers(app)
 
@@ -27,6 +28,7 @@ def _init_extensions(app: Flask) -> None:
     migrate.init_app(app, db)
     # Restringimos CORS al prefijo de la API para que el frontend pueda consumirla desde su propio origen sin bloqueos del navegador.
     cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", "*"), "supports_credentials": True}})
+    limiter.init_app(app)
 
 def _register_jwt_handlers(app: Flask) -> None:
     # Unificamos el formato de los errores que flask-jwt-extended genera directamente (antes de llegar a nuestras rutas) con el mismo formato {"error": {"code", "message"}} que usa el resto de la API.
@@ -98,6 +100,28 @@ def _register_jwt_handlers(app: Flask) -> None:
 
         token_issued_at = datetime.fromtimestamp(iat, tz=tz.utc)
         return token_issued_at < pca_floor
+
+
+def _register_error_handlers(app: Flask) -> None:
+    # Traduce cualquier AppError (o subclase) no atrapada en un punto mas especifico de la pila a una respuesta HTTP consistente con el resto de la API, sin que cada controller tenga que envolver cada llamada a un repositorio en su propio try/except.
+    from app.utils.response import error_response
+    from app.utils.errors import AppError
+
+    @app.errorhandler(AppError)
+    def handle_app_error(error):
+        return error_response(
+            code=error.code,
+            message=error.message,
+            status_code=error.status_code,
+        )
+
+    @app.errorhandler(429)
+    def handle_rate_limit_exceeded(error):
+        return error_response(
+            code="RATE_LIMIT_EXCEEDED",
+            message="Has excedido el limite de solicitudes. Intenta de nuevo mas tarde.",
+            status_code=429,
+        )
 
 
 def _register_blueprints(app: Flask) -> None:

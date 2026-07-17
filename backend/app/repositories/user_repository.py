@@ -1,5 +1,11 @@
+import logging
+from sqlalchemy.exc import IntegrityError
 from app.models.user import User
 from app.extensions import db
+from app.utils.errors import AppError, ConflictError
+
+logger = logging.getLogger(__name__)
+
 
 class UserRepository:
     # Encapsula el acceso a datos para la entidad User. Aísla las consultas SQLAlchemy de la lógica de negocio.
@@ -11,14 +17,19 @@ class UserRepository:
         try:
             db.session.commit()
             return user
-        except Exception:
+        except IntegrityError as e:
             db.session.rollback()
-            return None
+            logger.warning("Violacion de integridad al crear User: %s", str(e))
+            raise ConflictError("No se pudo crear el usuario: conflicto de integridad de datos.")
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Fallo inesperado al crear User: %s", str(e))
+            raise AppError("Error interno al crear el usuario.", code="DATABASE_ERROR", status_code=500)
 
     @classmethod
     def get_by_id(cls, user_id: int) -> User:
         return db.session.get(User, user_id)
-        
+
     @classmethod
     def get_by_email(cls, email: str) -> User:
         # Búsqueda especializada indispensable para el flujo de autenticación y prevención de duplicados
@@ -47,9 +58,14 @@ class UserRepository:
         try:
             db.session.commit()
             return user
-        except Exception:
+        except IntegrityError as e:
             db.session.rollback()
-            return None
+            logger.warning("Violacion de integridad al guardar User: %s", str(e))
+            raise ConflictError("No se pudo guardar el usuario: conflicto de integridad de datos.")
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Fallo inesperado al guardar User: %s", str(e))
+            raise AppError("Error interno al guardar el usuario.", code="DATABASE_ERROR", status_code=500)
 
     @classmethod
     def count_active_admins(cls) -> int:
