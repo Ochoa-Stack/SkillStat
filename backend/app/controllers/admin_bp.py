@@ -191,13 +191,7 @@ def update_user_role(user_id):
 
     previous_role = target.role
     target.role = new_role
-    saved = UserRepository.save(target)
-    if not saved:
-        return error_response(
-            code="INTERNAL_ERROR",
-            message="No se pudo actualizar el rol.",
-            status_code=500,
-        )
+    UserRepository.save(target)
 
     logger.info(
         "Cambio de rol: admin %s cambio a usuario %s (%s) de %s a %s.",
@@ -242,13 +236,7 @@ def update_user_status(user_id):
 
     previous_status = target.is_active
     target.is_active = new_status
-    saved = UserRepository.save(target)
-    if not saved:
-        return error_response(
-            code="INTERNAL_ERROR",
-            message="No se pudo actualizar el estado.",
-            status_code=500,
-        )
+    UserRepository.save(target)
 
     logger.info(
         "Cambio de estado: admin %s cambio a usuario %s (%s) de is_active=%s a %s.",

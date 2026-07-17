@@ -11,6 +11,10 @@ class BaseConfig:
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "pool_recycle": 300,
+        "connect_args": {
+            "client_encoding": "utf8",
+            "options": "-c lc_messages=C",
+        },
     }
 
     JWT_SECRET_KEY = os.environ.get(
