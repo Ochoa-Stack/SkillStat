@@ -182,7 +182,7 @@ def update_user_role(user_id):
     new_role = payload["role"]
     # Si el actor se esta auto-modificando y la operacion lo saca de ADMIN, protegemos contra dejar el sistema sin ningun admin activo.
     if target.id == actor_id and target.role == "ADMIN" and new_role != "ADMIN":
-        if UserRepository.count_active_admins() <= 1:
+        if UserRepository.count_active_admins_for_update() <= 1:
             return error_response(
                 code="LAST_ADMIN_PROTECTED",
                 message="No puedes quitarte el rol de ADMIN: eres el unico administrador activo.",
@@ -227,7 +227,7 @@ def update_user_status(user_id):
     new_status = payload["is_active"]
     # Misma proteccion de ultimo-admin, aplicada a desactivacion en vez de cambio de rol.
     if target.id == actor_id and target.role == "ADMIN" and new_status is False:
-        if UserRepository.count_active_admins() <= 1:
+        if UserRepository.count_active_admins_for_update() <= 1:
             return error_response(
                 code="LAST_ADMIN_PROTECTED",
                 message="No puedes desactivar tu cuenta: eres el unico administrador activo.",
