@@ -1,0 +1,22 @@
+.error-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.error-page__content {
+  text-align: center;
+}
+
+.error-page__code {
+  font-size: calc(var(--text-3xl) * 5);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-orange);
+  margin-bottom: var(--space-2);
+}
+
+.error-page__message {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
