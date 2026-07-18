@@ -123,6 +123,22 @@ def _register_error_handlers(app: Flask) -> None:
             status_code=429,
         )
 
+    @app.errorhandler(404)
+    def handle_not_found(error):
+        return error_response(
+            code="NOT_FOUND",
+            message="El recurso solicitado no existe.",
+            status_code=404,
+        )
+
+    @app.errorhandler(500)
+    def handle_internal_error(error):
+        return error_response(
+            code="INTERNAL_ERROR",
+            message="Ocurrio un error interno. Intenta de nuevo mas tarde.",
+            status_code=500,
+        )
+
 
 def _register_blueprints(app: Flask) -> None:
     # Importaciones diferidas para prevenir dependencias circulares antes de inicializar Flask
