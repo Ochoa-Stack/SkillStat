@@ -45,8 +45,10 @@ class BaseConfig:
     if not RESEND_API_KEY:
         raise ValueError("Error de arranque: RESEND_API_KEY es obligatoria y no está configurada en el entorno.")
 
-    BACKUP_STORAGE_URL = os.environ.get("BACKUP_STORAGE_URL")
-    BACKUP_STORAGE_KEY = os.environ.get("BACKUP_STORAGE_KEY")
+    R2_ENDPOINT_URL = os.environ.get("R2_ENDPOINT_URL")
+    R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
+    R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
+    R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME")
 
     SCHEDULER_ENABLED = os.environ.get("SCHEDULER_ENABLED", "false").lower() == "true"
     INGESTION_INTERVAL_HOURS = int(os.environ.get("INGESTION_INTERVAL_HOURS", 6))
