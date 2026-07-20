@@ -14,7 +14,8 @@ class RemoteStorageService:
         endpoint = current_app.config.get("R2_ENDPOINT_URL")
         access_key = current_app.config.get("R2_ACCESS_KEY_ID")
         secret_key = current_app.config.get("R2_SECRET_ACCESS_KEY")
-        if not all([endpoint, access_key, secret_key]):
+        bucket = current_app.config.get("R2_BUCKET_NAME")
+        if not all([endpoint, access_key, secret_key, bucket]):
             return None
         return boto3.client(
             "s3",
