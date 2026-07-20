@@ -29,8 +29,8 @@ spacy>=3.8,<4.0
 # Procesamiento y análisis de datos
 pandas>=2.2,<3.0
 
-# Envío de correos electrónicos
-sendgrid>=6.11,<7.0
+# Cliente S3-compatible para almacenamiento remoto de respaldos (Cloudflare R2)
+boto3>=1.35,<2.0
 
 # Servidor WSGI para producción
 gunicorn>=23.0,<24.0
