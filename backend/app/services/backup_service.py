@@ -5,6 +5,7 @@ from flask import current_app
 from app.extensions import db
 from app.repositories.backup_repository import BackupRepository
 from app.utils.errors import AppError
+from app.services.storage_service import RemoteStorageService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -67,6 +68,7 @@ class BackupService:
             subprocess.run(command, env=env, capture_output=True, text=True, check=True)
 
             file_size = os.path.getsize(filepath)
+            RemoteStorageService.upload_backup(filepath, filename)
             BackupRepository.update(
                 backup_record.id,
                 {"status": "COMPLETED", "file_size_bytes": file_size},
@@ -112,11 +114,22 @@ class BackupService:
                 status_code=422,
             )
         if not os.path.exists(backup.storage_url):
-            raise AppError(
-                "El archivo de respaldo no existe en el almacenamiento local.",
-                code="BACKUP_FILE_MISSING",
-                status_code=404,
+            logger.warning(
+                "Archivo de respaldo %s no encontrado localmente, intentando descargar desde R2.",
+                backup.filename,
             )
+            # Aseguramos que el directorio destino exista antes de escribir el archivo descargado (en un entorno recien desplegado podria no existir todavia).
+            os.makedirs(os.path.dirname(backup.storage_url), exist_ok=True)
+            downloaded = RemoteStorageService.download_backup(
+                backup.filename, backup.storage_url
+            )
+            if not downloaded:
+                raise AppError(
+                    "El archivo de respaldo no existe localmente y no se pudo "
+                    "descargar desde el almacenamiento remoto.",
+                    code="BACKUP_FILE_MISSING",
+                    status_code=404,
+                )
 
         # Extraemos TODOS los valores primitivos que necesitamos del objeto backup ANTES de generar el backup de seguridad. Esto es critico porque cualquier acceso a un atributo del ORM despues del commit de execute_database_backup() dispara un lazy-load que abre una transaccion implicita nueva, la cual retiene un lock compartido sobre la tabla backups y causa un deadlock real con pg_restore, que necesita un lock exclusivo sobre esa misma tabla para hacer DROP CONSTRAINT/DROP TABLE. Confirmado con evidencia de pg_stat_activity durante el diagnostico de esta rama.
         backup_filepath = backup.storage_url
