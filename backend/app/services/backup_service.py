@@ -1,4 +1,5 @@
 import os
+from flask_migrate import upgrade
 import subprocess
 from datetime import datetime
 from flask import current_app
@@ -173,14 +174,36 @@ class BackupService:
 
         try:
             subprocess.run(command, env=env, capture_output=True, text=True, check=True)
-            return {
-                "status": "success",
-                "restored_from": backup_filename,
-                "safety_backup": safety_backup["file"],
-            }
         except subprocess.CalledProcessError as e:
             raise AppError(
                 f"Fallo en ejecucion de pg_restore: {e.stderr}",
                 code="RESTORE_ERROR",
                 status_code=500,
             )
+
+        # upgrade() usa la configuracion de directorio de migraciones registrada via migrate.init_app(app, db) en _init_extensions(), que apunta a backend/migrations/ (ubicacion default de flask_migrate, sin parametro directory adicional). Se invoca en un bloque separado para distinguir claramente un fallo de esquema de un fallo del propio pg_restore.
+        try:
+            upgrade()
+        except Exception as e:
+            logger.error(
+                "Los datos se restauraron correctamente desde %s, pero la "
+                "sincronizacion automatica del esquema (flask db upgrade) "
+                "fallo: %s. Se requiere intervencion manual inmediata "
+                "ejecutando 'flask db upgrade' desde la terminal.",
+                backup_filename, str(e),
+            )
+            raise AppError(
+                "El respaldo se restauro correctamente, pero la sincronizacion "
+                "automatica del esquema de base de datos fallo. Los datos son "
+                "validos pero el esquema puede estar desincronizado respecto "
+                "al codigo actual. Ejecute 'flask db upgrade' manualmente de "
+                "inmediato.",
+                code="RESTORE_SCHEMA_SYNC_FAILED",
+                status_code=500,
+            )
+
+        return {
+            "status": "success",
+            "restored_from": backup_filename,
+            "safety_backup": safety_backup["file"],
+        }
