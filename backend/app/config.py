@@ -83,7 +83,10 @@ class TestingConfig(BaseConfig):
     TESTING = True
     DEBUG = True
 
-    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "TEST_DATABASE_URL",
+        "postgresql://postgres:Ochoa-Stack@localhost:5432/skillstat_test",
+    )
 
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
 
