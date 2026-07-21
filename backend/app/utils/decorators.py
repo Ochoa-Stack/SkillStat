@@ -24,14 +24,19 @@ def role_required(*allowed_roles):
             user_id = get_jwt_identity()
             user = UserRepository.get_by_id(int(user_id)) if user_id else None
 
-            if not user or user.role not in allowed_roles:
-                # Solo logeamos cuando el usuario existe pero su rol no es suficiente; un user=None indica que el token no correspondía a un usuario válido, lo cual ya maneja flask-jwt-extended.
-                if user and user.role not in allowed_roles:
-                    logger.warning(
-                        f"Acceso denegado: usuario {user.id} ({user.email}) con rol "
-                        f"{user.role} intentó acceder a un recurso que requiere "
-                        f"{allowed_roles}."
-                    )
+            if not user:
+                # Un token puede seguir siendo criptograficamente valido aunque el usuario ya no exista (cuenta eliminada tras emitirse el token). Usamos el mismo code que un token ausente porque en ambos casos el frontend debe reaccionar igual: redirigir a login.
+                return error_response(
+                    code="UNAUTHORIZED",
+                    message="La sesion no corresponde a un usuario valido.",
+                    status_code=401,
+                )
+            if user.role not in allowed_roles:
+                logger.warning(
+                    f"Acceso denegado: usuario {user.id} ({user.email}) con rol "
+                    f"{user.role} intentó acceder a un recurso que requiere "
+                    f"{allowed_roles}."
+                )
                 return error_response(
                     code="FORBIDDEN",
                     message="No tienes permiso para acceder a este recurso.",
