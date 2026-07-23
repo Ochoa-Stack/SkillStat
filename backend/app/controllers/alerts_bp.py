@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 
-from app.schemas.alert_schema import AlertRequestSchema, AlertResponseSchema
+from app.schemas.alert_schema import AlertRequestSchema, AlertResponseSchema, AlertStatusUpdateSchema
 from app.repositories.alert_repository import AlertRepository
 from app.utils.response import success_response, error_response
 
@@ -48,3 +48,20 @@ def delete_alert(alert_id):
         
     AlertRepository.delete(alert_id)
     return success_response(data={"deleted": True}, status_code=200)
+
+@alerts_bp.route("/<int:alert_id>/status", methods=["PATCH"])
+@jwt_required()
+def update_alert_status(alert_id):
+    user_id = int(get_jwt_identity())
+    try:
+        payload = AlertStatusUpdateSchema().load(request.get_json() or {})
+    except ValidationError as err:
+        return error_response(code="VALIDATION_ERROR", message=err.messages, status_code=422)
+    
+    alert = AlertRepository.get_by_id(alert_id)
+    if not alert or alert.user_id != user_id:
+        return error_response(code="NOT_FOUND", message="Alerta no encontrada.", status_code=404)
+        
+    alert.active = payload["active"]
+    AlertRepository.save(alert)
+    return success_response(data={"id": alert.id, "active": alert.active}, status_code=200)
