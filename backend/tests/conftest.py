@@ -24,6 +24,8 @@ def db_session(app):
     import sqlalchemy as sa
     raw_session = sa.orm.Session(bind=connection, join_transaction_mode="create_savepoint")
     
+    """ Guardamos la sesion original para restaurarla al finalizar. Si no la restauramos, db.session queda apuntando a una conexion ya cerrada, lo que rompe cualquier test posterior que use db.session directamente en vez del fixture (como test_backup_restore_schema_sync) """
+    original_session = _db.session
     _db.session = sa.orm.scoped_session(lambda: raw_session)
 
     yield _db.session
@@ -31,3 +33,5 @@ def db_session(app):
     _db.session.remove()
     transaction.rollback()
     connection.close()
+    _db.session = original_session
+    
