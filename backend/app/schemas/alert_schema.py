@@ -47,3 +47,9 @@ class AlertResponseSchema(Schema):
     threshold_value = fields.Integer(dump_only=True, allow_none=True)
     threshold_percentage = fields.Decimal(dump_only=True, allow_none=True, as_string=True)
     created_at = fields.DateTime(dump_only=True)
+
+class AlertStatusUpdateSchema(Schema):
+    active = fields.Boolean(
+        required=True,
+        error_messages={"required": "El campo active es obligatorio."}
+    )
