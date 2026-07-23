@@ -235,4 +235,194 @@ def test_delete_alert_nonexistent_returns_404(app, db_session, client):
 
     assert response.status_code == 404
     assert response.get_json()["error"]["code"] == "NOT_FOUND"
+
+
+# Tests: PATCH /api/alerts/<id>/status
+
+def test_deactivate_alert_success(app, db_session, client):
+    """ Usuario con una alerta propia, active=True. PATCH con active=False. Verificar 200 y en BD active=False """
+    cat = _make_category(db_session, name="Cat_Deactivate")
+    skill = _make_skill(db_session, cat.id, name="Skill_Deactivate")
+    user = _make_user(db_session, email="deactivate_ok@example.com")
+    alert = _make_alert(db_session, user.id, skill.id, active=True)
+    alert_id = alert.id
+    user_id = user.id
+
+    with app.app_context():
+        token, csrf = _mint_token_and_csrf(user_id)
+
+    client.set_cookie("access_token_cookie", token)
+    response = client.patch(
+        f"/api/alerts/{alert_id}/status",
+        json={"active": False},
+        headers={"X-CSRF-TOKEN": csrf}
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["data"]["active"] is False
+
+    db_session.expire_all()
+    persisted = db_session.get(Alert, alert_id)
+    assert persisted.active is False
+
+
+def test_reactivate_alert_success(app, db_session, client):
+    """ Usuario con alerta ya desactivada. PATCH con active=True. Verificar 200 y en BD active=True """
+    cat = _make_category(db_session, name="Cat_Reactivate")
+    skill = _make_skill(db_session, cat.id, name="Skill_Reactivate")
+    user = _make_user(db_session, email="reactivate_ok@example.com")
+    alert = _make_alert(db_session, user.id, skill.id, active=False)
+    alert_id = alert.id
+    user_id = user.id
+
+    with app.app_context():
+        token, csrf = _mint_token_and_csrf(user_id)
+
+    client.set_cookie("access_token_cookie", token)
+    response = client.patch(
+        f"/api/alerts/{alert_id}/status",
+        json={"active": True},
+        headers={"X-CSRF-TOKEN": csrf}
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["data"]["active"] is True
+
+    db_session.expire_all()
+    persisted = db_session.get(Alert, alert_id)
+    assert persisted.active is True
+
+
+def test_update_status_missing_active_field_returns_422(app, db_session, client):
+    """ PATCH con payload vacio {}. Verificar 422 VALIDATION_ERROR """
+    cat = _make_category(db_session, name="Cat_MissingActive")
+    skill = _make_skill(db_session, cat.id, name="Skill_MissingActive")
+    user = _make_user(db_session, email="missing_active@example.com")
+    alert = _make_alert(db_session, user.id, skill.id)
+    alert_id = alert.id
+    user_id = user.id
+
+    with app.app_context():
+        token, csrf = _mint_token_and_csrf(user_id)
+
+    client.set_cookie("access_token_cookie", token)
+    response = client.patch(
+        f"/api/alerts/{alert_id}/status",
+        json={},
+        headers={"X-CSRF-TOKEN": csrf}
+    )
+
+    assert response.status_code == 422
+    assert response.get_json()["error"]["code"] == "VALIDATION_ERROR"
+
+
+def test_update_status_not_owned_returns_404(app, db_session, client):
+    """ Intento de modificar estado de alerta ajena. Verificar 404 NOT_FOUND y que estado no cambia """
+    cat = _make_category(db_session, name="Cat_PatchNotOwned")
+    skill = _make_skill(db_session, cat.id, name="Skill_PatchNotOwned")
+    user1 = _make_user(db_session, email="patch_not_owned1@example.com")
+    user2 = _make_user(db_session, email="patch_not_owned2@example.com")
     
+    # Alerta de user2, activa por defecto
+    alert2 = _make_alert(db_session, user2.id, skill.id, active=True)
+    alert2_id = alert2.id
+
+    with app.app_context():
+        token, csrf = _mint_token_and_csrf(user1.id)
+
+    client.set_cookie("access_token_cookie", token)
+    response = client.patch(
+        f"/api/alerts/{alert2_id}/status",
+        json={"active": False},
+        headers={"X-CSRF-TOKEN": csrf}
+    )
+
+    assert response.status_code == 404
+    assert response.get_json()["error"]["code"] == "NOT_FOUND"
+
+    db_session.expire_all()
+    persisted = db_session.get(Alert, alert2_id)
+    assert persisted.active is True
+
+
+def test_update_status_nonexistent_alert_returns_404(app, db_session, client):
+    """ PATCH a ID inexistente retorna 404 """
+    user = _make_user(db_session, email="patch_nonexist@example.com")
+    user_id = user.id
+
+    with app.app_context():
+        token, csrf = _mint_token_and_csrf(user_id)
+
+    client.set_cookie("access_token_cookie", token)
+    response = client.patch(
+        "/api/alerts/999999/status",
+        json={"active": False},
+        headers={"X-CSRF-TOKEN": csrf}
+    )
+
+    assert response.status_code == 404
+    assert response.get_json()["error"]["code"] == "NOT_FOUND"
+
+
+def _make_snapshot(db_session, skill_id, demand_count=None, growth_rate=None,
+                   snap_date=None, city_id=None):
+    from app.models.trend_snapshot import TrendSnapshot
+    from datetime import date
+    snap = TrendSnapshot(
+        skill_id=skill_id,
+        city_id=city_id,
+        date=snap_date or date(2025, 1, 1),
+        demand_count=demand_count,
+        growth_rate=growth_rate,
+    )
+    db_session.add(snap)
+    db_session.flush()
+    return snap
+
+
+def test_deactivated_alert_is_excluded_from_evaluation(app, db_session, client, monkeypatch):
+    """ Confirmar que PATCH /status conecta con la exclusión de AlertsService.evaluate_and_notify() """
+    from unittest.mock import MagicMock
+    from app.services.alerts_service import AlertsService
+    from datetime import date
+    from app.models.trend_snapshot import TrendSnapshot
+    
+    mock_send = MagicMock()
+    monkeypatch.setattr("app.services.alerts_service.send_alert_email", mock_send)
+
+    cat = _make_category(db_session, name="Cat_EndToEnd")
+    skill = _make_skill(db_session, cat.id, name="Skill_EndToEnd")
+    user = _make_user(db_session, email="end_to_end@example.com")
+    
+    # Snapshot que cumple sobradamente el threshold (100 >= 50)
+    _make_snapshot(db_session, skill.id, demand_count=100, snap_date=date(2025, 1, 2))
+    alert = _make_alert(db_session, user.id, skill.id, alert_type="ABSOLUTE", threshold_value=50, active=True)
+    alert_id = alert.id
+    user_id = user.id
+
+    # 1. Comprobamos que con active=True la alerta SI se dispara
+    with app.app_context():
+        result_active = AlertsService.evaluate_and_notify()
+    
+    assert result_active == 1
+    mock_send.assert_called_once()
+    mock_send.reset_mock()
+
+    # 2. Desactivamos via el endpoint REST
+    with app.app_context():
+        token, csrf = _mint_token_and_csrf(user_id)
+
+    client.set_cookie("access_token_cookie", token)
+    patch_response = client.patch(
+        f"/api/alerts/{alert_id}/status",
+        json={"active": False},
+        headers={"X-CSRF-TOKEN": csrf}
+    )
+    assert patch_response.status_code == 200
+
+    # 3. Comprobamos que al estar desactivada ya NO se dispara
+    with app.app_context():
+        result_inactive = AlertsService.evaluate_and_notify()
+    
+    assert result_inactive == 0
+    mock_send.assert_not_called()
