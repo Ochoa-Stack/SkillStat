@@ -1,7 +1,11 @@
 import os
 import pytest
+from dotenv import load_dotenv
 
-os.environ.setdefault("RESEND_API_KEY", "test-resend-key")
+# Cargamos el archivo .env primero
+load_dotenv()
+
+os.environ["RESEND_API_KEY"] = "test-resend-key"
 
 from app import create_app
 from app.extensions import db as _db
