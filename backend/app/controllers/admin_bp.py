@@ -1,5 +1,6 @@
+import hmac
 import logging
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 
@@ -248,10 +249,23 @@ def update_user_status(user_id):
 
 
 @admin_bp.route("/trigger-pipeline", methods=["POST"])
-@jwt_required()
-@role_required("ADMIN")
 def trigger_pipeline():
-    """Dispara el pipeline diario (snapshots + evaluación de alertas) bajo demanda. Reemplaza el disparo interno de APScheduler, que no es confiable en servicios que se duermen por inactividad (ej. Render free tier). Este endpoint será invocado por GitHub Actions en el horario programado."""
+    """Dispara el pipeline diario (snapshots + evaluación de alertas) bajo demanda.
+    Autenticado exclusivamente via el header X-Pipeline-Trigger-Key, comparado
+    con PIPELINE_TRIGGER_SECRET usando tiempo constante para evitar timing attacks.
+    Diseñado para ser invocado por GitHub Actions, sin sesión de usuario."""
+    provided_key = request.headers.get("X-Pipeline-Trigger-Key", "")
+    expected_key = current_app.config.get("PIPELINE_TRIGGER_SECRET", "")
+
+    # hmac.compare_digest previene timing attacks: el tiempo de comparación no
+    # varía según cuántos caracteres coincidan, a diferencia del operador ==.
+    if not hmac.compare_digest(provided_key, expected_key):
+        return error_response(
+            code="UNAUTHORIZED",
+            message="Clave de autenticación de servicio inválida o ausente.",
+            status_code=401,
+        )
+
     from app.services.market_trends_service import MarketTrendsService
     from app.services.alerts_service import AlertsService
 
@@ -269,4 +283,3 @@ def trigger_pipeline():
         },
         status_code=200,
     )
-

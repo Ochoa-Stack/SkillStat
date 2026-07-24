@@ -54,6 +54,16 @@ class BaseConfig:
     INGESTION_INTERVAL_HOURS = int(os.environ.get("INGESTION_INTERVAL_HOURS", 6))
     TRENDS_INTERVAL_HOURS = int(os.environ.get("TRENDS_INTERVAL_HOURS", 24))
 
+    # Clave secreta para el endpoint POST /api/admin/trigger-pipeline, que es invocado por GitHub Actions sin sesión de usuario. Se valida via el header X-Pipeline-Trigger-Key usando comparación de tiempo constante (hmac.compare_digest).
+    PIPELINE_TRIGGER_SECRET = os.environ.get("PIPELINE_TRIGGER_SECRET")
+
+    # Validación explícita en arranque (guard incondicional)
+    if not PIPELINE_TRIGGER_SECRET:
+        raise ValueError(
+            "Error de arranque: PIPELINE_TRIGGER_SECRET es obligatoria y no está configurada en el entorno."
+        )
+
+
 
 class DevelopmentConfig(BaseConfig):
 
