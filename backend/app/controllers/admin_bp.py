@@ -245,3 +245,28 @@ def update_user_status(user_id):
     return success_response(
         data={"id": target.id, "is_active": target.is_active}, status_code=200
     )
+
+
+@admin_bp.route("/trigger-pipeline", methods=["POST"])
+@jwt_required()
+@role_required("ADMIN")
+def trigger_pipeline():
+    """Dispara el pipeline diario (snapshots + evaluación de alertas) bajo demanda. Reemplaza el disparo interno de APScheduler, que no es confiable en servicios que se duermen por inactividad (ej. Render free tier). Este endpoint será invocado por GitHub Actions en el horario programado."""
+    from app.services.market_trends_service import MarketTrendsService
+    from app.services.alerts_service import AlertsService
+
+    snapshots_count = MarketTrendsService.generate_snapshots()
+    notifications_sent = AlertsService.evaluate_and_notify()
+
+    logger.info(
+        "Pipeline disparado via endpoint: %d snapshots generados, %d notificaciones enviadas.",
+        snapshots_count, notifications_sent,
+    )
+    return success_response(
+        data={
+            "snapshots_generated": snapshots_count,
+            "notifications_sent": notifications_sent,
+        },
+        status_code=200,
+    )
+
