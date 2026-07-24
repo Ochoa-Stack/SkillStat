@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:5000/api";
+// API_BASE_URL se define en assets/js/config.js, que debe cargarse mediante un <script> antes que este archivo en cada HTML.
 
 async function parseErrorBody(response) {
   try {
