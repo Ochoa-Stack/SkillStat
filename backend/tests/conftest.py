@@ -34,4 +34,10 @@ def db_session(app):
     transaction.rollback()
     connection.close()
     _db.session = original_session
-    
+
+
+@pytest.fixture(autouse=True)
+def _cleanup_db_session_after_test(app):
+    # No abrimos un app_context nuevo aqui; la fixture app (scope session) ya mantiene uno activo durante toda la suite. Abrir uno anidado crea un scope distinto y limpia la sesion equivocada, dejando intacta la conexion real que se abrio durante el test.
+    yield
+    _db.session.remove()
