@@ -11,10 +11,6 @@ class BaseConfig:
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "pool_recycle": 300,
-        "connect_args": {
-            "client_encoding": "utf8",
-            "options": "-c lc_messages=C",
-        },
     }
 
     JWT_SECRET_KEY = os.environ.get(
@@ -72,6 +68,13 @@ class DevelopmentConfig(BaseConfig):
         "DATABASE_URL",
         "postgresql://postgres:postgres@localhost:5432/skillstat_dev",
     )
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        **BaseConfig.SQLALCHEMY_ENGINE_OPTIONS,
+        "connect_args": {
+            "client_encoding": "utf8",
+            "options": "-c lc_messages=C",
+        },
+    }
 
 
 class ProductionConfig(BaseConfig):
@@ -97,6 +100,13 @@ class TestingConfig(BaseConfig):
         "TEST_DATABASE_URL",
         "postgresql://postgres:Ochoa-Stack@localhost:5432/skillstat_test",
     )
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        **BaseConfig.SQLALCHEMY_ENGINE_OPTIONS,
+        "connect_args": {
+            "client_encoding": "utf8",
+            "options": "-c lc_messages=C",
+        },
+    }
 
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
 
