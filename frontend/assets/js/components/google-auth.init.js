@@ -34,7 +34,7 @@ function handleGoogleCredential(response) {
 
   apiPost("/auth/google", { credential: response.credential })
     .then(() => {
-      window.location.href = "panorama.html";
+      window.location.href = "/views/panorama.html";
     })
     .catch((error) => {
       console.error(

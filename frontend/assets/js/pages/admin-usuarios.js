@@ -180,10 +180,10 @@ async function initAdminUsuariosPage() {
     bindControls();
   } catch (error) {
     if (error.status === 401) {
-      window.location.href = "../register.html";
+      window.location.href = "/views/register.html";
     } else if (error.status === 403) {
       // Sesión válida pero sin rol ADMIN que redirige silenciosamente sin mensaje
-      window.location.href = "../panorama.html";
+      window.location.href = "/views/panorama.html";
     } else {
       console.error("Error cargando usuarios:", error);
       document.getElementById("admin-loading").innerHTML =
