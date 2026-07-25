@@ -200,7 +200,7 @@ async function handleLoginSubmit(event) {
       email: form.email.value,
       password: form.password.value,
     });
-    window.location.href = "panorama.html";
+    window.location.href = "/views/panorama.html";
   } catch (error) {
     if (error.code === "EMAIL_NOT_VERIFIED") {
       showUnverifiedBanner(form, form.email.value);

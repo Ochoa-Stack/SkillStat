@@ -89,7 +89,7 @@ async function initProfilePage() {
     await loadSkills();
   } catch (error) {
     if (error.status === 401) {
-      window.location.href = "register.html";
+      window.location.href = "/views/register.html";
     } else {
       console.error("Error cargando perfil:", error);
       // Fallback
@@ -160,7 +160,7 @@ async function handlePasswordSubmit(e) {
     showInlineMessage(msg, "Contraseña actualizada. Redirigiendo...", true);
 
     setTimeout(() => {
-      window.location.href = "register.html";
+      window.location.href = "/views/register.html";
     }, 2000);
   } catch (error) {
     if (error.code === "INVALID_CREDENTIALS") {

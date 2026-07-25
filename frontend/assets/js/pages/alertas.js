@@ -216,7 +216,7 @@ async function initAlertasPage() {
     bindCreateForm();
   } catch (error) {
     if (error.status === 401) {
-      window.location.href = "register.html";
+      window.location.href = "/views/register.html";
     } else {
       console.error("Error cargando alertas:", error);
       document.getElementById("alertas-loading").innerHTML =

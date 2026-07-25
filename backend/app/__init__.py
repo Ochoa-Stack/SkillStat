@@ -3,7 +3,7 @@ import logging_config
 from flask import Flask
 
 from app.config import config_map
-from app.extensions import db, jwt, cors, migrate, scheduler, limiter
+from app.extensions import db, jwt, cors, migrate, limiter
 
 def create_app(env: str = None) -> Flask:
     # Aplicamos el patrón Application Factory porque aislar la inicialización nos permite instanciar aplicaciones independientes durante las pruebas automatizadas, previniendo choques por estado global.
@@ -18,7 +18,6 @@ def create_app(env: str = None) -> Flask:
     _register_jwt_handlers(app)
     _register_error_handlers(app)
     _register_blueprints(app)
-    _register_schedulers(app)
 
     return app
 
@@ -29,6 +28,7 @@ def _init_extensions(app: Flask) -> None:
     # Restringimos CORS al prefijo de la API para que el frontend pueda consumirla desde su propio origen sin bloqueos del navegador.
     cors.init_app(app, resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", "*"), "supports_credentials": True}})
     limiter.init_app(app)
+
 
 def _register_jwt_handlers(app: Flask) -> None:
     # Unificamos el formato de los errores que flask-jwt-extended genera directamente (antes de llegar a nuestras rutas) con el mismo formato {"error": {"code", "message"}} que usa el resto de la API.
@@ -154,20 +154,3 @@ def _register_blueprints(app: Flask) -> None:
     app.register_blueprint(admin_bp, url_prefix="/api/admin")
     app.register_blueprint(profile_bp, url_prefix="/api/profile")
 
-def _register_schedulers(app: Flask) -> None:
-    from scheduler.jobs import daily_pipeline
-    import functools
-
-    # Vinculamos la instancia concreta de app al job para que APScheduler pueda ejecutarlo en su hilo sin depender del proxy.
-    bound_pipeline = functools.partial(daily_pipeline, app)
-
-    if not scheduler.running:
-        scheduler.add_job(
-            func=bound_pipeline,
-            trigger="cron",
-            hour=0,
-            minute=0,
-            id="daily_pipeline",
-            replace_existing=True,
-        )
-        scheduler.start()

@@ -11,10 +11,6 @@ class BaseConfig:
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "pool_recycle": 300,
-        "connect_args": {
-            "client_encoding": "utf8",
-            "options": "-c lc_messages=C",
-        },
     }
 
     JWT_SECRET_KEY = os.environ.get(
@@ -28,7 +24,6 @@ class BaseConfig:
     JWT_TOKEN_LOCATION = ["cookies"]
     JWT_BLOCKLIST_TOKEN_CHECKS = ["access", "refresh"]
     JWT_COOKIE_SECURE = os.environ.get("JWT_COOKIE_SECURE", "false").lower() == "true"
-    JWT_COOKIE_SAMESITE = "Lax"
     JWT_COOKIE_CSRF_PROTECT = True
     JWT_CSRF_IN_COOKIES = True
 
@@ -54,6 +49,16 @@ class BaseConfig:
     INGESTION_INTERVAL_HOURS = int(os.environ.get("INGESTION_INTERVAL_HOURS", 6))
     TRENDS_INTERVAL_HOURS = int(os.environ.get("TRENDS_INTERVAL_HOURS", 24))
 
+    # Clave secreta para el endpoint POST /api/admin/trigger-pipeline, que es invocado por GitHub Actions sin sesión de usuario. Se valida via el header X-Pipeline-Trigger-Key usando comparación de tiempo constante (hmac.compare_digest).
+    PIPELINE_TRIGGER_SECRET = os.environ.get("PIPELINE_TRIGGER_SECRET")
+
+    # Validación explícita en arranque (guard incondicional)
+    if not PIPELINE_TRIGGER_SECRET:
+        raise ValueError(
+            "Error de arranque: PIPELINE_TRIGGER_SECRET es obligatoria y no está configurada en el entorno."
+        )
+
+
 
 class DevelopmentConfig(BaseConfig):
 
@@ -62,6 +67,14 @@ class DevelopmentConfig(BaseConfig):
         "DATABASE_URL",
         "postgresql://postgres:postgres@localhost:5432/skillstat_dev",
     )
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        **BaseConfig.SQLALCHEMY_ENGINE_OPTIONS,
+        "connect_args": {
+            "client_encoding": "utf8",
+            "options": "-c lc_messages=C",
+        },
+    }
+    JWT_COOKIE_SAMESITE = "Lax"
 
 
 class ProductionConfig(BaseConfig):
@@ -77,6 +90,9 @@ class ProductionConfig(BaseConfig):
         "max_overflow": 20,
     }
 
+    # SameSite=None es obligatorio en producción porque el frontend (skillstat-ss.onrender.com) y el backend (skillstat.onrender.com) son dominios distintos (cross-site). SameSite=None requiere Secure=True, que ya está activo vía JWT_COOKIE_SECURE=true en el entorno de Render.
+    JWT_COOKIE_SAMESITE = "None"
+
 
 class TestingConfig(BaseConfig):
 
@@ -87,10 +103,18 @@ class TestingConfig(BaseConfig):
         "TEST_DATABASE_URL",
         "postgresql://postgres:Ochoa-Stack@localhost:5432/skillstat_test",
     )
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        **BaseConfig.SQLALCHEMY_ENGINE_OPTIONS,
+        "connect_args": {
+            "client_encoding": "utf8",
+            "options": "-c lc_messages=C",
+        },
+    }
 
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
 
     SCHEDULER_ENABLED = False
+    JWT_COOKIE_SAMESITE = "Lax"
 
 
 config_map = {

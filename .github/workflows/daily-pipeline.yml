@@ -1,0 +1,33 @@
+name: Daily Pipeline
+
+on:
+  # Disparo programado: todos los días a las 00:00 UTC.
+  schedule:
+    - cron: "0 0 * * *"
+
+  # Disparo manual desde la interfaz de GitHub para poder probar sin esperar al horario programado o depurar fallos.
+  workflow_dispatch:
+
+jobs:
+  trigger-pipeline:
+    name: Trigger Daily Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: POST /api/admin/trigger-pipeline
+        run: |
+          HTTP_STATUS=$(curl --silent --output /tmp/pipeline_response.json \
+            --write-out "%{http_code}" \
+            --request POST \
+            --header "X-Pipeline-Trigger-Key: ${{ secrets.PIPELINE_TRIGGER_SECRET }}" \
+            --header "Content-Type: application/json" \
+            "${{ secrets.PIPELINE_BACKEND_URL }}/api/admin/trigger-pipeline")
+
+          echo "HTTP status: $HTTP_STATUS"
+          echo "Response body:"
+          cat /tmp/pipeline_response.json
+
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::error::El pipeline falló con HTTP $HTTP_STATUS. Ver el body de arriba para detalles."
+            exit 1
+          fi
