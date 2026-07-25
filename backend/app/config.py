@@ -24,7 +24,6 @@ class BaseConfig:
     JWT_TOKEN_LOCATION = ["cookies"]
     JWT_BLOCKLIST_TOKEN_CHECKS = ["access", "refresh"]
     JWT_COOKIE_SECURE = os.environ.get("JWT_COOKIE_SECURE", "false").lower() == "true"
-    JWT_COOKIE_SAMESITE = "Lax"
     JWT_COOKIE_CSRF_PROTECT = True
     JWT_CSRF_IN_COOKIES = True
 
@@ -75,6 +74,7 @@ class DevelopmentConfig(BaseConfig):
             "options": "-c lc_messages=C",
         },
     }
+    JWT_COOKIE_SAMESITE = "Lax"
 
 
 class ProductionConfig(BaseConfig):
@@ -89,6 +89,9 @@ class ProductionConfig(BaseConfig):
         "pool_size": 10,
         "max_overflow": 20,
     }
+
+    # SameSite=None es obligatorio en producción porque el frontend (skillstat-ss.onrender.com) y el backend (skillstat.onrender.com) son dominios distintos (cross-site). SameSite=None requiere Secure=True, que ya está activo vía JWT_COOKIE_SECURE=true en el entorno de Render.
+    JWT_COOKIE_SAMESITE = "None"
 
 
 class TestingConfig(BaseConfig):
@@ -111,6 +114,7 @@ class TestingConfig(BaseConfig):
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
 
     SCHEDULER_ENABLED = False
+    JWT_COOKIE_SAMESITE = "Lax"
 
 
 config_map = {
