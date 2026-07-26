@@ -17,7 +17,7 @@ Usamos dos servicios independientes en Render: un Web Service para el backend Fl
 **Servicio único fusionado.** Evaluado explícitamente contra la separación. Habría requerido introducir `render_template` y `static_folder` en un backend que hasta ese momento no los usaba en ningún endpoint, es decir, una modificación de arquitectura motivada únicamente por conveniencia de despliegue, no por una necesidad real del sistema. Adicionalmente, fusionar ambos habría hecho que el frontend se durmiera junto con el backend en el ciclo de sleep del free tier, perdiendo la ventaja real de que un Static Site nunca duerme. Se descartó porque no resolvía ningún problema que la separación no resolviera ya, y sí introducía una regresión de disponibilidad para el frontend.
 
 ## Consecuencias
-El proyecto opera con dos dominios `.onrender.com` distintos en vez de uno solo, lo que introdujo directamente el problema de cookies cross-site documentado en un ADR separado (ver ADR de SameSite). Esta es una consecuencia conocida y aceptada de la decisión, no un efecto secundario no previsto.
+El proyecto opera con dos dominios `.onrender.com` distintos en vez de uno solo, lo que introdujo directamente el problema de cookies cross-site documentado en [ADR-005](./ADR-005-samesite-none-condicional-por-entorno.md). Esta es una consecuencia conocida y aceptada de la decisión, no un efecto secundario no previsto.
 
 El frontend permanece siempre disponible sin cold start, mientras que el backend sí experimenta cold start tras inactividad, una asimetría consciente y aceptada: el costo de espera recae únicamente en las llamadas a la API, no en la carga inicial de la interfaz.
 
