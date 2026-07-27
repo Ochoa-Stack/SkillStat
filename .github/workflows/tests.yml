@@ -51,6 +51,7 @@ jobs:
           GOOGLE_CLIENT_ID: "test-google-client-id"
           FRONTEND_BASE_URL: "http://localhost:5500/frontend"
           PIPELINE_TRIGGER_SECRET: "test-pipeline-secret"
+          RESEND_API_KEY: "test-resend-api-key"
 
       - name: Run tests with coverage
         working-directory: backend
@@ -63,6 +64,7 @@ jobs:
           GOOGLE_CLIENT_ID: "test-google-client-id"
           FRONTEND_BASE_URL: "http://localhost:5500/frontend"
           PIPELINE_TRIGGER_SECRET: "test-pipeline-secret"
+          RESEND_API_KEY: "test-resend-api-key"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
