@@ -18,7 +18,17 @@ from app.extensions import db as _db
 # Duplicados deliberadamente aqui (principio DAMP): cada archivo de tests es autocontenido. No se importa desde otros archivos de tests para preservar aislamiento y legibilidad individual.
 
 def _make_city(db_session, city_id, name="Mexico Nacional", state="Nacional"):
-    """ Crea una City con un ID especifico usando INSERT directo para poder controlar el id=1 que necesita el fallback de generate_snapshots(). Usa INSERT con id explicito en lugar de add() para garantizar el id exacto, ya que PostgreSQL asigna secuencias y podria saltarse el 1 si ya hubo inserts previos en la sesion """
+    """ Crea una City con un ID especifico usando INSERT directo para poder
+    controlar el id=1 que necesita el fallback de generate_snapshots(). Usa
+    INSERT con id explicito en lugar de add() para garantizar el id exacto.
+
+    Si ya existe una City con ese id (p.ej. la fila sembrada por la migración
+    9a104cdbdaed para México Nacional), la retorna directamente sin intentar
+    re-insertarla. Esto hace la función idempotente frente al esquema base
+    que ya contiene id=1 tras flask db upgrade. """
+    existing = db_session.get(City, city_id)
+    if existing:
+        return existing
     city = City(id=city_id, name=name, state=state)
     db_session.add(city)
     db_session.flush()
