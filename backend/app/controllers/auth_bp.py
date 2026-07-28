@@ -357,6 +357,7 @@ def forgot_password():
 
 
 @auth_bp.route("/reset-password", methods=["POST"])
+@limiter.limit("3 per hour")
 def reset_password():
     try:
         data = ResetPasswordSchema().load(request.get_json() or {})

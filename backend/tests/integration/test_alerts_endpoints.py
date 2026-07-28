@@ -400,7 +400,7 @@ def test_deactivated_alert_is_excluded_from_evaluation(app, db_session, client, 
     alert_id = alert.id
     user_id = user.id
 
-    # 1. Comprobamos que con active=True la alerta SI se dispara
+    # Comprobamos que con active=True la alerta SI se dispara
     with app.app_context():
         result_active = AlertsService.evaluate_and_notify()
     
@@ -408,7 +408,7 @@ def test_deactivated_alert_is_excluded_from_evaluation(app, db_session, client, 
     mock_send.assert_called_once()
     mock_send.reset_mock()
 
-    # 2. Desactivamos via el endpoint REST
+    # Desactivamos via el endpoint REST
     with app.app_context():
         token, csrf = _mint_token_and_csrf(user_id)
 
@@ -420,9 +420,42 @@ def test_deactivated_alert_is_excluded_from_evaluation(app, db_session, client, 
     )
     assert patch_response.status_code == 200
 
-    # 3. Comprobamos que al estar desactivada ya NO se dispara
+    # Comprobamos que al estar desactivada ya NO se dispara
     with app.app_context():
         result_inactive = AlertsService.evaluate_and_notify()
     
     assert result_inactive == 0
     mock_send.assert_not_called()
+
+
+def test_create_alert_rejects_when_active_limit_reached(app, db_session, client):
+    """ POST a /api/alerts/ cuando el usuario ya tiene 20 alertas activas. Verificar 422 LIMIT_EXCEEDED y que la alerta 21 no se crea """
+    from sqlalchemy import select
+    
+    cat = _make_category(db_session, name="Cat_Limit")
+    skill = _make_skill(db_session, cat.id, name="Skill_Limit")
+    user = _make_user(db_session, email="limit_reached@example.com")
+    skill_id = skill.id
+    user_id = user.id
+
+    # Crear 20 alertas activas
+    for _ in range(20):
+        _make_alert(db_session, user_id, skill_id)
+
+    with app.app_context():
+        token, csrf = _mint_token_and_csrf(user_id)
+
+    client.set_cookie("access_token_cookie", token)
+    
+    # Intentar crear la alerta 21
+    payload = {"skill_id": skill_id, "alert_type": "ABSOLUTE", "threshold_value": 100}
+    response = client.post("/api/alerts/", json=payload, headers={"X-CSRF-TOKEN": csrf})
+
+    assert response.status_code == 422
+    assert response.get_json()["error"]["code"] == "LIMIT_EXCEEDED"
+    assert response.get_json()["error"]["message"] == "Has alcanzado el límite de 20 alertas activas."
+
+    # Verificar que las alertas en BD sigan siendo exactamente 20
+    db_session.expire_all()
+    user_alerts = db_session.execute(select(Alert).filter_by(user_id=user_id)).scalars().all()
+    assert len(user_alerts) == 20

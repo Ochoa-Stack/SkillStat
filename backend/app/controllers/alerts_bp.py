@@ -5,11 +5,13 @@ from marshmallow import ValidationError
 from app.schemas.alert_schema import AlertRequestSchema, AlertResponseSchema, AlertStatusUpdateSchema
 from app.repositories.alert_repository import AlertRepository
 from app.utils.response import success_response, error_response
+from app.extensions import limiter
 
 alerts_bp = Blueprint("alerts_bp", __name__)
 
 @alerts_bp.route("/", methods=["POST"])
 @jwt_required()
+@limiter.limit("10 per hour")
 def create_alert():
     try:
         data = AlertRequestSchema().load(request.get_json() or {})
@@ -17,6 +19,11 @@ def create_alert():
         return error_response(code="VALIDATION_ERROR", message=err.messages, status_code=422)
 
     user_id = get_jwt_identity()
+    
+    user_alerts = AlertRepository.get_by_user_id(int(user_id))
+    active_count = sum(1 for a in user_alerts if a.active)
+    if active_count >= 20:
+        return error_response(code="LIMIT_EXCEEDED", message="Has alcanzado el límite de 20 alertas activas.", status_code=422)
     
     # Forzamos el ID extraído del token criptográfico sobre la carga de datos para erradicar ataques de asignación cruzada o escalamiento horizontal.
     data["user_id"] = int(user_id)
