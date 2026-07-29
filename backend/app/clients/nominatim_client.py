@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 class NominatimClient:
     BASE_URL = "https://nominatim.openstreetmap.org/search"
-    USER_AGENT = "SkillStat/1.0 (proyecto academico UTCJ, contacto: eliaslucinoochoamalaga@gmail.com)"
+    USER_AGENT = "SkillStat/1.0 (proyecto academico UTCJ, contacto: 195959137+Ochoa-Stack@users.noreply.github.com)"
     
     # Valid types that represent a real city/town/village entity.
     VALID_TYPES = {"city", "town", "village", "municipality"}
@@ -32,9 +32,7 @@ class NominatimClient:
 
     @classmethod
     def geocode_city(cls, query: str) -> dict | None:
-        """Geocodes a city name using Nominatim API.
-        Returns a dict with 'name', 'state', 'lat', 'lon' or None if it fails, timeouts,
-        or doesn't meet the confidence threshold (must have state, must be a valid city type)"""
+        """ Geocodes a city name using Nominatim API. Returns a dict with 'name', 'state', 'lat', 'lon' or None if it fails, timeouts, or doesn't meet the confidence threshold (must have state, must be a valid city type) """
         import unicodedata
         
         # Desambiguación de query
