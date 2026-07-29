@@ -45,6 +45,11 @@ class IngestionService:
         return stats
 
     @classmethod
+    def _compute_is_remote(cls, title: str, description: str) -> bool:
+        search_text = f"{title} {description}".lower()
+        return bool(re.search(r'\bremote\b', search_text) or re.search(r'\bremoto\b', search_text))
+
+    @classmethod
     def _process_job(cls, item: dict, known_skills: dict, stats: dict, verbose: bool = False) -> None:
         description = item.get("description", "")
         if not description:
@@ -63,9 +68,8 @@ class IngestionService:
         company = item.get("company", {}).get("display_name", "Confidencial")
         url = item.get("redirect_url", "")
         
-        # Acotamos la búsqueda de remote/remoto a title y description con límites de palabra () para evitar falsos positivos por nombres de empresa (ej. "RemoteWorks Solutions") o coincidencias parciales.
-        search_text = f"{title} {description}".lower()
-        is_remote = bool(re.search(r'\bremote\b', search_text) or re.search(r'\bremoto\b', search_text))
+        # Acotamos la búsqueda de remote/remoto a title y description con límites de palabra (\b) para evitar falsos positivos por nombres de empresa (ej. "RemoteWorks Solutions") o coincidencias parciales.
+        is_remote = cls._compute_is_remote(title, description)
 
         salary_min = item.get("salary_min")
         salary_max = item.get("salary_max")
