@@ -1,4 +1,5 @@
 import logging
+import re
 import hashlib
 import click
 from flask import current_app
@@ -62,8 +63,9 @@ class IngestionService:
         company = item.get("company", {}).get("display_name", "Confidencial")
         url = item.get("redirect_url", "")
         
-        # Guardamos sin location estricta hasta integrar Nominatim, determinando la bandera remote de forma aislada.
-        is_remote = "remote" in str(item).lower() or "remoto" in str(item).lower()
+        # Acotamos la búsqueda de remote/remoto a title y description con límites de palabra () para evitar falsos positivos por nombres de empresa (ej. "RemoteWorks Solutions") o coincidencias parciales.
+        search_text = f"{title} {description}".lower()
+        is_remote = bool(re.search(r'\bremote\b', search_text) or re.search(r'\bremoto\b', search_text))
 
         salary_min = item.get("salary_min")
         salary_max = item.get("salary_max")
@@ -120,8 +122,7 @@ class IngestionService:
 
     @classmethod
     def _resolve_city(cls, raw_location: str, stats: dict, verbose: bool = False):
-        """Resuelve la ubicación cruda de Adzuna a una fila de la tabla cities.
-        Devuelve (city_id, label_para_log). Usa "México Nacional" como fallback cuando la geocodificación falla o la ubicación está vacía, para garantizar que city_id nunca quede nulo"""
+        """Resuelve la ubicación cruda de Adzuna a una fila de la tabla cities. Devuelve (city_id, label_para_log). Usa "México Nacional" como fallback cuando la geocodificación falla o la ubicación está vacía, para garantizar que city_id nunca quede nulo"""
         city, created = CityRepository.get_or_create_city(raw_location) if raw_location else (None, False)
 
         if city:

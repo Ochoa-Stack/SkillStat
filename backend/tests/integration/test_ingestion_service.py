@@ -125,8 +125,8 @@ def test_get_or_create_skill_reuses_id_case_insensitive(monkeypatch):
     assert skill_id == 100
     mock_create_skill.assert_not_called()
 
-def test_is_remote_false_positive_on_company_name_containing_remote(monkeypatch):
-    """  DOCUMENTATION OF CURRENT BUG: is_remote stringifies the entire dict and looks for "remote". If the company name is "RemoteWorks Solutions", it flags the job as remote even if title/description don't mention it. """
+def test_is_remote_ignores_company_name_containing_remote(monkeypatch):
+    """ is_remote solo examina title y description. Un job cuya empresa se llama "RemoteWorks Solutions" pero cuyo título y descripción son presenciales NO debe marcarse como remoto. Verifica el comportamiento correcto tras la corrección del bug. """
     monkeypatch.setattr("app.services.ingestion_service.JobRepository.get_by_hash", MagicMock(return_value=None))
     
     mock_job = MagicMock()
@@ -138,7 +138,7 @@ def test_is_remote_false_positive_on_company_name_containing_remote(monkeypatch)
 
     stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
     
-    # This item doesn't mention remote in title or description, but the company name contains "Remote"
+    # Empresa con "Remote" en el nombre, pero título y descripción completamente presenciales.
     item = {
         "title": "Backend Developer (On-site)",
         "description": "We need an on-site backend developer to work in our office in Monterrey.",
@@ -149,8 +149,62 @@ def test_is_remote_false_positive_on_company_name_containing_remote(monkeypatch)
     
     IngestionService._process_job(item, {}, stats)
     
-    # Get the job_data dictionary passed to JobRepository.create
     job_data_passed = mock_create_job.call_args[0][0]
     
-    # We assert that the bug exists and it marks the job as remote
+    # El nombre de la empresa NO debe influir en la detección de modalidad.
+    assert job_data_passed["remote"] is False
+
+
+def test_is_remote_detects_genuine_remote_in_description(monkeypatch):
+    """ is_remote detecta correctamente 'remoto' como palabra completa dentro de la descripción. Caso positivo genuino: la modalidad remota sí está mencionada en el texto de la vacante. """
+    monkeypatch.setattr("app.services.ingestion_service.JobRepository.get_by_hash", MagicMock(return_value=None))
+    
+    mock_job = MagicMock()
+    mock_job.id = 100
+    mock_create_job = MagicMock(return_value=mock_job)
+    monkeypatch.setattr("app.services.ingestion_service.JobRepository.create", mock_create_job)
+    monkeypatch.setattr("app.services.ingestion_service.SkillsExtractionService.extract_skills", MagicMock(return_value=[]))
+    monkeypatch.setattr("app.services.ingestion_service.CityRepository.get_or_create_city", MagicMock(return_value=(None, False)))
+
+    stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
+    
+    item = {
+        "title": "Desarrollador Backend",
+        "description": "Puesto 100% remoto, no requiere presencia en oficina. Trabajo desde casa.",
+        "company": {"display_name": "TechCorp"}
+    }
+    
+    IngestionService._process_job(item, {}, stats)
+    
+    job_data_passed = mock_create_job.call_args[0][0]
+    
+    # La palabra 'remoto' en la descripción debe marcar el job como remoto.
     assert job_data_passed["remote"] is True
+
+
+def test_is_remote_does_not_match_partial_word_containing_remoto(monkeypatch):
+    """ is_remote usa \\b (límite de palabra), por lo que una cadena que contenga 'remoto' como subcadena de otra palabra (ej. 'remotorizado') NO debe disparar un falso positivo. """
+    monkeypatch.setattr("app.services.ingestion_service.JobRepository.get_by_hash", MagicMock(return_value=None))
+    
+    mock_job = MagicMock()
+    mock_job.id = 101
+    mock_create_job = MagicMock(return_value=mock_job)
+    monkeypatch.setattr("app.services.ingestion_service.JobRepository.create", mock_create_job)
+    monkeypatch.setattr("app.services.ingestion_service.SkillsExtractionService.extract_skills", MagicMock(return_value=[]))
+    monkeypatch.setattr("app.services.ingestion_service.CityRepository.get_or_create_city", MagicMock(return_value=(None, False)))
+
+    stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
+    
+    # 'remotorizado' contiene la subcadena 'remoto' pero no es la palabra 'remoto'.
+    item = {
+        "title": "Tecnico Electrico",
+        "description": "Se requiere conocimiento en sistemas remotorizado y control de motores.",
+        "company": {"display_name": "ElectroCorp"}
+    }
+    
+    IngestionService._process_job(item, {}, stats)
+    
+    job_data_passed = mock_create_job.call_args[0][0]
+    
+    # 'remotorizado' no debe confundirse con la palabra 'remoto'.
+    assert job_data_passed["remote"] is False
