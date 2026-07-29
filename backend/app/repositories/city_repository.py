@@ -8,6 +8,13 @@ class CityRepository(BaseRepository):
     model = City
 
     @classmethod
+    def _normalize(cls, text: str) -> str:
+        return ''.join(
+            c for c in unicodedata.normalize('NFD', text.strip().lower())
+            if unicodedata.category(c) != 'Mn'
+        )
+
+    @classmethod
     def get_by_name(cls, name: str):
         return db.session.execute(
             db.select(City).filter_by(name=name)
@@ -19,14 +26,12 @@ class CityRepository(BaseRepository):
             return None, False
             
         # lowercase, sin acentos y trim (Normaliza)
-        normalized = raw_location.strip().lower()
-        normalized = ''.join(c for c in unicodedata.normalize('NFD', normalized) if unicodedata.category(c) != 'Mn')
+        normalized = cls._normalize(raw_location)
         
         # Búsqueda exhaustiva comparando el nombre normalizado
         all_cities = db.session.execute(db.select(City)).scalars().all()
         for city in all_cities:
-            city_norm = city.name.strip().lower()
-            city_norm = ''.join(c for c in unicodedata.normalize('NFD', city_norm) if unicodedata.category(c) != 'Mn')
+            city_norm = cls._normalize(city.name)
             if city_norm == normalized:
                 return city, False
                 
@@ -37,12 +42,10 @@ class CityRepository(BaseRepository):
             
         # Nominatim puede resolver un alias (ej: "Distrito Federal") a un nombre real (ej: "Ciudad de México"). Revisamos si ese nombre real ya existe en BD para evitar IntegrityError secuencial
         resolved_name = geo_data["name"]
-        resolved_norm = resolved_name.strip().lower()
-        resolved_norm = ''.join(c for c in unicodedata.normalize('NFD', resolved_norm) if unicodedata.category(c) != 'Mn')
+        resolved_norm = cls._normalize(resolved_name)
         
         for city in all_cities:
-            city_norm = city.name.strip().lower()
-            city_norm = ''.join(c for c in unicodedata.normalize('NFD', city_norm) if unicodedata.category(c) != 'Mn')
+            city_norm = cls._normalize(city.name)
             if city_norm == resolved_norm:
                 return city, False
             
