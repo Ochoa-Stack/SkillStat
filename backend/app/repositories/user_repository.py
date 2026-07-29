@@ -78,11 +78,13 @@ class UserRepository:
 
     @classmethod
     def count_active_admins_for_update(cls) -> int:
-        # Version con lock de fila explicito (SELECT ... FOR UPDATE) para proteger contra condiciones de carrera reales: dos requests concurrentes intentando degradar/desactivar a los dos ultimos administradores activos al mismo tiempo. El lock se retiene hasta el commit() de la transaccion actual (el que ya ocurre dentro de save()), forzando que la segunda request espere a que la primera termine antes de leer un conteo actualizado.
-        # Nota de implementacion: with_for_update() no es compatible directamente con func.count() como subquery en SQLAlchemy 2.x, por lo que se aplica FOR UPDATE sobre la query de filas y se cuenta el resultado en Python (equivalente semanticamente).
         rows = db.session.execute(
             db.select(User.id).filter_by(
                 role="ADMIN", is_active=True
             ).with_for_update()
         ).all()
         return len(rows)
+
+    @classmethod
+    def is_last_active_admin(cls, user_id: int) -> bool:
+        return cls.count_active_admins_for_update() <= 1

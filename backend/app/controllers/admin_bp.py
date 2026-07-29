@@ -183,7 +183,7 @@ def update_user_role(user_id):
     new_role = payload["role"]
     # Si el actor se esta auto-modificando y la operacion lo saca de ADMIN, protegemos contra dejar el sistema sin ningun admin activo.
     if target.id == actor_id and target.role == "ADMIN" and new_role != "ADMIN":
-        if UserRepository.count_active_admins_for_update() <= 1:
+        if UserRepository.is_last_active_admin(actor_id):
             return error_response(
                 code="LAST_ADMIN_PROTECTED",
                 message="No puedes quitarte el rol de ADMIN: eres el unico administrador activo.",
@@ -228,7 +228,7 @@ def update_user_status(user_id):
     new_status = payload["is_active"]
     # Misma proteccion de ultimo-admin, aplicada a desactivacion en vez de cambio de rol.
     if target.id == actor_id and target.role == "ADMIN" and new_status is False:
-        if UserRepository.count_active_admins_for_update() <= 1:
+        if UserRepository.is_last_active_admin(actor_id):
             return error_response(
                 code="LAST_ADMIN_PROTECTED",
                 message="No puedes desactivar tu cuenta: eres el unico administrador activo.",
@@ -250,15 +250,11 @@ def update_user_status(user_id):
 
 @admin_bp.route("/trigger-pipeline", methods=["POST"])
 def trigger_pipeline():
-    """Dispara el pipeline diario (snapshots + evaluación de alertas) bajo demanda.
-    Autenticado exclusivamente via el header X-Pipeline-Trigger-Key, comparado
-    con PIPELINE_TRIGGER_SECRET usando tiempo constante para evitar timing attacks.
-    Diseñado para ser invocado por GitHub Actions, sin sesión de usuario."""
+    """Dispara el pipeline diario bajo demanda. Autenticado exclusivamente via el header X-Pipeline-Trigger-Key, comparado con PIPELINE_TRIGGER_SECRET usando tiempo constante para evitar timing attacks. Diseñado para ser invocado por GitHub Actions, sin sesión de usuario."""
     provided_key = request.headers.get("X-Pipeline-Trigger-Key", "")
     expected_key = current_app.config.get("PIPELINE_TRIGGER_SECRET", "")
 
-    # hmac.compare_digest previene timing attacks: el tiempo de comparación no
-    # varía según cuántos caracteres coincidan, a diferencia del operador ==.
+    # hmac.compare_digest previene timing attacks, el tiempo de comparación no varía según cuántos caracteres coincidan, a diferencia del operador ==.
     if not hmac.compare_digest(provided_key, expected_key):
         return error_response(
             code="UNAUTHORIZED",
