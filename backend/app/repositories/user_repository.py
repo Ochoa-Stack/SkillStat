@@ -9,22 +9,26 @@ logger = logging.getLogger(__name__)
 
 class UserRepository:
     # Encapsula el acceso a datos para la entidad User. Aísla las consultas SQLAlchemy de la lógica de negocio.
-
+    
     @classmethod
-    def create(cls, user_data: dict) -> User:
-        user = User(**user_data)
-        db.session.add(user)
+    def _commit_or_rollback(cls, user: User, action: str) -> User:
         try:
             db.session.commit()
             return user
         except IntegrityError as e:
             db.session.rollback()
-            logger.warning("Violacion de integridad al crear User: %s", str(e))
-            raise ConflictError("No se pudo crear el usuario: conflicto de integridad de datos.")
+            logger.warning(f"Violacion de integridad al {action} User: {e}")
+            raise ConflictError(f"No se pudo {action} el usuario: conflicto de integridad de datos.")
         except Exception as e:
             db.session.rollback()
-            logger.error("Fallo inesperado al crear User: %s", str(e))
-            raise AppError("Error interno al crear el usuario.", code="DATABASE_ERROR", status_code=500)
+            logger.error(f"Fallo inesperado al {action} User: {e}")
+            raise AppError(f"Error interno al {action} el usuario.", code="DATABASE_ERROR", status_code=500)
+
+    @classmethod
+    def create(cls, user_data: dict) -> User:
+        user = User(**user_data)
+        db.session.add(user)
+        return cls._commit_or_rollback(user, "crear")
 
     @classmethod
     def get_by_id(cls, user_id: int) -> User:
@@ -55,26 +59,7 @@ class UserRepository:
     def save(cls, user: User) -> User:
         # Persiste cambios en una entidad ya existente, como el reseteo de password_hash; no crea un nuevo registro, solo hace commit.
         db.session.add(user)
-        try:
-            db.session.commit()
-            return user
-        except IntegrityError as e:
-            db.session.rollback()
-            logger.warning("Violacion de integridad al guardar User: %s", str(e))
-            raise ConflictError("No se pudo guardar el usuario: conflicto de integridad de datos.")
-        except Exception as e:
-            db.session.rollback()
-            logger.error("Fallo inesperado al guardar User: %s", str(e))
-            raise AppError("Error interno al guardar el usuario.", code="DATABASE_ERROR", status_code=500)
-
-    @classmethod
-    def count_active_admins(cls) -> int:
-        # Cuenta administradores activos para proteger contra que una operación deje al sistema sin ningún ADMIN capaz de operar el panel.
-        return db.session.execute(
-            db.select(db.func.count()).select_from(User).filter_by(
-                role="ADMIN", is_active=True
-            )
-        ).scalar_one()
+        return cls._commit_or_rollback(user, "guardar")
 
     @classmethod
     def count_active_admins_for_update(cls) -> int:
