@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 class NominatimClient:
     BASE_URL = "https://nominatim.openstreetmap.org/search"
-    USER_AGENT = "SkillStat/1.0 (proyecto academico UTCJ, contacto: eliaslucinoochoamalaga@gmail.com)"
+    USER_AGENT = "SkillStat/1.0 (proyecto academico UTCJ, contacto: 195959137+Ochoa-Stack@users.noreply.github.com)"
     
     # Valid types that represent a real city/town/village entity.
     VALID_TYPES = {"city", "town", "village", "municipality"}
@@ -31,20 +31,29 @@ class NominatimClient:
     }
 
     @classmethod
-    def geocode_city(cls, query: str) -> dict | None:
-        """Geocodes a city name using Nominatim API.
-        Returns a dict with 'name', 'state', 'lat', 'lon' or None if it fails, timeouts,
-        or doesn't meet the confidence threshold (must have state, must be a valid city type)"""
+    def _resolve_query(cls, query: str) -> str:
         import unicodedata
-        
-        # Desambiguación de query
         normalized_query = query.strip().lower()
         normalized_query = ''.join(c for c in unicodedata.normalize('NFD', normalized_query) if unicodedata.category(c) != 'Mn')
-        
-        # Eliminamos puntos comunes como en "mexico d.f." -> "mexico df" para que coincida con el diccionario
         normalized_query = normalized_query.replace(".", "")
-        
-        actual_query = cls.QUERY_DISAMBIGUATION.get(normalized_query, query)
+        return cls.QUERY_DISAMBIGUATION.get(normalized_query, query)
+
+    @classmethod
+    def _is_valid_place_type(cls, result: dict) -> bool:
+        place_type = result.get("type", "").lower()
+        place_class = result.get("class", "").lower()
+        addresstype = result.get("addresstype", "").lower()
+        return place_type in cls.VALID_TYPES or place_class in cls.VALID_TYPES or addresstype in cls.VALID_TYPES
+
+    @classmethod
+    def _extract_city_name(cls, result: dict) -> str | None:
+        address = result.get("address", {})
+        return address.get("city") or address.get("town") or address.get("village") or address.get("municipality") or result.get("name")
+
+    @classmethod
+    def geocode_city(cls, query: str) -> dict | None:
+        """ Geocodes a city name using Nominatim API. Returns a dict with 'name', 'state', 'lat', 'lon' or None if it fails, timeouts, or doesn't meet the confidence threshold (must have state, must be a valid city type) """
+        actual_query = cls._resolve_query(query)
         
         # Sleep to respect Nominatim's strict 1 req/sec limit
         time.sleep(1.1)
@@ -70,11 +79,7 @@ class NominatimClient:
                 
             result = data[0]
             
-            place_type = result.get("type", "").lower()
-            place_class = result.get("class", "").lower()
-            addresstype = result.get("addresstype", "").lower()
-            
-            if place_type not in cls.VALID_TYPES and place_class not in cls.VALID_TYPES and addresstype not in cls.VALID_TYPES:
+            if not cls._is_valid_place_type(result):
                 return None
                 
             address = result.get("address", {})
@@ -83,7 +88,7 @@ class NominatimClient:
             if not state:
                 return None
                 
-            name = address.get("city") or address.get("town") or address.get("village") or address.get("municipality") or result.get("name")
+            name = cls._extract_city_name(result)
             
             if not name:
                 return None

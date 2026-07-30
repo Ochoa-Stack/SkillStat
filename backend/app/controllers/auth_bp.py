@@ -114,6 +114,7 @@ def get_profile():
 
 
 @auth_bp.route("/google", methods=["POST"])
+@limiter.limit("10 per 15 minutes")
 def google_login():
     data = request.get_json() or {}
     credential = data.get("credential")

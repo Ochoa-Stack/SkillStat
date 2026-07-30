@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 from flask_migrate import upgrade
 import subprocess
 from datetime import datetime
@@ -15,8 +16,22 @@ class BackupService:
     # Encapsula la ejecución de comandos del sistema operativo (pg_dump). Requisito obligatorio de infraestructura y recuperación.
 
     @classmethod
+    def _get_connection_params(cls, db_url: str) -> dict:
+        # Usamos urlparse para manejar correctamente passwords con caracteres especiales que el split manual no puede resolver.
+        parsed = urlparse(db_url)
+        password = parsed.password or ""
+        env = os.environ.copy()
+        env["PGPASSWORD"] = password
+        return {
+            "host": parsed.hostname,
+            "port": str(parsed.port or 5432),
+            "user": parsed.username,
+            "db_name": parsed.path.lstrip("/"),
+            "env": env,
+        }
+
+    @classmethod
     def execute_database_backup(cls, requested_by: int = None) -> dict:
-        from urllib.parse import urlparse
 
         db_url = current_app.config.get("SQLALCHEMY_DATABASE_URI", "")
 
@@ -45,28 +60,19 @@ class BackupService:
         })
 
         try:
-            # Usamos urlparse para manejar correctamente passwords con caracteres especiales que el split manual no puede resolver.
-            parsed = urlparse(db_url)
-            user = parsed.username
-            password = parsed.password or ""
-            host = parsed.hostname
-            port = str(parsed.port or 5432)
-            db_name = parsed.path.lstrip("/")
-
-            env = os.environ.copy()
-            env["PGPASSWORD"] = password
+            conn = cls._get_connection_params(db_url)
 
             command = [
                 "pg_dump",
-                "-h", host,
-                "-p", port,
-                "-U", user,
+                "-h", conn["host"],
+                "-p", conn["port"],
+                "-U", conn["user"],
                 "-F", "c",
                 "-f", filepath,
-                db_name,
+                conn["db_name"],
             ]
 
-            subprocess.run(command, env=env, capture_output=True, text=True, check=True)
+            subprocess.run(command, env=conn["env"], capture_output=True, text=True, check=True)
 
             file_size = os.path.getsize(filepath)
             RemoteStorageService.upload_backup(filepath, filename)
@@ -104,7 +110,6 @@ class BackupService:
 
     @classmethod
     def restore_database_backup(cls, backup_id: int, requested_by: int) -> dict:
-        from urllib.parse import urlparse
         backup = BackupRepository.get_by_id(backup_id)
         if not backup:
             raise AppError("El respaldo solicitado no existe.", code="NOT_FOUND", status_code=404)
@@ -150,22 +155,15 @@ class BackupService:
             )
 
         db_url = current_app.config.get("SQLALCHEMY_DATABASE_URI", "")
-        parsed = urlparse(db_url)
-        user = parsed.username
-        password = parsed.password or ""
-        host = parsed.hostname
-        port = str(parsed.port or 5432)
-        db_name = parsed.path.lstrip("/")
-        env = os.environ.copy()
-        env["PGPASSWORD"] = password
+        conn = cls._get_connection_params(db_url)
         command = [
             "pg_restore",
             "--clean",
             "--if-exists",
-            "-h", host,
-            "-p", port,
-            "-U", user,
-            "-d", db_name,
+            "-h", conn["host"],
+            "-p", conn["port"],
+            "-U", conn["user"],
+            "-d", conn["db_name"],
             backup_filepath,
         ]
 
@@ -173,7 +171,7 @@ class BackupService:
         db.session.remove()
 
         try:
-            subprocess.run(command, env=env, capture_output=True, text=True, check=True)
+            subprocess.run(command, env=conn["env"], capture_output=True, text=True, check=True)
         except subprocess.CalledProcessError as e:
             raise AppError(
                 f"Fallo en ejecucion de pg_restore: {e.stderr}",
