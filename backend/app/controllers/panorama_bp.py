@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from app.repositories.skill_repository import SkillRepository
 from app.repositories.city_repository import CityRepository
 from app.repositories.trend_snapshot_repository import TrendSnapshotRepository
+from app.services.panorama_service import PanoramaService
 from app.schemas.skill_schema import SkillResponseSchema
 from app.schemas.panorama_schema import (
     CatalogsResponseSchema,
@@ -244,39 +245,16 @@ def get_compare():
             status_code=422,
         )
 
-    skills_map = {}
-    missing_ids = []
-    for sid in skill_ids:
-        skill = SkillRepository.get_by_id(sid)
-        if skill:
-            skills_map[sid] = skill
-        else:
-            missing_ids.append(sid)
+    data = PanoramaService.get_compare_data(skill_ids)
 
-    if missing_ids:
+    if data["missing_ids"]:
         return error_response(
             code="NOT_FOUND",
-            message=f"Las siguientes habilidades no existen: {missing_ids}.",
+            message=f"Las siguientes habilidades no existen: {data['missing_ids']}.",
             status_code=404,
         )
 
-    blocks = []
-    for sid in skill_ids:
-        skill = skills_map[sid]
-        latest = TrendSnapshotRepository.get_latest_by_skill(sid)
-        series_snapshots = TrendSnapshotRepository.get_by_skill_id(sid)
-
-        blocks.append({
-            "skill_id": skill.id,
-            "skill_name": skill.name,
-            "demand_count": latest.demand_count if latest else 0,
-            "growth_rate": latest.growth_rate if latest else None,
-            "avg_salary": latest.avg_salary if latest else None,
-            "series": [
-                {"date": s.date, "demand_count": s.demand_count}
-                for s in series_snapshots
-            ],
-        })
+    blocks = data["blocks"]
 
     result = CompareResponseSchema().dump({"skills": blocks})
     return success_response(data=result, status_code=200)

@@ -172,7 +172,7 @@ def test_get_skills_top_respects_limit_bounds(app, client):
     assert resp_zero.status_code == 200
     assert isinstance(resp_zero.get_json()["data"], list)
 
-    # limit=1000 => max(1, min(1000, 50)) = 50 — no debe fallar
+    # limit=1000 => max(1, min(1000, 50)) = 50 - no debe fallar
     resp_over = client.get("/api/panorama/skills/top?limit=1000")
     assert resp_over.status_code == 200
     assert isinstance(resp_over.get_json()["data"], list)
@@ -261,12 +261,12 @@ def test_get_compare_requires_between_2_and_5_skills(app, db_session, client):
     skills = [_make_skill(db_session, cat.id, name=f"Skill_Bound_{i}") for i in range(6)]
     ids = [s.id for s in skills]
 
-    # Un solo skill — menor al minimo de 2
+    # Un solo skill - menor al minimo de 2
     resp_one = client.get(f"/api/panorama/compare?skill_ids={ids[0]}")
     assert resp_one.status_code == 422
     assert resp_one.get_json()["error"]["code"] == "VALIDATION_ERROR"
 
-    # Seis skills — excede el maximo de 5
+    # Seis skills - excede el maximo de 5
     ids_str = ",".join(str(i) for i in ids)
     resp_six = client.get(f"/api/panorama/compare?skill_ids={ids_str}")
     assert resp_six.status_code == 422
@@ -301,7 +301,7 @@ def test_get_compare_success_with_valid_skills(app, db_session, client):
 def test_get_compare_query_count_baseline_before_optimization(
     client, db_session, query_counter
 ):
-    """ Test de caracterización: documenta el número EXACTO de queries que get_compare ejecuta hoy con 5 skills (patrón N+1 confirmado en auditoría: hasta 15 queries). Este test debe actualizarse, no eliminarse, cuando la Ronda 3 introduzca los métodos batch. """
+    """ Test de caracterización: documenta el número EXACTO de queries que get_compare ejecuta hoy con 5 skills. """
     skill_ids = _setup_compare_skills(db_session, num_skills=5, base_id=50)
     ids_str = ",".join(str(i) for i in skill_ids)
 
@@ -310,4 +310,4 @@ def test_get_compare_query_count_baseline_before_optimization(
 
     assert response.status_code == 200
     
-    assert query_counter["n"] == 15
+    assert query_counter["n"] == 3
