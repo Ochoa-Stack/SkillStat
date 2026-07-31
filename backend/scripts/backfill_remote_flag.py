@@ -36,7 +36,7 @@ def backfill_remote_flag(execute):
             try:
                 # El título o descripción pueden ser None en la BD? Según los modelos y el schema, title y description suelen ser strings, pero por precaución:
                 title = job.title or ""
-                description = job.description or ""
+                description = job.raw_description or ""
                 
                 new_remote = IngestionService._compute_is_remote(title, description)
                 
