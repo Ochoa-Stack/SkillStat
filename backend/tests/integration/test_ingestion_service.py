@@ -85,7 +85,7 @@ def test_process_job_extracts_last_area_as_raw_location(monkeypatch):
 
 def test_resolve_city_returns_fallback(monkeypatch):
     """ _resolve_city retorna MEXICO_NACIONAL_CITY_ID y registra stats['fallback'] cuando CityRepository.get_or_create_city retorna (None, False). """
-    monkeypatch.setattr("app.services.ingestion_service.CityRepository.get_or_create_city", MagicMock(return_value=(None, False)))
+    monkeypatch.setattr("app.services.ingestion_service.CityService.get_or_create_city", MagicMock(return_value=(None, False)))
     
     stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
     
@@ -102,7 +102,7 @@ def test_resolve_city_returns_id_and_increments_created_when_new(monkeypatch):
     mock_city.name = "TestCity"
     mock_city.state = "TestState"
     
-    monkeypatch.setattr("app.services.ingestion_service.CityRepository.get_or_create_city", MagicMock(return_value=(mock_city, True)))
+    monkeypatch.setattr("app.services.ingestion_service.CityService.get_or_create_city", MagicMock(return_value=(mock_city, True)))
     
     stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
     
@@ -134,7 +134,7 @@ def test_is_remote_ignores_company_name_containing_remote(monkeypatch):
     mock_create_job = MagicMock(return_value=mock_job)
     monkeypatch.setattr("app.services.ingestion_service.JobRepository.create", mock_create_job)
     monkeypatch.setattr("app.services.ingestion_service.SkillsExtractionService.extract_skills", MagicMock(return_value=[]))
-    monkeypatch.setattr("app.services.ingestion_service.CityRepository.get_or_create_city", MagicMock(return_value=(None, False)))
+    monkeypatch.setattr("app.services.ingestion_service.CityService.get_or_create_city", MagicMock(return_value=(None, False)))
 
     stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
     
@@ -164,7 +164,7 @@ def test_is_remote_detects_genuine_remote_in_description(monkeypatch):
     mock_create_job = MagicMock(return_value=mock_job)
     monkeypatch.setattr("app.services.ingestion_service.JobRepository.create", mock_create_job)
     monkeypatch.setattr("app.services.ingestion_service.SkillsExtractionService.extract_skills", MagicMock(return_value=[]))
-    monkeypatch.setattr("app.services.ingestion_service.CityRepository.get_or_create_city", MagicMock(return_value=(None, False)))
+    monkeypatch.setattr("app.services.ingestion_service.CityService.get_or_create_city", MagicMock(return_value=(None, False)))
 
     stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
     
@@ -191,7 +191,7 @@ def test_is_remote_does_not_match_partial_word_containing_remoto(monkeypatch):
     mock_create_job = MagicMock(return_value=mock_job)
     monkeypatch.setattr("app.services.ingestion_service.JobRepository.create", mock_create_job)
     monkeypatch.setattr("app.services.ingestion_service.SkillsExtractionService.extract_skills", MagicMock(return_value=[]))
-    monkeypatch.setattr("app.services.ingestion_service.CityRepository.get_or_create_city", MagicMock(return_value=(None, False)))
+    monkeypatch.setattr("app.services.ingestion_service.CityService.get_or_create_city", MagicMock(return_value=(None, False)))
 
     stats = {"fetched": 0, "processed": 0, "duplicates": 0, "errors": 0, "cities_created": 0, "fallback": 0}
     
