@@ -13,14 +13,14 @@ class CityRepository(BaseRepository):
 
     @classmethod
     def find_by_normalized_name(cls, raw_name: str):
-        # Usa el indice funcional immutable_unaccent(lower(name)) para busqueda insensible a acentos y mayusculas en una sola query indexada, reemplazando el escaneo completo en memoria que hacia _normalize.
+        # Usa unaccent() nativo de PostgreSQL para busqueda insensible a acentos y mayusculas, reemplazando el escaneo completo en memoria que hacia _normalize. Sin indice funcional (unaccent de un solo argumento es STABLE, no IMMUTABLE, y el wrapper IMMUTABLE resulto incompatible entre versiones de PostgreSQL), aceptable dado el volumen actual del catalogo de ciudades; escanea la tabla completa en el motor, no en Python, que ya es la mejora real sobre el comportamiento anterior.
         if not raw_name:
             return None
         raw_name = raw_name.strip()
         from sqlalchemy import func
-        normalized_input = func.immutable_unaccent(func.lower(raw_name))
+        normalized_input = func.unaccent(func.lower(raw_name))
         return db.session.execute(
             db.select(City).filter(
-                func.immutable_unaccent(func.lower(City.name)) == normalized_input
+                func.unaccent(func.lower(City.name)) == normalized_input
             )
         ).scalar_one_or_none()

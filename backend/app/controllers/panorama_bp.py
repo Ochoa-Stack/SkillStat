@@ -1,7 +1,4 @@
 from flask import Blueprint, request
-from app.repositories.skill_repository import SkillRepository
-from app.repositories.city_repository import CityRepository
-from app.repositories.trend_snapshot_repository import TrendSnapshotRepository
 from app.services.panorama_service import PanoramaService
 from app.schemas.skill_schema import SkillResponseSchema
 from app.schemas.panorama_schema import (
@@ -17,88 +14,35 @@ from app.utils.response import success_response, error_response
 
 panorama_bp = Blueprint("panorama_bp", __name__)
 
-
 @panorama_bp.route("/skills", methods=["GET"])
 def get_skills():
-    # Exponemos el catalogo estatico aplicando el esquema de solo lectura para alimentar los selectores de la interfaz sin filtrar metadatos internos.
-    skills = SkillRepository.get_all()
+    skills = PanoramaService.get_all_skills()
     result = SkillResponseSchema(many=True).dump(skills)
     return success_response(data=result, status_code=200)
 
-
 @panorama_bp.route("/catalogs", methods=["GET"])
 def get_catalogs():
-    # Endpoint ligero pensado para poblar selectores del frontend. Devolvemos id+name unicamente, sin metricas, para minimizar el payload en una ruta que probablemente se llama una sola vez por sesion.
-    skills = SkillRepository.get_all()
-    cities = CityRepository.get_all()
-
-    payload = {
-        "skills": [{"id": s.id, "name": s.name} for s in skills],
-        "cities": [{"id": c.id, "name": c.name} for c in cities],
-    }
-
+    payload = PanoramaService.get_catalogs_data()
     result = CatalogsResponseSchema().dump(payload)
     return success_response(data=result, status_code=200)
 
-
 @panorama_bp.route("/summary", methods=["GET"])
 def get_summary():
-    # KPIs globales que alimentan las tarjetas superiores del Panorama
-    data = TrendSnapshotRepository.get_summary_data()
-
-    def build_skill_block(row):
-        if not row:
-            return None
-        snapshot, skill_name = row
-        return {
-            "skill_id": snapshot.skill_id,
-            "name": skill_name,
-            "demand_count": snapshot.demand_count,
-            "growth_rate": snapshot.growth_rate,
-            "avg_salary": snapshot.avg_salary,
-        }
-
-    payload = {
-        "total_jobs": data["total_jobs"],
-        "total_skills_tracked": data["total_skills_tracked"],
-        "total_companies": data["total_companies"],
-        "top_emerging_skill": build_skill_block(data["top_emerging"]),
-        "top_declining_skill": build_skill_block(data["top_declining"]),
-        "last_updated": data["latest_date"],
-    }
-
+    payload = PanoramaService.get_summary_data()
     result = SummaryResponseSchema().dump(payload)
     return success_response(data=result, status_code=200)
 
-
 @panorama_bp.route("/skills/top", methods=["GET"])
 def get_top_skills():
-    # Ranking de habilidades por demanda actual. El frontend lo usa para la grafica de barras principal del Panorama
     limit = request.args.get("limit", default=10, type=int)
-    # Acotamos el limite para evitar que un valor arbitrario en la query fuerce una consulta desproporcionada contra la base de datos
+    # Acotamos el limite para evitar que un valor arbitrario en la query fuerce una consulta desproporcionada contra la base de datos — validacion de entrada HTTP, no logica de negocio.
     limit = max(1, min(limit, 50))
-
-    snapshots = TrendSnapshotRepository.get_top_skills(limit=limit)
-
-    payload = [
-        {
-            "skill_id": s.skill_id,
-            "name": s.skill.name if s.skill else None,
-            "category": s.skill.category.name if s.skill and s.skill.category else None,
-            "demand_count": s.demand_count,
-            "growth_rate": s.growth_rate,
-            "avg_salary": s.avg_salary,
-        }
-        for s in snapshots
-    ]
-
+    payload = PanoramaService.get_top_skills_data(limit=limit)
     result = SkillTrendSchema(many=True).dump(payload)
     return success_response(data=result, status_code=200)
 
-
 @panorama_bp.route("/trends", methods=["GET"])
 def get_trends():
-    # Serie temporal de demanda para una habilidad especifica. El frontend la usa para la grafica de lineas de evolucion
     skill_id = request.args.get("skill_id", type=int)
 
     if not skill_id:
@@ -108,32 +52,19 @@ def get_trends():
             status_code=422,
         )
 
-    skill = SkillRepository.get_by_id(skill_id)
-    if not skill:
+    payload = PanoramaService.get_trends_data(skill_id)
+    if payload is None:
         return error_response(
             code="NOT_FOUND",
             message="La habilidad solicitada no existe.",
             status_code=404,
         )
 
-    snapshots = TrendSnapshotRepository.get_by_skill_id(skill_id)
-
-    payload = {
-        "skill_id": skill.id,
-        "skill_name": skill.name,
-        "series": [
-            {"date": s.date, "demand_count": s.demand_count}
-            for s in snapshots
-        ],
-    }
-
     result = TrendsResponseSchema().dump(payload)
     return success_response(data=result, status_code=200)
 
-
 @panorama_bp.route("/geo", methods=["GET"])
 def get_geo():
-    # Distribucion geografica de demanda. Si se filtra por skill_id devolvemos la distribucion de esa habilidad especifica, de lo contrario la demanda total agregada por ciudad.
     skill_id = request.args.get("skill_id", type=int)
     group_by = request.args.get("group_by", default="city", type=str)
 
@@ -144,47 +75,19 @@ def get_geo():
             status_code=422,
         )
 
-    skill = None
-    if skill_id is not None:
-        skill = SkillRepository.get_by_id(skill_id)
-        if not skill:
-            return error_response(
-                code="NOT_FOUND",
-                message="La habilidad solicitada no existe.",
-                status_code=404,
-            )
-
-    rows = TrendSnapshotRepository.get_geo_distribution(skill_id=skill_id, group_by=group_by)
-
-    distribution = []
-    for row in rows:
-        if group_by == "state":
-            distribution.append({
-                "state": row.state,
-                "demand_count": row.total_demand,
-                "is_fallback": row.is_fallback,
-            })
-        else:
-            distribution.append({
-                "city_id": row.city_id,
-                "city_name": row.city_name,
-                "state": row.state,
-                "demand_count": row.total_demand,
-            })
-
-    payload = {
-        "skill_id": skill.id if skill else None,
-        "skill_name": skill.name if skill else None,
-        "distribution": distribution,
-    }
+    payload = PanoramaService.get_geo_data(skill_id=skill_id, group_by=group_by)
+    if isinstance(payload, tuple) and payload[0] == "NOT_FOUND":
+        return error_response(
+            code="NOT_FOUND",
+            message="La habilidad solicitada no existe.",
+            status_code=404,
+        )
 
     result = GeoResponseSchema().dump(payload)
     return success_response(data=result, status_code=200)
 
-
 @panorama_bp.route("/salaries", methods=["GET"])
 def get_salaries():
-    # Cruce de habilidad contra rango salarial promedio. Requiere skill_id porque el calculo es por habilidad, no agregable globalmente sin perder sentido.
     skill_id = request.args.get("skill_id", type=int)
 
     if not skill_id:
@@ -194,27 +97,16 @@ def get_salaries():
             status_code=422,
         )
 
-    skill = SkillRepository.get_by_id(skill_id)
-    if not skill:
+    payload = PanoramaService.get_salaries_data(skill_id)
+    if payload is None:
         return error_response(
             code="NOT_FOUND",
             message="La habilidad solicitada no existe.",
             status_code=404,
         )
 
-    stats = SkillRepository.get_salary_stats(skill_id)
-
-    payload = {
-        "skill_id": skill.id,
-        "skill_name": skill.name,
-        "avg_salary_min": stats.avg_salary_min if stats else None,
-        "avg_salary_max": stats.avg_salary_max if stats else None,
-        "sample_size": stats.sample_size if stats else 0,
-    }
-
     result = SalaryResponseSchema().dump(payload)
     return success_response(data=result, status_code=200)
-
 
 @panorama_bp.route("/compare", methods=["GET"])
 def get_compare():
