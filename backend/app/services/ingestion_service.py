@@ -8,7 +8,7 @@ from app.services.skills_extraction_service import SkillsExtractionService
 from app.repositories.job_repository import JobRepository
 from app.repositories.skill_repository import SkillRepository
 from app.repositories.job_skill_repository import JobSkillRepository
-from app.repositories.city_repository import CityRepository
+from app.services.city_service import CityService
 from app.utils.errors import AppError
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class IngestionService:
         # Hashing criptográfico para garantizar la idempotencia de la ingesta y evitar guardar la misma vacante si Adzuna la devuelve en días posteriores.
         desc_hash = hashlib.sha256(description.encode("utf-8")).hexdigest()
         
-        # Validar duplicados ANTES de geocodificar o instanciar objetos, para evitar excepciones de BD y transacciones descartadas
+        # Validamos duplicados ANTES de geocodificar o instanciar objetos, para evitar excepciones de BD y transacciones descartadas
         if JobRepository.get_by_hash(desc_hash):
             stats["duplicates"] += 1
             return
@@ -127,7 +127,7 @@ class IngestionService:
     @classmethod
     def _resolve_city(cls, raw_location: str, stats: dict, verbose: bool = False):
         """Resuelve la ubicación cruda de Adzuna a una fila de la tabla cities. Devuelve (city_id, label_para_log). Usa "México Nacional" como fallback cuando la geocodificación falla o la ubicación está vacía, para garantizar que city_id nunca quede nulo"""
-        city, created = CityRepository.get_or_create_city(raw_location) if raw_location else (None, False)
+        city, created = CityService.get_or_create_city(raw_location) if raw_location else (None, False)
 
         if city:
             if created:

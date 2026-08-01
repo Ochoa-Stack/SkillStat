@@ -20,6 +20,12 @@ class SkillRepository(BaseRepository):
         ).scalar_one_or_none()
 
     @classmethod
+    def get_by_ids(cls, skill_ids: list[int]) -> list:
+        return db.session.execute(
+            db.select(Skill).filter(Skill.id.in_(skill_ids))
+        ).scalars().all()
+
+    @classmethod
     def get_salary_stats(cls, skill_id: int):
         from sqlalchemy import func
         from app.models.job import Job

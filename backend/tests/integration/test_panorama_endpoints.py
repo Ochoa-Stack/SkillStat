@@ -1,5 +1,6 @@
 import uuid
 import pytest
+from sqlalchemy import event
 from datetime import datetime, timezone, timedelta
 
 from app.models.city import City
@@ -10,6 +11,14 @@ from app.models.job_skill import JobSkill
 from app.models.trend_snapshot import TrendSnapshot
 from app.extensions import db as _db
 
+@pytest.fixture
+def query_counter(app):
+    counts = {"n": 0}
+    def on_execute(conn, cursor, statement, parameters, context, executemany):
+        counts["n"] += 1
+    event.listen(_db.engine, "before_cursor_execute", on_execute)
+    yield counts
+    event.remove(_db.engine, "before_cursor_execute", on_execute)
 
 # Helpers de creacion de entidades.
 # Duplicados deliberadamente aqui (principio DAMP): cada archivo de tests es autocontenido. No se importan desde otros archivos de tests.
@@ -21,20 +30,17 @@ def _make_city(db_session, city_id=2, name="Ciudad Test", state="Estado Test"):
     db_session.flush()
     return city
 
-
 def _make_category(db_session, name="Programacion"):
     cat = Category(name=name)
     db_session.add(cat)
     db_session.flush()
     return cat
 
-
 def _make_skill(db_session, category_id, name="Python"):
     skill = Skill(name=name, canonical_name=name.lower(), category_id=category_id)
     db_session.add(skill)
     db_session.flush()
     return skill
-
 
 def _make_job(db_session, city_id, salary_min=None, salary_max=None):
     job = Job(
@@ -53,7 +59,6 @@ def _make_job(db_session, city_id, salary_min=None, salary_max=None):
     db_session.flush()
     return job
 
-
 def _make_job_skill(db_session, job_id, skill_id, confidence_score=0.9):
     js = JobSkill(
         job_id=job_id,
@@ -63,7 +68,6 @@ def _make_job_skill(db_session, job_id, skill_id, confidence_score=0.9):
     db_session.add(js)
     db_session.flush()
     return js
-
 
 def _make_snapshot(db_session, skill_id, city_id, demand_count=10,
                    days_ago=0, growth_rate=None, avg_salary=None):
@@ -81,6 +85,15 @@ def _make_snapshot(db_session, skill_id, city_id, demand_count=10,
     db_session.commit()
     return snap
 
+def _setup_compare_skills(db_session, num_skills=2, base_id=40):
+    city = _make_city(db_session, city_id=base_id, name=f"City_Compare_{base_id}")
+    cat = _make_category(db_session, name=f"Cat_Compare_{base_id}")
+    skill_ids = []
+    for i in range(num_skills):
+        skill = _make_skill(db_session, cat.id, name=f"Skill_Compare_{base_id}_{i}")
+        _make_snapshot(db_session, skill.id, city.id, demand_count=(i+1)*5)
+        skill_ids.append(skill.id)
+    return skill_ids
 
 # GET /api/panorama/skills
 
@@ -129,7 +142,6 @@ def test_get_catalogs_returns_skills_and_cities(app, db_session, client):
     any_city = next(c for c in data["cities"] if c["id"] == city_id)
     assert "name" in any_city
 
-
 # GET /api/panorama/summary
 
 def test_get_summary_returns_kpis(app, db_session, client):
@@ -151,7 +163,6 @@ def test_get_summary_returns_kpis(app, db_session, client):
     assert data["total_jobs"] >= 1
     assert data["total_skills_tracked"] >= 1
 
-
 # GET /api/panorama/skills/top
 
 def test_get_skills_top_respects_limit_bounds(app, client):
@@ -161,11 +172,10 @@ def test_get_skills_top_respects_limit_bounds(app, client):
     assert resp_zero.status_code == 200
     assert isinstance(resp_zero.get_json()["data"], list)
 
-    # limit=1000 => max(1, min(1000, 50)) = 50 — no debe fallar
+    # limit=1000 => max(1, min(1000, 50)) = 50 - no debe fallar
     resp_over = client.get("/api/panorama/skills/top?limit=1000")
     assert resp_over.status_code == 200
     assert isinstance(resp_over.get_json()["data"], list)
-
 
 # GET /api/panorama/trends
 
@@ -176,14 +186,12 @@ def test_get_trends_requires_skill_id(app, client):
     assert response.status_code == 422
     assert response.get_json()["error"]["code"] == "VALIDATION_ERROR"
 
-
 def test_get_trends_returns_404_for_nonexistent_skill(app, client):
     """ GET con skill_id inexistente debe retornar 404 NOT_FOUND. """
     response = client.get("/api/panorama/trends?skill_id=999999")
 
     assert response.status_code == 404
     assert response.get_json()["error"]["code"] == "NOT_FOUND"
-
 
 def test_get_trends_returns_series_for_valid_skill(app, db_session, client):
     """ Crear skill con un trend_snapshot. Verificar 200 y que la serie temporal incluye la fecha del snapshot insertado. """
@@ -204,7 +212,6 @@ def test_get_trends_returns_series_for_valid_skill(app, db_session, client):
     series_dates = [s["date"] for s in data["series"]]
     assert str(snap_date) in series_dates
 
-
 # GET /api/panorama/geo
 
 def test_get_geo_rejects_invalid_group_by(app, client):
@@ -214,14 +221,12 @@ def test_get_geo_rejects_invalid_group_by(app, client):
     assert response.status_code == 422
     assert response.get_json()["error"]["code"] == "VALIDATION_ERROR"
 
-
 def test_get_geo_returns_404_for_nonexistent_skill(app, client):
     """ skill_id inexistente debe retornar 404 NOT_FOUND. """
     response = client.get("/api/panorama/geo?skill_id=999999")
 
     assert response.status_code == 404
     assert response.get_json()["error"]["code"] == "NOT_FOUND"
-
 
 def test_get_geo_returns_200_without_skill_filter(app, client):
     """ Sin skill_id el endpoint debe retornar 200 con distribucion global (puede estar vacia si no hay snapshots, pero no debe fallar). """
@@ -232,7 +237,6 @@ def test_get_geo_returns_200_without_skill_filter(app, client):
     assert "distribution" in data
     assert isinstance(data["distribution"], list)
 
-
 # GET /api/panorama/salaries
 
 def test_get_salaries_requires_skill_id(app, client):
@@ -242,14 +246,12 @@ def test_get_salaries_requires_skill_id(app, client):
     assert response.status_code == 422
     assert response.get_json()["error"]["code"] == "VALIDATION_ERROR"
 
-
 def test_get_salaries_returns_404_for_nonexistent_skill(app, client):
     """ skill_id inexistente debe retornar 404 NOT_FOUND. """
     response = client.get("/api/panorama/salaries?skill_id=999999")
 
     assert response.status_code == 404
     assert response.get_json()["error"]["code"] == "NOT_FOUND"
-
 
 # GET /api/panorama/compare
 
@@ -259,17 +261,16 @@ def test_get_compare_requires_between_2_and_5_skills(app, db_session, client):
     skills = [_make_skill(db_session, cat.id, name=f"Skill_Bound_{i}") for i in range(6)]
     ids = [s.id for s in skills]
 
-    # Un solo skill — menor al minimo de 2
+    # Un solo skill - menor al minimo de 2
     resp_one = client.get(f"/api/panorama/compare?skill_ids={ids[0]}")
     assert resp_one.status_code == 422
     assert resp_one.get_json()["error"]["code"] == "VALIDATION_ERROR"
 
-    # Seis skills — excede el maximo de 5
+    # Seis skills - excede el maximo de 5
     ids_str = ",".join(str(i) for i in ids)
     resp_six = client.get(f"/api/panorama/compare?skill_ids={ids_str}")
     assert resp_six.status_code == 422
     assert resp_six.get_json()["error"]["code"] == "VALIDATION_ERROR"
-
 
 def test_get_compare_returns_404_when_any_skill_missing(app, db_session, client):
     """ Un skill real + un id inexistente debe retornar 404 NOT_FOUND. """
@@ -282,17 +283,10 @@ def test_get_compare_returns_404_when_any_skill_missing(app, db_session, client)
     assert response.status_code == 404
     assert response.get_json()["error"]["code"] == "NOT_FOUND"
 
-
 def test_get_compare_success_with_valid_skills(app, db_session, client):
     """ Crear dos skills con al menos un snapshot cada uno. Verificar 200 y que la respuesta incluye un bloque por cada skill solicitado. """
-    city = _make_city(db_session, city_id=40, name="City_Compare")
-    cat = _make_category(db_session, name="Cat_Compare_OK")
-    skill_a = _make_skill(db_session, cat.id, name="Skill_Compare_A")
-    skill_b = _make_skill(db_session, cat.id, name="Skill_Compare_B")
-    _make_snapshot(db_session, skill_a.id, city.id, demand_count=8)
-    _make_snapshot(db_session, skill_b.id, city.id, demand_count=12)
-    id_a = skill_a.id
-    id_b = skill_b.id
+    skill_ids = _setup_compare_skills(db_session, num_skills=2, base_id=40)
+    id_a, id_b = skill_ids
 
     response = client.get(f"/api/panorama/compare?skill_ids={id_a},{id_b}")
 
@@ -303,3 +297,17 @@ def test_get_compare_success_with_valid_skills(app, db_session, client):
     returned_skill_ids = {block["skill_id"] for block in data["skills"]}
     assert id_a in returned_skill_ids
     assert id_b in returned_skill_ids
+
+def test_get_compare_query_count_baseline_before_optimization(
+    client, db_session, query_counter
+):
+    """ Test de caracterización: documenta el número EXACTO de queries que get_compare ejecuta hoy con 5 skills. """
+    skill_ids = _setup_compare_skills(db_session, num_skills=5, base_id=50)
+    ids_str = ",".join(str(i) for i in skill_ids)
+
+    query_counter["n"] = 0
+    response = client.get(f"/api/panorama/compare?skill_ids={ids_str}")
+
+    assert response.status_code == 200
+    
+    assert query_counter["n"] == 3

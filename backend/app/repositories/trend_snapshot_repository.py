@@ -17,6 +17,16 @@ class TrendSnapshotRepository(BaseRepository):
         ).scalar_one_or_none()
 
     @classmethod
+    def get_latest_by_skill_ids(cls, skill_ids: list[int]) -> list:
+        # DISTINCT ON requiere que el primer campo de ORDER BY coincida con la columna de distinct, así garantizamos una fila por skill_id: la de fecha mas reciente (date DESC).
+        return db.session.execute(
+            db.select(TrendSnapshot)
+            .filter(TrendSnapshot.skill_id.in_(skill_ids))
+            .distinct(TrendSnapshot.skill_id)
+            .order_by(TrendSnapshot.skill_id, desc(TrendSnapshot.date))
+        ).scalars().all()
+
+    @classmethod
     def get_by_skill_city_date(cls, skill_id: int, city_id: int, target_date):
         return db.session.execute(
             db.select(TrendSnapshot)
@@ -64,6 +74,14 @@ class TrendSnapshotRepository(BaseRepository):
             db.select(TrendSnapshot)
             .filter_by(skill_id=skill_id)
             .order_by(TrendSnapshot.date)
+        ).scalars().all()
+
+    @classmethod
+    def get_by_skill_ids(cls, skill_ids: list[int]) -> list:
+        return db.session.execute(
+            db.select(TrendSnapshot)
+            .filter(TrendSnapshot.skill_id.in_(skill_ids))
+            .order_by(TrendSnapshot.skill_id, TrendSnapshot.date)
         ).scalars().all()
 
     @classmethod
