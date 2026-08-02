@@ -244,9 +244,6 @@ class AuthService:
         - AppError(EMAIL_NOT_VERIFIED, 401) si Google no marcó el email como verificado.
         - AppError(NOT_FOUND, 404) si el OAuthAccount existe pero el User fue eliminado.
         - AppError(ACCOUNT_LINK_PENDING, 200) si se requiere confirmación explícita. """
-        from google.oauth2 import id_token as _google_id_token
-        from google.auth.transport import requests as _google_requests
-
         try:
             idinfo = google_id_token.verify_oauth2_token(
                 credential,
@@ -312,7 +309,6 @@ class AuthService:
             )
 
         # Caso 3: cuenta completamente nueva, sin User ni OAuthAccount. Sin cambio de comportamiento respecto al flujo previo.
-        from datetime import datetime as _dt
         user = UserRepository.create({
             "email": email,
             "first_name": first_name,
