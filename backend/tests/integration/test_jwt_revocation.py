@@ -38,13 +38,12 @@ def test_token_revoked_immediately_after_deactivation(app, db_session, client):
 
     """ Configuramos el test client con la cookie y el header, los valores por defecto de flask-jwt-extended en el proyecto son:
     a. Cookie name: access_token_cookie
-    b. CSRF Header: X-CSRF-TOKEN
-    """
+    b. CSRF Header: X-CSRF-TOKEN """
     client.set_cookie("access_token_cookie", token)
     headers = {"X-CSRF-TOKEN": csrf}
 
     # Hacemos un GET a /api/auth/me y verificar que responde 200 (usuario activo)
-    response_active = client.get("/api/auth/me", headers=headers)
+    response_active = client.get("/api/profile/me", headers=headers)
     assert response_active.status_code == 200, "El token deberia funcionar para un usuario activo."
 
     # Modificamos el usuario, is_active = False y guardar
@@ -53,12 +52,11 @@ def test_token_revoked_immediately_after_deactivation(app, db_session, client):
     db_session.commit()
 
     # Aplicamos OTRO GET a /api/auth/me con el MISMO client y header, sin generar token nuevo. El client ya tiene la cookie guardada desde el set_cookie anterior.
-    response_revoked = client.get("/api/auth/me", headers=headers)
+    response_revoked = client.get("/api/profile/me", headers=headers)
     assert response_revoked.status_code == 401, "El token debio ser rechazado porque el usuario esta inactivo."
     
     data = response_revoked.get_json()
     assert data["error"]["code"] == "TOKEN_REVOKED", "El error debio ser especificamente TOKEN_REVOKED segun el handler revoked_token_loader."
-
 
 def test_token_revoked_after_password_change(app, db_session, client):
     """ Verifica que un token emitido ANTES de que el usuario cambie su contrasena es revocado automaticamente """
@@ -87,10 +85,9 @@ def test_token_revoked_after_password_change(app, db_session, client):
     headers = {"X-CSRF-TOKEN": csrf}
 
     # El GET debe ser 401 con TOKEN_REVOKED
-    response = client.get("/api/auth/me", headers=headers)
+    response = client.get("/api/profile/me", headers=headers)
     assert response.status_code == 401, "El token viejo debio ser rechazado tras el cambio de contrasena."
     assert response.get_json()["error"]["code"] == "TOKEN_REVOKED"
-
 
 def test_token_valid_after_password_change_if_issued_later(app, db_session, client):
     """ Verifica que un token emitido DESPUES de un cambio de contrasena es valido y no se revoca erronamente """
@@ -119,9 +116,8 @@ def test_token_valid_after_password_change_if_issued_later(app, db_session, clie
     headers = {"X-CSRF-TOKEN": csrf}
 
     # El GET debe ser 200 (token valido)
-    response = client.get("/api/auth/me", headers=headers)
+    response = client.get("/api/profile/me", headers=headers)
     assert response.status_code == 200, "El token nuevo debio ser aceptado."
-
 
 def test_oauth_only_user_never_revoked_by_password_change(app, db_session, client):
     """ Verifica que un usuario exclusivamente OAuth (password_changed_at=None) nunca tiene sus tokens revocados por este mecanismo, sin importar el IAT """
@@ -147,5 +143,5 @@ def test_oauth_only_user_never_revoked_by_password_change(app, db_session, clien
     headers = {"X-CSRF-TOKEN": csrf}
 
     # El GET debe ser 200 (token valido)
-    response = client.get("/api/auth/me", headers=headers)
+    response = client.get("/api/profile/me", headers=headers)
     assert response.status_code == 200, "El token del usuario OAuth debio ser aceptado."

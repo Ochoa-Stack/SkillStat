@@ -16,6 +16,18 @@ class BaseConfig:
     JWT_SECRET_KEY = os.environ.get(
         "JWT_SECRET_KEY", "jwt-insecure-key-change-in-production"
     )
+    
+    # Validación explícita condicionada a producción para claves secretas
+    if os.environ.get("FLASK_ENV") == "production":
+        if SECRET_KEY == "dev-insecure-key-change-in-production":
+            raise ValueError(
+                "Error de arranque: SECRET_KEY es obligatoria y no está configurada en el entorno (se está usando el valor inseguro de fallback en producción)."
+            )
+        if JWT_SECRET_KEY == "jwt-insecure-key-change-in-production":
+            raise ValueError(
+                "Error de arranque: JWT_SECRET_KEY es obligatoria y no está configurada en el entorno (se está usando el valor inseguro de fallback en producción)."
+            )
+
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
         seconds=int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES", 7200))
     )
@@ -58,8 +70,6 @@ class BaseConfig:
             "Error de arranque: PIPELINE_TRIGGER_SECRET es obligatoria y no está configurada en el entorno."
         )
 
-
-
 class DevelopmentConfig(BaseConfig):
 
     DEBUG = True
@@ -76,7 +86,6 @@ class DevelopmentConfig(BaseConfig):
     }
     JWT_COOKIE_SAMESITE = "Lax"
 
-
 class ProductionConfig(BaseConfig):
 
     DEBUG = False
@@ -92,7 +101,6 @@ class ProductionConfig(BaseConfig):
 
     # SameSite=None es obligatorio en producción porque el frontend (skillstat-ss.onrender.com) y el backend (skillstat.onrender.com) son dominios distintos (cross-site). SameSite=None requiere Secure=True, que ya está activo vía JWT_COOKIE_SECURE=true en el entorno de Render.
     JWT_COOKIE_SAMESITE = "None"
-
 
 class TestingConfig(BaseConfig):
 
