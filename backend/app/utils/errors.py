@@ -1,11 +1,12 @@
 class AppError(Exception):
-    # Excepción base para que la capa de Controladores pueda atrapar cualquier
-    # fallo lógico de la capa de Servicios sin acoplarse a librerías HTTP.
-    def __init__(self, message: str, code: str = "INTERNAL_ERROR", status_code: int = 500):
+    # Excepción base para que la capa de Controladores pueda atrapar cualquier fallo lógico de la capa de Servicios sin acoplarse a librerías HTTP.
+    def __init__(self, message: str, code: str = "INTERNAL_ERROR", status_code: int = 500, detail: dict = None):
         super().__init__(message)
         self.message = message
         self.code = code
         self.status_code = status_code
+        # Campo opcional para datos estructurados adicionales que el controlador puede necesitar para construir la respuesta (ej: link_token en ACCOUNT_LINK_PENDING).
+        self.detail = detail
 
 class ResourceNotFoundError(AppError):
     def __init__(self, message: str = "El recurso solicitado no fue encontrado."):

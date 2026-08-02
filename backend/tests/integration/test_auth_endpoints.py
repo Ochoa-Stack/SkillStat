@@ -4,11 +4,9 @@ import pytest
 from app.models.user import User
 from app.utils.hash import hash_password
 
-
 # Helpers - duplicados localmente (principio DAMP: cada archivo de tests es autocontenido). Si la suite crece significativamente, extraer a tests/helpers.py queda como decision pendiente.
 
 _VALID_PASSWORD = "Secure1!"
-
 
 def _make_user(db_session, email="user@example.com", password=_VALID_PASSWORD,
                verified=True, role="REGISTERED"):
@@ -27,7 +25,6 @@ def _make_user(db_session, email="user@example.com", password=_VALID_PASSWORD,
     db_session.commit()
     db_session.refresh(user)
     return user
-
 
 def _register_payload(email="new@example.com", password=_VALID_PASSWORD,
                       first_name="Test", last_name="User"):
@@ -76,7 +73,6 @@ def test_register_success(app, db_session, client, monkeypatch):
     assert len(mock_calls) == 1
     assert mock_calls[0][0] == "register_ok@example.com"
 
-
 def test_register_duplicate_email_returns_409(app, db_session, client, monkeypatch):
     """ Crear un usuario existente, luego registrar con el mismo email. Verificar 409 con code CONFLICT """
     monkeypatch.setattr(
@@ -92,7 +88,6 @@ def test_register_duplicate_email_returns_409(app, db_session, client, monkeypat
     assert response.status_code == 409
     assert response.get_json()["error"]["code"] == "CONFLICT"
 
-
 def test_register_invalid_payload_returns_422(app, client):
     """ POST con payload incompleto — sin email. Verificar 422 VALIDATION_ERROR. No necesita db_session porque el schema rechaza antes de tocar la BD """
     payload = {"password": _VALID_PASSWORD, "first_name": "Test", "last_name": "User"}
@@ -100,7 +95,6 @@ def test_register_invalid_payload_returns_422(app, client):
 
     assert response.status_code == 422
     assert response.get_json()["error"]["code"] == "VALIDATION_ERROR"
-
 
 def test_register_succeeds_even_if_email_delivery_fails(app, db_session, client, monkeypatch):
     """ Mockear send_verification_email para que lance EmailDeliveryError. El registro NO se revierte: la respuesta sigue siendo 201, pero con el mensaje alternativo, y el usuario quedo en BD """
@@ -129,7 +123,6 @@ def test_register_succeeds_even_if_email_delivery_fails(app, db_session, client,
     persisted = db.session.query(UserModel).filter_by(email=email).first()
     assert persisted is not None
 
-
 # Tests: POST /api/auth/login
 
 def test_login_success(app, db_session, client):
@@ -149,7 +142,6 @@ def test_login_success(app, db_session, client):
     cookie = client.get_cookie("access_token_cookie")
     assert cookie is not None, "La cookie 'access_token_cookie' no fue seteada tras un login exitoso"
 
-
 def test_login_wrong_password_returns_401(app, db_session, client):
     """ Usuario real con password correcto en BD. POST con password incorrecto. Verificar 401 UNAUTHORIZED (mismo code que email inexistente, sin distincion que permita enumeracion de cuentas) """
     email = "wrong_pass@example.com"
@@ -162,7 +154,6 @@ def test_login_wrong_password_returns_401(app, db_session, client):
     assert response.status_code == 401
     assert response.get_json()["error"]["code"] == "UNAUTHORIZED"
 
-
 def test_login_nonexistent_email_returns_401(app, client):
     """ POST con email que no existe en BD. Verificar 401 UNAUTHORIZED. El code debe ser identico al de password incorrecto; sin distincion para evitar enumeracion de cuentas """
     response = client.post(
@@ -172,7 +163,6 @@ def test_login_nonexistent_email_returns_401(app, client):
 
     assert response.status_code == 401
     assert response.get_json()["error"]["code"] == "UNAUTHORIZED"
-
 
 def test_login_unverified_email_returns_403(app, db_session, client):
     """ Usuario con credenciales correctas pero email_verified_at=None. Verificar 403 EMAIL_NOT_VERIFIED """
@@ -184,7 +174,6 @@ def test_login_unverified_email_returns_403(app, db_session, client):
 
     assert response.status_code == 403
     assert response.get_json()["error"]["code"] == "EMAIL_NOT_VERIFIED"
-
 
 # Tests: POST /api/auth/google
 
@@ -198,7 +187,7 @@ def test_google_login_creates_new_user(app, db_session, client, monkeypatch):
             "given_name": "Nueva",
             "family_name": "Cuenta"
         }
-    monkeypatch.setattr("app.controllers.auth_bp.google_id_token.verify_oauth2_token", fake_verify)
+    monkeypatch.setattr("google.oauth2.id_token.verify_oauth2_token", fake_verify)
 
     response = client.post("/api/auth/google", json={"credential": "fake_token"})
     assert response.status_code == 200
@@ -243,7 +232,7 @@ def test_google_login_existing_oauth_account(app, db_session, client, monkeypatc
             "given_name": "Existing",
             "family_name": "User"
         }
-    monkeypatch.setattr("app.controllers.auth_bp.google_id_token.verify_oauth2_token", fake_verify)
+    monkeypatch.setattr("google.oauth2.id_token.verify_oauth2_token", fake_verify)
 
     response = client.post("/api/auth/google", json={"credential": "fake_token"})
     assert response.status_code == 200
@@ -254,9 +243,8 @@ def test_google_login_existing_oauth_account(app, db_session, client, monkeypatc
     assert len(users) == 1
     assert users[0].id == original_user_id
 
-
-def test_google_login_links_existing_email_without_oauth(app, db_session, client, monkeypatch):
-    """ Usuario registrado normal (con password) hace login con Google (mismo email). Verificar 200, usuario no duplicado, OAuthAccount creada """
+def test_google_login_account_link_pending_when_email_exists(app, db_session, client, monkeypatch):
+    """ Usuario registrado normal (con password) hace login con Google (mismo email). Nuevo comportamiento de Ronda 3: debe devolver 200 con code ACCOUNT_LINK_PENDING y un link_token — sin emitir cookie de sesion todavia. No se crea OAuthAccount. """
     email = "link_oauth@example.com"
     user = _make_user(db_session, email=email, password=_VALID_PASSWORD, verified=True)
     original_user_id = user.id
@@ -269,33 +257,39 @@ def test_google_login_links_existing_email_without_oauth(app, db_session, client
             "given_name": "Linked",
             "family_name": "User"
         }
-    monkeypatch.setattr("app.controllers.auth_bp.google_id_token.verify_oauth2_token", fake_verify)
+    monkeypatch.setattr("google.oauth2.id_token.verify_oauth2_token", fake_verify)
 
     response = client.post("/api/auth/google", json={"credential": "fake_token"})
     assert response.status_code == 200
-    
-    from app.models.user import User as UserModel
+    data = response.get_json()["data"]
+    assert data["code"] == "ACCOUNT_LINK_PENDING"
+    assert "link_token" in data
+    assert data["email"] == email
+
+    # No se emite cookie de sesion todavia
+    cookie = client.get_cookie("access_token_cookie")
+    assert cookie is None
+
+    # No se crea OAuthAccount todavia
     from app.models.oauth_account import OAuthAccount
     from app.extensions import db
-    
-    users = db.session.query(UserModel).filter_by(email=email).all()
-    assert len(users) == 1
-    assert users[0].id == original_user_id
-    
-    oauth_acc = db.session.query(OAuthAccount).filter_by(user_id=original_user_id, provider="google", provider_user_id="new_sub_789").first()
-    assert oauth_acc is not None
-
+    oauth_acc = db.session.query(OAuthAccount).filter_by(user_id=original_user_id, provider="google").first()
+    assert oauth_acc is None
 
 def test_google_login_rejects_invalid_token(app, client, monkeypatch):
     """ Token invalido lanza ValueError desde la libreria de Google. Verificar 401 TOKEN_INVALID """
     def fake_verify_raises(*args, **kwargs):
         raise ValueError("Invalid token")
-    monkeypatch.setattr("app.controllers.auth_bp.google_id_token.verify_oauth2_token", fake_verify_raises)
+    monkeypatch.setattr("google.oauth2.id_token.verify_oauth2_token", fake_verify_raises)
 
-    response = client.post("/api/auth/google", json={"credential": "bad_token"})
-    assert response.status_code == 401
-    assert response.get_json()["error"]["code"] == "TOKEN_INVALID"
+    response = client.post("/api/auth/google", json={"bad_token": "bad_token"})
+    assert response.status_code == 422
 
+def test_google_login_missing_credential_returns_422(app, client):
+    """ POST sin campo credential. Verificar 422 VALIDATION_ERROR. """
+    response = client.post("/api/auth/google", json={})
+    assert response.status_code == 422
+    assert response.get_json()["error"]["code"] == "VALIDATION_ERROR"
 
 def test_google_login_rejects_unverified_email(app, client, monkeypatch):
     """ Google dice email_verified='false'. Verificar 401 EMAIL_NOT_VERIFIED """
@@ -307,19 +301,95 @@ def test_google_login_rejects_unverified_email(app, client, monkeypatch):
             "given_name": "Unverified",
             "family_name": "User"
         }
-    monkeypatch.setattr("app.controllers.auth_bp.google_id_token.verify_oauth2_token", fake_verify_unverified)
+    monkeypatch.setattr("google.oauth2.id_token.verify_oauth2_token", fake_verify_unverified)
 
     response = client.post("/api/auth/google", json={"credential": "fake_token"})
     assert response.status_code == 401
     assert response.get_json()["error"]["code"] == "EMAIL_NOT_VERIFIED"
 
+# Tests: POST /api/auth/google/confirm-link
+
+def _create_google_link_token(db_session, user_id, token_plain, expired=False, used=False):
+    from app.models.google_link_token import GoogleLinkToken
+    token_hash = hashlib.sha256(token_plain.encode("utf-8")).hexdigest()
+    now = datetime.now(timezone.utc)
+    expires_at = now - timedelta(minutes=1) if expired else now + timedelta(minutes=15)
+    used_at = now if used else None
+    glt = GoogleLinkToken(
+        user_id=user_id,
+        token_hash=token_hash,
+        google_user_id="google_sub_confirm",
+        pending_email="confirm@example.com",
+        pending_first_name="Confirm",
+        pending_last_name="User",
+        expires_at=expires_at,
+        used_at=used_at,
+    )
+    db_session.add(glt)
+    db_session.commit()
+    db_session.refresh(glt)
+    return glt
+
+def test_confirm_google_link_success(app, db_session, client):
+    """ Token valido: crea el OAuthAccount, marca el token como usado, emite cookie de sesion. """
+    user = _make_user(db_session, email="confirm@example.com", password=_VALID_PASSWORD, verified=True)
+    token_plain = "valid_confirm_token"
+    glt = _create_google_link_token(db_session, user.id, token_plain)
+
+    response = client.post("/api/auth/google/confirm-link", json={"link_token": token_plain})
+    assert response.status_code == 200
+
+    # Cookie de sesion emitida
+    cookie = client.get_cookie("access_token_cookie")
+    assert cookie is not None
+
+    # OAuthAccount creado
+    from app.models.oauth_account import OAuthAccount
+    from app.extensions import db
+    oauth_acc = db.session.query(OAuthAccount).filter_by(user_id=user.id, provider="google", provider_user_id="google_sub_confirm").first()
+    assert oauth_acc is not None
+
+    # Token marcado como usado
+    db_session.refresh(glt)
+    assert glt.used_at is not None
+
+def test_confirm_google_link_already_used_returns_409(app, db_session, client):
+    """Token ya consumido: devuelve 409 TOKEN_ALREADY_USED."""
+    user = _make_user(db_session, email="confirm_used@example.com", password=_VALID_PASSWORD, verified=True)
+    token_plain = "used_confirm_token"
+    _create_google_link_token(db_session, user.id, token_plain, used=True)
+
+    response = client.post("/api/auth/google/confirm-link", json={"link_token": token_plain})
+    assert response.status_code == 409
+    assert response.get_json()["error"]["code"] == "TOKEN_ALREADY_USED"
+
+def test_confirm_google_link_expired_returns_410(app, db_session, client):
+    """ Token expirado: devuelve 410 TOKEN_EXPIRED. """
+    user = _make_user(db_session, email="confirm_expired@example.com", password=_VALID_PASSWORD, verified=True)
+    token_plain = "expired_confirm_token"
+    _create_google_link_token(db_session, user.id, token_plain, expired=True)
+
+    response = client.post("/api/auth/google/confirm-link", json={"link_token": token_plain})
+    assert response.status_code == 410
+    assert response.get_json()["error"]["code"] == "TOKEN_EXPIRED"
+
+def test_confirm_google_link_invalid_token_returns_404(app, client):
+    """ Token que no existe en BD: devuelve 404 TOKEN_INVALID. """
+    response = client.post("/api/auth/google/confirm-link", json={"link_token": "nonexistent_token"})
+    assert response.status_code == 404
+    assert response.get_json()["error"]["code"] == "TOKEN_INVALID"
+
+def test_confirm_google_link_missing_token_returns_422(app, client):
+    """ POST sin campo link_token: devuelve 422 VALIDATION_ERROR. """
+    response = client.post("/api/auth/google/confirm-link", json={})
+    assert response.status_code == 422
+    assert response.get_json()["error"]["code"] == "VALIDATION_ERROR"
 
 # Helpers y Tests: GET/POST /api/auth/verify-email & POST /api/auth/resend-verification
 
 import hashlib
 from datetime import timedelta
 from app.models.email_verification_token import EmailVerificationToken
-
 
 def _create_token(db_session, user_id, token_plain, expired=False, used=False):
     token_hash = hashlib.sha256(token_plain.encode("utf-8")).hexdigest()
@@ -335,7 +405,6 @@ def _create_token(db_session, user_id, token_plain, expired=False, used=False):
     db_session.add(evt)
     db_session.commit()
     return evt
-
 
 def test_verify_email_get_valid_token(app, db_session, client):
     """ GET con token valido. Verificar 200, valid=true, sin mutaciones. """
@@ -355,13 +424,11 @@ def test_verify_email_get_valid_token(app, db_session, client):
     assert evt.used_at is None
     assert user.email_verified_at is None
 
-
 def test_verify_email_get_invalid_token_returns_404(app, client):
     """ GET con token inexistente. Verificar 404 TOKEN_INVALID. """
     response = client.get("/api/auth/verify-email?token=does_not_exist")
     assert response.status_code == 404
     assert response.get_json()["error"]["code"] == "TOKEN_INVALID"
-
 
 def test_verify_email_get_expired_token_returns_410(app, db_session, client):
     """ GET con token expirado. Verificar 410 TOKEN_EXPIRED. """
@@ -372,7 +439,6 @@ def test_verify_email_get_expired_token_returns_410(app, db_session, client):
     response = client.get(f"/api/auth/verify-email?token={token_plain}")
     assert response.status_code == 410
     assert response.get_json()["error"]["code"] == "TOKEN_EXPIRED"
-
 
 def test_verify_email_post_marks_verified(app, db_session, client):
     """ POST con token valido. Verificar 200 y que el usuario y token se mutan. """
@@ -389,7 +455,6 @@ def test_verify_email_post_marks_verified(app, db_session, client):
     assert evt.used_at is not None
     assert user.email_verified_at is not None
 
-
 def test_verify_email_post_already_used_returns_409(app, db_session, client):
     """ POST con token ya usado. Verificar 409 TOKEN_ALREADY_USED. """
     user = _make_user(db_session, verified=False)
@@ -400,7 +465,6 @@ def test_verify_email_post_already_used_returns_409(app, db_session, client):
     assert response.status_code == 409
     assert response.get_json()["error"]["code"] == "TOKEN_ALREADY_USED"
 
-
 def test_resend_verification_unknown_email_returns_generic_200(app, client, monkeypatch):
     """ Resend a email no existente. Verificar 200 para evitar enumeracion. """
     mock_calls = []
@@ -410,7 +474,6 @@ def test_resend_verification_unknown_email_returns_generic_200(app, client, monk
     assert response.status_code == 200
     assert "nuevo enlace" in response.get_json()["data"]["message"].lower()
     assert len(mock_calls) == 0
-
 
 def test_resend_verification_already_verified_returns_generic_200(app, db_session, client, monkeypatch):
     """ Resend a email ya verificado. Verificar 200 pero sin email real. """
@@ -426,7 +489,6 @@ def test_resend_verification_already_verified_returns_generic_200(app, db_sessio
     count = db.session.query(EmailVerificationToken).filter_by(user_id=user.id).count()
     assert count == 0
     assert len(mock_calls) == 0
-
 
 def test_resend_verification_creates_new_token(app, db_session, client, monkeypatch):
     """ Resend a email no verificado. Verificar 200, token creado en BD, y llamada de correo. """
@@ -444,11 +506,9 @@ def test_resend_verification_creates_new_token(app, db_session, client, monkeypa
     assert len(mock_calls) == 1
     assert mock_calls[0][0] == user.email
 
-
 # Helpers y Tests: GET /api/auth/me, POST /api/auth/forgot-password, POST /api/auth/reset-password
 
 from app.models.password_reset_token import PasswordResetToken
-
 
 def _create_pwd_reset_token(db_session, user_id, token_plain, expired=False, used=False):
     token_hash = hashlib.sha256(token_plain.encode("utf-8")).hexdigest()
@@ -465,7 +525,6 @@ def _create_pwd_reset_token(db_session, user_id, token_plain, expired=False, use
     db_session.commit()
     return evt
 
-
 def test_forgot_password_unknown_email_returns_generic_200(app, client, monkeypatch):
     mock_calls = []
     monkeypatch.setattr("app.services.email_service.send_password_reset_email", lambda to, t: mock_calls.append((to, t)))
@@ -473,7 +532,6 @@ def test_forgot_password_unknown_email_returns_generic_200(app, client, monkeypa
     response = client.post("/api/auth/forgot-password", json={"email": "nobody@example.com"})
     assert response.status_code == 200
     assert len(mock_calls) == 0
-
 
 def test_forgot_password_known_email_creates_token_and_sends_email(app, db_session, client, monkeypatch):
     user = _make_user(db_session, email="known_forgot@example.com")
@@ -489,7 +547,6 @@ def test_forgot_password_known_email_creates_token_and_sends_email(app, db_sessi
     assert count == 1
     assert len(mock_calls) == 1
     assert mock_calls[0][0] == user.email
-
 
 def test_reset_password_success(app, db_session, client):
     user = _make_user(db_session, email="reset_ok@example.com", password=_VALID_PASSWORD)
@@ -507,7 +564,6 @@ def test_reset_password_success(app, db_session, client):
     assert prt.used_at is not None
     assert user.password_hash != original_hash
     assert user.password_changed_at > original_changed_at
-
 
 def test_reset_password_invalidates_old_tokens(app, db_session, client):
     user = _make_user(db_session, email="reset_revoke@example.com", password=_VALID_PASSWORD)
@@ -533,7 +589,7 @@ def test_reset_password_invalidates_old_tokens(app, db_session, client):
     headers = {"X-CSRF-TOKEN": csrf}
 
     # Verify token works BEFORE reset
-    resp_before = client.get("/api/auth/me", headers=headers)
+    resp_before = client.get("/api/profile/me", headers=headers)
     assert resp_before.status_code == 200
 
     token_plain = "revoke_reset_token_123"
@@ -544,7 +600,7 @@ def test_reset_password_invalidates_old_tokens(app, db_session, client):
     assert resp_reset.status_code == 200
 
     # Verify old token NO LONGER works (TOKEN_REVOKED)
-    resp_after = client.get("/api/auth/me", headers=headers)
+    resp_after = client.get("/api/profile/me", headers=headers)
     assert resp_after.status_code == 401
     assert resp_after.get_json()["error"]["code"] == "TOKEN_REVOKED"
 
@@ -553,28 +609,3 @@ def test_reset_password_invalid_or_expired_token_returns_400(app, db_session, cl
     response = client.post("/api/auth/reset-password", json={"token": "does_not_exist", "new_password": "NewSecure1!"})
     assert response.status_code == 400
     assert response.get_json()["error"]["code"] == "INVALID_TOKEN"
-
-
-def test_get_me_success(app, db_session, client):
-    user = _make_user(db_session, email="get_me_ok@example.com")
-    
-    from flask_jwt_extended import create_access_token, get_csrf_token
-    with app.app_context():
-        token = create_access_token(identity=str(user.id))
-        csrf = get_csrf_token(token)
-
-    client.set_cookie("access_token_cookie", token)
-    headers = {"X-CSRF-TOKEN": csrf}
-
-    response = client.get("/api/auth/me", headers=headers)
-    assert response.status_code == 200
-    
-    data = response.get_json()["data"]
-    assert data["email"] == "get_me_ok@example.com"
-    assert data["first_name"] == "Test"
-    assert data["role"] == "REGISTERED"
-
-
-def test_get_me_without_token_returns_401(app, client):
-    response = client.get("/api/auth/me")
-    assert response.status_code == 401

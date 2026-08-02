@@ -2,9 +2,9 @@
   async function injectAdminLink() {
     let user;
     try {
-      user = await apiGet("/auth/me");
+      user = await apiGet("/profile/me");
     } catch {
-      // Si /auth/me falla (401, red, lo que sea), simplemente no se inyecta el link. Cada página ya maneja su propio guard de sesión por separado; este script solo decide visibilidad.
+      // Si /profile/me falla (401, red, lo que sea), simplemente no se inyecta el link. Cada página ya maneja su propio guard de sesión por separado; este script solo decide visibilidad.
       return;
     }
     if (user.role !== "ADMIN") return;

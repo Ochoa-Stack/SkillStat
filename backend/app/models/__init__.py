@@ -11,6 +11,7 @@ from .alert import Alert
 from .trend_snapshot import TrendSnapshot
 from .backup import Backup
 from .user_skill import UserSkill
+from .google_link_token import GoogleLinkToken
 
 __all__ = [
     "Category",
@@ -26,4 +27,5 @@ __all__ = [
     "TrendSnapshot",
     "Backup",
     "UserSkill",
+    "GoogleLinkToken",
 ]
