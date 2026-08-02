@@ -1,10 +1,9 @@
-"""
-Test de integracion: auto-sincronizacion de esquema tras restore.
+""" Test de integracion: auto-sincronizacion de esquema tras restore.
 
 Advertencia Crítica de Diseño:
 Este test NO usa db_session ni depende del aislamiento transaccional para su limpieza. Las operaciones DDL de Alembic (downgrade/upgrade) se ejecutan en conexiones independientes, un rollback de transaccion ORM NO revierte un ALTER TABLE ya aplicado por Alembic. El cleanup es manual y explicito en el bloque finally, con verificacion activa del estado final.
 
-El test replica el incidente historico verificado manualmente por Elias; Downgrade real de la BD un paso hacia atras (esquema viejo). pg_dump sobre el esquema viejo -> archivo .sql viejo. Upgrade de vuelta al head actual. Insertar registro Backup apuntando al .sql viejo. Llamar restore_database_backup(), que aplica pg_restore + upgrade(). Confirmar que el esquema quedo en head sin intervencion manual """
+El test replica el incidente historico verificado manualmente por Elias; Downgrade real de la BD un paso hacia atras (esquema viejo). pg_dump sobre el esquema viejo -> archivo .sql viejo. Upgrade de vuelta al head actual. Insertar registro Backup apuntando al .sql viejo. Llamar restore_database_backup(), que aplica pg_restore + upgrade(). Confirmar que el esquema quedo en head sin intervencion manual. """
 import os
 import subprocess
 import pytest
@@ -140,6 +139,18 @@ def test_restore_triggers_automatic_schema_sync(app):
                 f"La columna 'file_size_bytes' no existe en la tabla 'backups'. "
                 f"Columnas actuales: {columns}. "
                 "El esquema no fue correctamente resincronizado al head."
+            )
+
+            # Verificamos que la extension unaccent sigue presente tras el ciclo completo. El DROP SCHEMA CASCADE del nuevo mecanismo de restore no afecta las extensiones porque estas viven en pg_catalog, no en el schema public; pero el dump de un esquema viejo (previo a la migracion que instalo unaccent) tampoco la incluye. La garantia real de que unaccent sobrevive es que upgrade() re-aplica la migracion de unaccent. Este assert lo verifica explicitamente.
+            with db.engine.connect() as check_conn:
+                result = check_conn.execute(
+                    text("SELECT extname FROM pg_extension WHERE extname = 'unaccent'")
+                )
+                row = result.fetchone()
+            assert row is not None, (
+                "La extension 'unaccent' no esta presente en pg_extension tras el "
+                "ciclo completo de restore + upgrade(). El mecanismo automatico de "
+                "resincronizacion de esquema no reinstalo la extension correctamente."
             )
 
         finally:

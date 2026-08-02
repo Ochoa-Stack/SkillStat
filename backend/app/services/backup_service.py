@@ -1,5 +1,6 @@
 import os
 from urllib.parse import urlparse
+from sqlalchemy import text
 from flask_migrate import upgrade
 import subprocess
 from datetime import datetime
@@ -156,19 +157,24 @@ class BackupService:
 
         db_url = current_app.config.get("SQLALCHEMY_DATABASE_URI", "")
         conn = cls._get_connection_params(db_url)
+
+        # Cerramos explicitamente la sesion de SQLAlchemy ANTES del reset DDL y de pg_restore. Esto libera cualquier lock que la sesion actual pudiera estar reteniendo sobre las tablas (ej: locks por lazy-loading o transacciones de prueba abiertas) previniendo deadlocks durante el DROP SCHEMA y la recreación.
+        db.session.remove()
+
+        # Reseteamos el schema public completo antes de restaurar. El enfoque anterior solo emite DROPs para los objetos que están presentes en el dump, lo que causa un error cuando la BD actual tiene tablas con FK hacia objetos del dump que pg_restore intenta recrear (ej: google_link_tokens -> users). El DROP SCHEMA CASCADE elimina todo el grafo de objetos del schema, incluidas las FKs de tablas que el dump no conoce, dejando la BD estéril antes de la restauración. Las extensiones como unaccent se recuperan automáticamente: si el dump las incluye, pg_restore las recrea; si no, la llamada a upgrade() posterior vuelve a aplicar la migración correspondiente que las instala.
+        with db.engine.execution_options(isolation_level="AUTOCOMMIT").connect() as raw_conn:
+            raw_conn.execute(text("DROP SCHEMA public CASCADE"))
+            raw_conn.execute(text("CREATE SCHEMA public"))
+            raw_conn.execute(text("GRANT ALL ON SCHEMA public TO CURRENT_USER"))
+
         command = [
             "pg_restore",
-            "--clean",
-            "--if-exists",
             "-h", conn["host"],
             "-p", conn["port"],
             "-U", conn["user"],
             "-d", conn["db_name"],
             backup_filepath,
         ]
-
-        # Cerramos explicitamente la sesion de SQLAlchemy antes de lanzar pg_restore, como capa adicional de seguridad. Esto libera cualquier lock que la sesion actual pudiera estar reteniendo sobre la base de datos, incluso si no anticipamos su origen.
-        db.session.remove()
 
         try:
             subprocess.run(command, env=conn["env"], capture_output=True, text=True, check=True)
