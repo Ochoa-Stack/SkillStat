@@ -203,7 +203,14 @@ def test_restore_database_backup_pg_restore_failure(app, db_session, monkeypatch
         assert real_backup_record is not None, "No se encontro el registro del backup real en BD"
         backup_id = real_backup_record.id
 
-        # Ahora llamamos a restore con ese backup_id. pg_dump se ejecutara de nuevo (backup de seguridad interno) via el mock condicional, y pg_restore fallara con CalledProcessError simulado.
+        # Ahora llamamos a restore con ese backup_id. pg_dump se ejecutara de nuevo (backup de seguridad interno) via el mock condicional, y pg_restore fallara con CalledProcessError simulado. Ademas, mockeamos la conexion DDL cruda para evitar que DROP SCHEMA CASCADE haga deadlock con la transaccion de prueba activa en db_session.
+        from unittest.mock import MagicMock
+        mock_conn = MagicMock()
+        mock_conn.__enter__.return_value = mock_conn
+        mock_execution_options = MagicMock()
+        mock_execution_options.connect.return_value = mock_conn
+        monkeypatch.setattr("app.services.backup_service.db.engine.execution_options", lambda **kwargs: mock_execution_options)
+
         with pytest.raises(AppError) as exc_info:
             BackupService.restore_database_backup(backup_id=backup_id, requested_by=None)
 
