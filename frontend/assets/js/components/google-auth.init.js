@@ -1,5 +1,7 @@
 // Inicializamos el boton y el One Tap de Google Identity Services
-const GOOGLE_CLIENT_ID = "891817364914-fpq222eqf2jk1ticoldkuq5u74h5lurt.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID =
+  "891817364914-fpq222eqf2jk1ticoldkuq5u74h5lurt.apps.googleusercontent.com";
+let pendingLinkToken = null;
 
 function getCurrentGoogleTheme() {
   return document.documentElement.dataset.theme === "dark"
@@ -33,8 +35,18 @@ function handleGoogleCredential(response) {
   if (errorBox) errorBox.hidden = true;
 
   apiPost("/auth/google", { credential: response.credential })
-    .then(() => {
-      window.location.href = "/views/panorama.html";
+    .then((data) => {
+      if (data && data.code === "ACCOUNT_LINK_PENDING") {
+        pendingLinkToken = data.link_token;
+        const modal = document.querySelector("[data-link-modal]");
+        const emailSpan = document.querySelector("[data-link-email]");
+        if (modal && emailSpan) {
+          emailSpan.textContent = data.email || "tu correo";
+          modal.hidden = false;
+        }
+      } else {
+        window.location.href = "/views/panorama.html";
+      }
     })
     .catch((error) => {
       console.error(
@@ -69,6 +81,43 @@ function initGoogleAuth() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(renderGoogleButton, 200);
   });
+
+  const modal = document.querySelector("[data-link-modal]");
+  const btnConfirm = document.querySelector("[data-link-confirm]");
+  const btnCancel = document.querySelector("[data-link-cancel]");
+  const modalError = document.querySelector("[data-link-error]");
+
+  if (btnCancel && modal) {
+    btnCancel.addEventListener("click", () => {
+      modal.hidden = true;
+      pendingLinkToken = null;
+      if (modalError) modalError.hidden = true;
+    });
+  }
+
+  if (btnConfirm) {
+    btnConfirm.addEventListener("click", () => {
+      if (!pendingLinkToken) return;
+
+      const originalText = btnConfirm.textContent;
+      btnConfirm.textContent = "Vinculando...";
+      btnConfirm.disabled = true;
+      if (modalError) modalError.hidden = true;
+
+      apiPost("/auth/google/confirm-link", { link_token: pendingLinkToken })
+        .then(() => {
+          window.location.href = "/views/panorama.html";
+        })
+        .catch((error) => {
+          btnConfirm.textContent = originalText;
+          btnConfirm.disabled = false;
+          if (modalError) {
+            modalError.textContent = error.message;
+            modalError.hidden = false;
+          }
+        });
+    });
+  }
 }
 
 window.addEventListener("load", initGoogleAuth);

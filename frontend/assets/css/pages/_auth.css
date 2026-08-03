@@ -168,3 +168,47 @@
   color: var(--color-text-disabled);
   white-space: nowrap;
 }
+
+/* Modal de Vinculación de Google */
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-4);
+}
+
+.auth-modal-overlay[hidden] {
+  display: none !important;
+}
+
+.auth-modal {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-6);
+  border-radius: var(--radius-lg, 12px);
+  text-align: center;
+}
+
+.auth-modal__title {
+  margin-bottom: var(--space-4);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+}
+
+.auth-modal__text {
+  margin-bottom: var(--space-6);
+}
+
+.auth-modal__actions {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+}
+
+.auth-modal__actions .btn {
+  flex: 1;
+}
