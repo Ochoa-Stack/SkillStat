@@ -269,6 +269,27 @@
       </section>
     </div>
 
+    <!-- Modal de Vinculación de Cuenta -->
+    <div class="auth-modal-overlay" data-link-modal hidden>
+      <div class="auth-modal surface">
+        <h2 class="auth-modal__title">Vincular cuenta</h2>
+        <p class="text-body auth-modal__text">
+          Ya existe una cuenta registrada con el correo
+          <strong data-link-email></strong>. ¿Deseas vincular tu cuenta de
+          Google para iniciar sesión de forma rápida la próxima vez?
+        </p>
+        <p class="form-error" data-link-error role="alert" hidden></p>
+        <div class="auth-modal__actions">
+          <button type="button" class="btn btn--outline" data-link-cancel>
+            Cancelar
+          </button>
+          <button type="button" class="btn btn--primary" data-link-confirm>
+            Vincular cuenta
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script src="../assets/js/config.js"></script>
     <script src="../assets/js/api/client.js"></script>
     <script src="../assets/js/api/auth.api.js"></script>
