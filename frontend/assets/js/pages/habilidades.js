@@ -194,7 +194,9 @@ function renderSkills() {
       </div>
       
       <div class="skill-item__actions">
-        <a href="perfil.html" class="btn btn--secondary btn--sm">Agregar a mi perfil</a>
+        <button type="button" class="btn btn--secondary btn--sm" data-action="add-skill" data-id="${skill.skill_id}">
+          Agregar a mi perfil
+        </button>
       </div>
     `;
 
@@ -206,6 +208,36 @@ function renderSkills() {
   // Re-inicializamos iconos de Lucide (si se agregaran íconos dinámicamente)
   if (window.lucide) {
     window.lucide.createIcons();
+  }
+
+  // Agregamos listeners a los botones de "Agregar a mi perfil"
+  listContainer.querySelectorAll('[data-action="add-skill"]').forEach((btn) => {
+    btn.addEventListener("click", () => handleAddSkill(btn.dataset.id, btn));
+  });
+}
+
+async function handleAddSkill(skillId, btnElement) {
+  const originalText = btnElement.textContent;
+  btnElement.textContent = "Agregando...";
+  btnElement.disabled = true;
+
+  try {
+    await apiPost("/profile/skills", { skill_id: parseInt(skillId) });
+    btnElement.textContent = "¡Agregado!";
+  } catch (error) {
+    console.error("Error agregando habilidad:", error);
+    if (error.status === 401) {
+      btnElement.textContent = "Inicia sesión para guardar";
+      setTimeout(() => {
+        window.location.href = "/views/register.html";
+      }, 1000);
+    } else {
+      btnElement.textContent = "Error";
+      setTimeout(() => {
+        btnElement.textContent = originalText;
+        btnElement.disabled = false;
+      }, 2000);
+    }
   }
 }
 
