@@ -1,5 +1,4 @@
 // API_BASE_URL se define en assets/js/config.js, que debe cargarse mediante un <script> antes que este archivo en cada HTML.
-
 async function parseErrorBody(response) {
   try {
     const json = await response.json();
@@ -44,20 +43,32 @@ async function apiGet(endpoint) {
   return json.data;
 }
 
-function getCsrfToken() {
-  // Flask-JWT-Extended emite la cookie csrf_access_token sin la bandera httpOnly intencionalmente. Esto nos permite leerla desde JavaScript en el navegador y adjuntarla como el header X-CSRF-TOKEN en las peticiones que mutan estado, completando el patrón Double Submit Cookie para protegernos de ataques CSRF sin requerir que nuestro backend de API mantenga estado de sesiones.
-  const match = document.cookie.match(
-    new RegExp("(^| )csrf_access_token=([^;]+)"),
-  );
-  if (match) {
-    return decodeURIComponent(match[2]);
+async function ensureCsrfToken() {
+  // Retorna el token cacheado si ya existe en sessionStorage — evita una peticion de red en cada mutacion despues de la primera.
+  const cached = sessionStorage.getItem("csrf_token");
+  if (cached) return cached;
+
+  // El frontend no puede leer csrf_access_token desde document.cookie porque backend y frontend viven en subdominios distintos de onrender.com, que esta en la Public Suffix List. Solicitamos el claim csrf directamente al backend via un GET autenticado con la cookie httpOnly que el navegador si envia automaticamente en peticiones cross-site con credentials: "include".
+  const response = await fetch(`${API_BASE_URL}/auth/csrf-token`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorBody = await parseErrorBody(response);
+    throw buildApiError(errorBody, response, "/auth/csrf-token");
   }
-  return null;
+
+  const json = await response.json();
+  const token = json.data?.csrf_token;
+  if (token) {
+    sessionStorage.setItem("csrf_token", token);
+  }
+  return token || null;
 }
 
 async function apiPost(endpoint, body) {
   const headers = { "Content-Type": "application/json" };
-  const csrfToken = getCsrfToken();
+  const csrfToken = await ensureCsrfToken();
   if (csrfToken) {
     headers["X-CSRF-TOKEN"] = csrfToken;
   }
@@ -80,7 +91,7 @@ async function apiPost(endpoint, body) {
 
 async function apiPatch(endpoint, body) {
   const headers = { "Content-Type": "application/json" };
-  const csrfToken = getCsrfToken();
+  const csrfToken = await ensureCsrfToken();
   if (csrfToken) {
     headers["X-CSRF-TOKEN"] = csrfToken;
   }
@@ -103,7 +114,7 @@ async function apiPatch(endpoint, body) {
 
 async function apiDelete(endpoint) {
   const headers = {};
-  const csrfToken = getCsrfToken();
+  const csrfToken = await ensureCsrfToken();
   if (csrfToken) {
     headers["X-CSRF-TOKEN"] = csrfToken;
   }

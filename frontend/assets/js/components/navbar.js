@@ -20,9 +20,7 @@
       applyTheme(next);
       localStorage.setItem(STORAGE_KEY, next);
 
-      // Si esta pagina tiene el boton de Google renderizado, lo
-      // volvemos a dibujar con el tema correcto — la libreria de Google
-      // no sincroniza su propio tema automaticamente con el nuestro.
+      // Si esta pagina tiene el boton de Google renderizado, lo volvemos a dibujar con el tema correcto, la libreria de Google no sincroniza su propio tema automaticamente con el nuestro.
       if (typeof window.refreshGoogleButtonTheme === "function") {
         window.refreshGoogleButtonTheme();
       }
@@ -82,6 +80,7 @@
     } catch (error) {
       console.error("No se pudo cerrar la sesión en el servidor:", error);
     } finally {
+      sessionStorage.removeItem("csrf_token");
       // Aunque la peticion falle, regresamos a index.html; desde la perspectiva del usuario, salir debe funcionar siempre.
       const logoLink = document.querySelector(".navbar__logo");
       const indexHref = logoLink
