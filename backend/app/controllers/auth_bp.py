@@ -1,7 +1,7 @@
 import logging
 
 from flask import Blueprint, request, current_app
-from flask_jwt_extended import set_access_cookies, unset_jwt_cookies
+from flask_jwt_extended import set_access_cookies, unset_jwt_cookies, jwt_required, get_jwt
 from marshmallow import ValidationError
 
 from app.schemas.auth_schema import (
@@ -69,6 +69,13 @@ def logout():
     )
     unset_jwt_cookies(response)
     return response, status_code
+
+@auth_bp.route("/csrf-token", methods=["GET"])
+@jwt_required()
+def csrf_token():
+    # Expone el claim csrf ya presente en el JWT actual. El frontend lo solicita bajo demanda la primera vez que necesita hacer una peticion mutable (POST/PATCH/DELETE), sorteando la restriccion de la Public Suffix List que impide leer csrf_access_token desde document.cookie cuando backend y frontend viven en subdominios distintos de onrender.com.
+    claims = get_jwt()
+    return success_response(data={"csrf_token": claims.get("csrf")}, status_code=200)
 
 @auth_bp.route("/google", methods=["POST"])
 @limiter.limit("10 per 15 minutes")
