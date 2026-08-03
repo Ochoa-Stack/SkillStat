@@ -54,8 +54,11 @@ async function ensureCsrfToken() {
   });
 
   if (!response.ok) {
-    const errorBody = await parseErrorBody(response);
-    throw buildApiError(errorBody, response, "/auth/csrf-token");
+    // Si no hay sesion activa (ej. durante login, register o google auth), el endpoint devuelve 401. No es una falla critica — retornamos null para que la peticion original continue sin el header CSRF, tal como funciona correctamente para los endpoints que no tienen @jwt_required().
+    console.warn(
+      "[ensureCsrfToken] No se pudo obtener el token CSRF (sin sesion activa), continuando sin el header.",
+    );
+    return null;
   }
 
   const json = await response.json();
