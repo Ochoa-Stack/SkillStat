@@ -1,17 +1,12 @@
 # Git en el dia a dia
 
-Esta guia cubre los comandos de Git que usamos en SkillStat. No asume
-conocimiento previo. Si ya dominas Git puedes usarla como referencia rapida.
+Esta guia cubre los comandos de Git que usamos en SkillStat. No asume conocimiento previo. Si ya dominas Git puedes usarla como referencia rapida.
 
 ## Como funciona Git en este proyecto
 
-Git guarda el historial de todos los cambios que hacemos al codigo.
-Cada vez que guardamos un cambio con `commit` quedamos un registro de
-que cambio, quien lo hizo y cuando.
+Git guarda el historial de todos los cambios que hacemos al codigo. Cada vez que guardamos un cambio con `commit` quedamos un registro de que cambio, quien lo hizo y cuando.
 
-Las ramas nos permiten trabajar en algo nuevo sin afectar lo que ya
-funciona. Cuando terminamos, integramos nuestro trabajo a `develop`
-a traves de un Pull Request en GitHub.
+Las ramas nos permiten trabajar en algo nuevo sin afectar lo que ya funciona. Cuando terminamos, integramos nuestro trabajo a `develop` a traves de un Pull Request en GitHub.
 
 ## Los comandos que mas usamos
 
@@ -107,5 +102,4 @@ Si queremos deshacer el ultimo commit pero conservar los cambios:
 git reset --soft HEAD~1
 ```
 
-Si tenemos dudas sobre algo que no esta en esta guia lo preguntamos
-antes de intentar comandos desconocidos.
+Si tenemos dudas sobre algo que no esta en esta guia lo preguntamos antes de intentar comandos desconocidos.

@@ -58,9 +58,13 @@
           <li>
             <a href="/views/panorama.html" class="navbar__link">Panorama</a>
           </li>
-          <li><a href="/views/comparar.html" class="navbar__link">Comparar</a></li>
           <li>
-            <a href="/views/habilidades.html" class="navbar__link">Habilidades</a>
+            <a href="/views/comparar.html" class="navbar__link">Comparar</a>
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="navbar__link"
+              >Habilidades</a
+            >
           </li>
           <li>
             <a href="/views/salarios.html" class="navbar__link">Salarios</a>
@@ -81,6 +85,7 @@
             href="/views/perfil.html"
             class="navbar__profile-link navbar__profile-link--active"
             aria-label="Mi perfil"
+            hidden
           >
             <i data-lucide="user"></i>
           </a>
@@ -104,9 +109,17 @@
             type="button"
             aria-label="Cerrar sesión"
             data-auth-action="logout"
+            hidden
           >
             <i data-lucide="log-out"></i>
           </button>
+          <a
+            href="/views/register.html"
+            class="navbar__link"
+            data-guest-cta
+            hidden
+            >Iniciar sesión</a
+          >
         </div>
       </nav>
     </header>
@@ -165,9 +178,13 @@
           <li>
             <a href="/views/panorama.html" class="nav-drawer__link">Panorama</a>
           </li>
-          <li><a href="/views/comparar.html" class="nav-drawer__link">Comparar</a></li>
           <li>
-            <a href="/views/habilidades.html" class="nav-drawer__link">Habilidades</a>
+            <a href="/views/comparar.html" class="nav-drawer__link">Comparar</a>
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="nav-drawer__link"
+              >Habilidades</a
+            >
           </li>
           <li>
             <a href="/views/salarios.html" class="nav-drawer__link">Salarios</a>
@@ -187,6 +204,7 @@
           class="nav-drawer__logout"
           type="button"
           data-auth-action="logout"
+          hidden
         >
           <i data-lucide="log-out"></i>
           Cerrar sesión

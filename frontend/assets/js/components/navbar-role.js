@@ -3,7 +3,17 @@
     let user;
     try {
       user = await apiGet("/profile/me");
+      document
+        .querySelectorAll(
+          ".navbar__profile-link, .navbar__logout, .nav-drawer__logout",
+        )
+        .forEach(function (el) {
+          el.removeAttribute("hidden");
+        });
     } catch {
+      document.querySelectorAll("[data-guest-cta]").forEach(function (el) {
+        el.removeAttribute("hidden");
+      });
       // Si /profile/me falla (401, red, lo que sea), simplemente no se inyecta el link. Cada página ya maneja su propio guard de sesión por separado; este script solo decide visibilidad.
       return;
     }

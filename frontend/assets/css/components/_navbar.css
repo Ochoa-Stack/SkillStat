@@ -248,6 +248,12 @@
   width: 100%;
 }
 
+.navbar__logout[hidden],
+.navbar__profile-link[hidden],
+.nav-drawer__logout[hidden] {
+  display: none;
+}
+
 @media (min-width: 768px) {
   .nav-drawer {
     display: none;
