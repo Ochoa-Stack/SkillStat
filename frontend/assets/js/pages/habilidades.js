@@ -4,6 +4,7 @@ let activeDemand = "all";
 let searchQuery = "";
 let maxDemand = 0;
 let demandChecks = {};
+let userSkillIds = new Set();
 
 async function initHabilidadesPage() {
   const loadingEl = document.getElementById("habilidades-loading");
@@ -15,6 +16,15 @@ async function initHabilidadesPage() {
 
     if (skills.length > 0) {
       maxDemand = Math.max(...skills.map((s) => s.demand_count));
+    }
+
+    try {
+      const gapData = await apiGet("/profile/skill-gap");
+      if (gapData && gapData.mis_habilidades) {
+        gapData.mis_habilidades.forEach((s) => userSkillIds.add(s.skill_id));
+      }
+    } catch (e) {
+      // Ignoramos silenciosamente (guest o error de red)
     }
 
     loadingEl.hidden = true;
@@ -194,9 +204,11 @@ function renderSkills() {
       </div>
       
       <div class="skill-item__actions">
-        <button type="button" class="btn btn--secondary btn--sm" data-action="add-skill" data-id="${skill.skill_id}">
-          Agregar a mi perfil
-        </button>
+        ${
+          userSkillIds.has(skill.skill_id)
+            ? `<button type="button" class="btn btn--secondary btn--sm" disabled>¡Agregado!</button>`
+            : `<button type="button" class="btn btn--secondary btn--sm" data-action="add-skill" data-id="${skill.skill_id}">Agregar a mi perfil</button>`
+        }
       </div>
     `;
 
