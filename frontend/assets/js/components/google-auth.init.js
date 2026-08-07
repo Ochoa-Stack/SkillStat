@@ -45,7 +45,9 @@ function handleGoogleCredential(response) {
           modal.hidden = false;
         }
       } else {
-        window.location.href = "/views/panorama.html";
+        resolvePostLoginRedirect("/views/panorama.html").then((target) => {
+          window.location.href = target;
+        });
       }
     })
     .catch((error) => {
@@ -105,8 +107,9 @@ function initGoogleAuth() {
       if (modalError) modalError.hidden = true;
 
       apiPost("/auth/google/confirm-link", { link_token: pendingLinkToken })
-        .then(() => {
-          window.location.href = "/views/panorama.html";
+        .then(() => resolvePostLoginRedirect("/views/panorama.html"))
+        .then((target) => {
+          window.location.href = target;
         })
         .catch((error) => {
           btnConfirm.textContent = originalText;

@@ -54,7 +54,7 @@ async function ensureCsrfToken() {
   });
 
   if (!response.ok) {
-    // Si no hay sesion activa (ej. durante login, register o google auth), el endpoint devuelve 401. No es una falla critica — retornamos null para que la peticion original continue sin el header CSRF, tal como funciona correctamente para los endpoints que no tienen @jwt_required().
+    // Si no hay sesion activa (ej. durante login, register o google auth), el endpoint devuelve 401. No es una falla critica, retornamos null para que la peticion original continue sin el header CSRF, tal como funciona correctamente para los endpoints que no tienen @jwt_required().
     console.warn(
       "[ensureCsrfToken] No se pudo obtener el token CSRF (sin sesion activa), continuando sin el header.",
     );
@@ -140,4 +140,35 @@ async function apiDelete(endpoint) {
   } catch {
     return null;
   }
+}
+
+const GUEST_INTENT_KEY = "skillstat_guest_intent";
+const GUEST_INTENT_TTL_MS = 30 * 60 * 1000;
+
+function saveGuestIntent(returnTo, action) {
+  const intent = { returnTo, action: action || null, ts: Date.now() };
+  localStorage.setItem(GUEST_INTENT_KEY, JSON.stringify(intent));
+}
+
+async function resolvePostLoginRedirect(defaultUrl) {
+  const raw = localStorage.getItem(GUEST_INTENT_KEY);
+  localStorage.removeItem(GUEST_INTENT_KEY);
+  if (!raw) return defaultUrl;
+  let intent;
+  try {
+    intent = JSON.parse(raw);
+  } catch {
+    return defaultUrl;
+  }
+  if (!intent || Date.now() - intent.ts > GUEST_INTENT_TTL_MS) {
+    return defaultUrl;
+  }
+  if (intent.action && intent.action.type === "add-skill") {
+    try {
+      await apiPost("/profile/skills", { skill_id: intent.action.skillId });
+    } catch (e) {
+      console.warn("No se pudo completar la acción pendiente del invitado:", e);
+    }
+  }
+  return intent.returnTo || defaultUrl;
 }
