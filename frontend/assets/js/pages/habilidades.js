@@ -240,6 +240,10 @@ async function handleAddSkill(skillId, btnElement) {
     console.error("Error agregando habilidad:", error);
     if (error.status === 401) {
       btnElement.textContent = "Inicia sesión para guardar";
+      saveGuestIntent(window.location.pathname, {
+        type: "add-skill",
+        skillId: parseInt(skillId),
+      });
       setTimeout(() => {
         window.location.href = "/views/register.html";
       }, 1000);
