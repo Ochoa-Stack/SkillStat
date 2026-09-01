@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Configura alertas de mercado laboral y recibe notificaciones cuando una habilidad supera el umbral de vacantes que definiste."
+    />
+    <title>SkillStat - Mis alertas</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <button
+          class="navbar__menu-toggle"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          data-nav-drawer-open
+        >
+          <i data-lucide="menu"></i>
+        </button>
+
+        <a
+          href="/views/index.html"
+          class="navbar__logo"
+          aria-label="SkillStat - Inicio"
+        >
+          <img
+            src="../assets/images/brand/skillstat-logo.svg"
+            alt="SkillStat"
+            height="32"
+            class="navbar__logo-img"
+          />
+        </a>
+
+        <ul class="navbar__links" role="list">
+          <li>
+            <a href="/views/panorama.html" class="navbar__link">Panorama</a>
+          </li>
+          <li>
+            <a href="/views/comparar.html" class="navbar__link">Comparar</a>
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="navbar__link"
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="/views/salarios.html" class="navbar__link">Salarios</a>
+          </li>
+          <li>
+            <a href="/views/regiones.html" class="navbar__link">Regiones</a>
+          </li>
+          <li>
+            <a href="/views/reportes.html" class="navbar__link">Reportes</a>
+          </li>
+          <li>
+            <a
+              href="/views/alertas.html"
+              class="navbar__link navbar__link--active"
+              aria-current="page"
+              >Alertas</a
+            >
+          </li>
+        </ul>
+
+        <div class="navbar__actions">
+          <a
+            href="/views/perfil.html"
+            class="navbar__profile-link"
+            aria-label="Mi perfil"
+            hidden
+          >
+            <i data-lucide="user"></i>
+          </a>
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Cambiar tema"
+          >
+            <i
+              data-lucide="sun"
+              class="theme-toggle__icon theme-toggle__icon--sun"
+            ></i>
+            <i
+              data-lucide="moon"
+              class="theme-toggle__icon theme-toggle__icon--moon"
+            ></i>
+          </button>
+          <button
+            class="navbar__logout"
+            type="button"
+            aria-label="Cerrar sesión"
+            data-auth-action="logout"
+            hidden
+          >
+            <i data-lucide="log-out"></i>
+          </button>
+          <a
+            href="/views/register.html"
+            class="navbar__link"
+            data-guest-cta
+            hidden
+            >Iniciar sesión</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <div class="nav-drawer" data-nav-drawer aria-hidden="true">
+      <div class="nav-drawer__backdrop" data-nav-drawer-close></div>
+      <div
+        class="nav-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+      >
+        <div class="nav-drawer__header">
+          <a
+            href="/views/index.html"
+            class="navbar__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo.svg"
+              alt="SkillStat"
+              height="28"
+              class="navbar__logo-img"
+            />
+          </a>
+          <div class="nav-drawer__header-actions">
+            <button
+              class="theme-toggle"
+              type="button"
+              data-theme-toggle
+              aria-label="Cambiar tema"
+            >
+              <i
+                data-lucide="sun"
+                class="theme-toggle__icon theme-toggle__icon--sun"
+              ></i>
+              <i
+                data-lucide="moon"
+                class="theme-toggle__icon theme-toggle__icon--moon"
+              ></i>
+            </button>
+            <button
+              class="nav-drawer__close"
+              type="button"
+              aria-label="Cerrar menú"
+              data-nav-drawer-close
+            >
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav-drawer__links" role="list">
+          <li>
+            <a href="/views/panorama.html" class="nav-drawer__link">Panorama</a>
+          </li>
+          <li>
+            <a href="/views/comparar.html" class="nav-drawer__link">Comparar</a>
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="nav-drawer__link"
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="/views/salarios.html" class="nav-drawer__link">Salarios</a>
+          </li>
+          <li>
+            <a href="/views/regiones.html" class="nav-drawer__link">Regiones</a>
+          </li>
+          <li>
+            <a href="/views/reportes.html" class="nav-drawer__link">Reportes</a>
+          </li>
+          <li>
+            <a
+              href="/views/alertas.html"
+              class="nav-drawer__link nav-drawer__link--active"
+              aria-current="page"
+              >Alertas</a
+            >
+          </li>
+        </ul>
+
+        <button
+          class="nav-drawer__logout"
+          type="button"
+          data-auth-action="logout"
+          hidden
+        >
+          <i data-lucide="log-out"></i>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <div id="alertas-loading" class="alertas-loading">
+      <p class="text-body">Cargando alertas...</p>
+    </div>
+
+    <main id="alertas-main" hidden>
+      <section class="panorama-header">
+        <div class="container">
+          <h1>Mis alertas</h1>
+        </div>
+      </section>
+
+      <div class="container grid-2-col">
+        <section class="alertas-form-section">
+          <h2>Nueva alerta</h2>
+          <form id="crear-alerta-form" class="alertas-form" novalidate>
+            <p class="form-error" id="crear-alerta-msg" role="alert" hidden></p>
+            <div class="form-group">
+              <label class="form-label" for="alert-skill-select"
+                >Habilidad</label
+              >
+              <select
+                id="alert-skill-select"
+                name="skill_id"
+                class="form-input"
+                required
+              >
+                <option value="">Selecciona una habilidad</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de alerta</label>
+              <div
+                class="alert-type-toggle"
+                role="radiogroup"
+                aria-label="Tipo de alerta"
+              >
+                <label class="alert-type-option">
+                  <input
+                    type="radio"
+                    name="alert_type"
+                    value="ABSOLUTE"
+                    checked
+                  />
+                  Umbral de vacantes
+                </label>
+                <label class="alert-type-option">
+                  <input type="radio" name="alert_type" value="TREND" />
+                  Tendencia de crecimiento
+                </label>
+              </div>
+            </div>
+            <div class="form-group" id="threshold-value-group">
+              <label class="form-label" for="alert-threshold"
+                >Umbral de vacantes activas</label
+              >
+              <input
+                type="number"
+                id="alert-threshold"
+                name="threshold_value"
+                class="form-input"
+                min="1"
+                step="1"
+                placeholder="Ej. 50"
+              />
+            </div>
+            <div class="form-group" id="threshold-percentage-group" hidden>
+              <label class="form-label" for="alert-percentage"
+                >Porcentaje mínimo de crecimiento semanal</label
+              >
+              <input
+                type="number"
+                id="alert-percentage"
+                name="threshold_percentage"
+                class="form-input"
+                min="0.01"
+                step="0.01"
+                placeholder="Ej. 15"
+              />
+            </div>
+            <button
+              type="submit"
+              class="btn btn--primary"
+              id="btn-crear-alerta"
+              disabled
+            >
+              Crear alerta
+            </button>
+          </form>
+        </section>
+
+        <section class="alertas-list-section">
+          <h2>Alertas activas</h2>
+          <p id="alertas-empty" class="alertas-empty text-body" hidden>
+            No tienes alertas configuradas todavía.
+          </p>
+          <div id="alertas-table-wrapper" class="alertas-table-wrapper" hidden>
+            <table class="alerta-table">
+              <thead>
+                <tr>
+                  <th scope="col">Habilidad</th>
+                  <th scope="col">Umbral</th>
+                  <th scope="col">Creada el</th>
+                  <th scope="col"><span class="sr-only">Acción</span></th>
+                </tr>
+              </thead>
+              <tbody id="alertas-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="../assets/js/utils/formatters.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api/client.js"></script>
+    <script src="../assets/js/api/panorama.api.js"></script>
+    <script src="../assets/js/api/alertas.api.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/navbar-role.js"></script>
+    <script src="../assets/js/pages/alertas.js"></script>
+  </body>
+</html>

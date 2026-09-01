@@ -1,0 +1,19 @@
+/* Clases utilitarias de proposito general que no encajan en tipografia, layout o componentes especificos. Nunca se escribe CSS inline en HTML; toda regla de estilo vive aqui o en su archivo correspondiente */
+
+/* Oculta visualmente un elemento pero lo mantiene disponible para lectores de pantalla. Usado en headings semanticos que no necesitan representacion visual */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Garantizamos que el atributo hidden siempre gane sobre cualquier display explicito que un componente defina en su propia clase; sin esto, un elemento con hidden y display:flex propio seguia siendovisible pese a tener hidden puesto. */
+[hidden] {
+  display: none !important;
+}

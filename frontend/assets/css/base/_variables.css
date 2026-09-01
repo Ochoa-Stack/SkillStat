@@ -1,0 +1,109 @@
+:root {
+  --color-bg-base: #f4f6f9;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-overlay: #f0f2f5;
+  --color-bg-warm: #dcc9a9;
+
+  --color-primary: #4b607f;
+  --color-primary-light: #7e94b4;
+  --color-primary-subtle: #e8edf5;
+
+  --color-accent-green: #21a675;
+  --color-accent-green-light: #29d194;
+  --color-accent-green-subtle: #e3f6ee;
+
+  --color-accent-orange: #f3701e;
+  --color-accent-orange-light: #f58945;
+
+  --color-semantic-error: #c72c31;
+  --color-semantic-error-subtle: #f9e5e6;
+
+  --color-text-primary: #1a2535;
+  --color-text-secondary: #4b607f;
+  --color-text-disabled: #9fafc6;
+
+  --color-border: #d1d9e3;
+  --color-border-subtle: #e8edf2;
+
+  --font-display: "Gaseok One", sans-serif;
+  --font-heading: "Bakbak One", sans-serif;
+  --font-body: "Bakbak One", sans-serif;
+  --font-label: "Antonio", sans-serif;
+
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 2px 8px rgba(15, 23, 42, 0.08);
+
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-theme:
+    background-color 250ms ease, color 250ms ease, border-color 250ms ease;
+
+  --z-base: 0;
+  --z-surface: 10;
+  --z-elevated: 100;
+  --z-overlay: 1000;
+}
+
+[data-theme="dark"] {
+  --color-bg-base: #0f1923;
+  --color-bg-surface: #1a2535;
+  --color-bg-elevated: #2e3d52;
+  --color-bg-overlay: #3a4d64;
+
+  --color-bg-warm: var(--color-bg-elevated);
+
+  --color-primary: #4b607f;
+  --color-primary-light: #7e94b4;
+  --color-primary-subtle: #9fafc6;
+
+  --color-accent-green: #21a675;
+  --color-accent-green-light: #29d194;
+  --color-accent-green-subtle: #16332a;
+
+  --color-accent-orange: #f3701e;
+  --color-accent-orange-light: #f58945;
+
+  --color-semantic-error: #c72c31;
+  --color-semantic-error-subtle: #9b2226;
+
+  --color-text-primary: #e8edf2;
+  --color-text-secondary: #9fafc6;
+  --color-text-disabled: #616161;
+
+  --color-border: #2e3d52;
+  --color-border-subtle: #1a2535;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+}

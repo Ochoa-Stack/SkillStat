@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Restablece tu contraseña de SkillStat." />
+    <title>SkillStat - Restablecer contraseña</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <div class="auth-screen" data-auth-screen>
+      <section class="auth-form-panel">
+        <button
+          class="auth-close"
+          type="button"
+          aria-label="Cerrar"
+          data-auth-close
+        >
+          <i data-lucide="x"></i>
+        </button>
+
+        <div class="auth-form-panel__content">
+          <a
+            href="/views/index.html"
+            class="navbar__logo auth-form-panel__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+            src="../assets/images/brand/skillstat-logo.svg"
+            alt="SkillStat"
+            height="32"
+            class="navbar__logo-img"
+          />
+          </a>
+
+          <div>
+            <h1>Restablecer contraseña</h1>
+            <p class="auth-form-panel__subtitle text-body">
+              Crea una nueva contraseña segura para tu cuenta.
+            </p>
+          </div>
+
+          <div>
+            <!-- Contenedor para el formulario principal -->
+            <div id="reset-form-container">
+              <form class="auth-form" data-reset-form novalidate>
+                <p class="form-error" data-reset-error role="alert" hidden></p>
+
+                <div class="form-group">
+                  <label for="reset-password" class="form-label"
+                    >Nueva contraseña</label
+                  >
+                  <input
+                    type="password"
+                    id="reset-password"
+                    name="password"
+                    class="form-input"
+                    autocomplete="new-password"
+                    required
+                    data-reset-password
+                  />
+                  <ul class="password-checklist" data-password-checklist>
+                    <li data-rule="length">Mínimo 8 caracteres</li>
+                    <li data-rule="upper">Una letra mayúscula</li>
+                    <li data-rule="number">Un número</li>
+                    <li data-rule="special">Un carácter especial</li>
+                  </ul>
+                </div>
+
+                <div class="form-group">
+                  <label for="reset-confirm" class="form-label"
+                    >Confirmar contraseña</label
+                  >
+                  <input
+                    type="password"
+                    id="reset-confirm"
+                    name="confirmPassword"
+                    class="form-input"
+                    autocomplete="new-password"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn--primary auth-form__submit"
+                  disabled
+                  data-reset-submit
+                >
+                  Actualizar contraseña
+                </button>
+              </form>
+            </div>
+
+            <!-- Contenedor para estados de error terminal o éxito -->
+            <div id="reset-status-container" hidden>
+              <p
+                class="form-error"
+                id="reset-status-message"
+                role="alert"
+                style="margin-bottom: 1.5rem"
+              ></p>
+              <a
+                href="/views/olvide-contrasena.html"
+                class="btn btn--secondary"
+                id="reset-status-action"
+                style="display: block; text-align: center; width: 100%"
+              >
+                Solicitar nuevo enlace
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-marketing-panel">
+        <div class="auth-marketing-panel__content">
+          <div>
+            <p class="auth-marketing-panel__headline">
+              Seguridad para tus datos.
+            </p>
+            <p class="auth-marketing-panel__subtitle text-body">
+              Mantén el acceso a tu cuenta siempre protegido.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api/client.js"></script>
+    <script src="../assets/js/api/auth.api.js"></script>
+    <script src="../assets/js/utils/auth.utils.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/pages/restablecer-contrasena.js"></script>
+  </body>
+</html>

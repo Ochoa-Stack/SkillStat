@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Inteligencia de mercado laboral tecnológico en México. Skills más demandados, salarios reales y distribución por ciudad."
+    />
+    <title>SkillStat - Inicio</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+
+    <!-- Preconnect para reducir latencia de carga de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Bakbak One y Antonio; Gaseok One no se carga aqui porque solo se usa en el isologo SVG -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bakbak+One&family=Antonio:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Mandamos a llamar el sistema de estilos -->
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+
+  <body>
+    <!-- Navbar con logo a la izquierda, toggle de tema a la derecha. En index no hay menu de navegacion de app porque el usuario no esta autenticado todavia -->
+    <header class="site-header" role="banner">
+      <nav class="navbar" aria-label="Navegación principal">
+        <!-- Logo -->
+        <a
+          href="/views/index.html"
+          class="navbar__logo"
+          aria-label="SkillStat — Inicio"
+        >
+          <img
+            src="../assets/images/brand/skillstat-logo.svg"
+            alt="SkillStat"
+            height="32"
+            class="navbar__logo-img"
+          />
+        </a>
+
+        <!-- Toggle de tema -->
+        <button
+          class="theme-toggle"
+          aria-label="Cambiar tema"
+          data-theme-toggle
+          type="button"
+        >
+          <!-- Icono sol (light mode activo) -->
+          <i
+            class="theme-toggle__icon theme-toggle__icon--sun"
+            data-lucide="sun"
+            aria-hidden="true"
+          ></i>
+          <!-- Icono luna (dark mode activo) -->
+          <i
+            class="theme-toggle__icon theme-toggle__icon--moon"
+            data-lucide="moon"
+            aria-hidden="true"
+          ></i>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main -->
+    <main>
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="container">
+          <p class="hero__eyebrow text-label">
+            Inteligencia de mercado laboral Mexicano
+          </p>
+
+          <h1 id="hero-heading" class="hero__heading text-hero">
+            El mercado tech mexicano,
+            <span class="hero__heading-accent text-orange">medido</span>
+            en tiempo real.
+          </h1>
+
+          <p class="hero__subheading text-body">
+            Skills más demandados, salarios reales y distribución por ciudad.
+            Datos, no corazonadas.
+          </p>
+        </div>
+      </section>
+
+      <!-- Carrusel de Métricas Actualizadas -->
+      <section
+        class="carousel-section"
+        aria-label="Métricas destacadas del mercado"
+      >
+        <div class="container">
+          <div
+            class="carousel"
+            role="region"
+            aria-label="Métricas en vivo"
+            data-carousel
+          >
+            <div class="carousel__track scroll-row" data-carousel-track>
+              <!-- Skill más demandado (slide 1) -->
+              <article
+                class="carousel__slide metric-card surface"
+                data-carousel-slide
+                aria-label="Skill más demandado"
+              >
+                <div class="card-header">
+                  <span class="metric-card__label text-label"
+                    >Skill más demandado</span
+                  >
+                  <span
+                    class="metric-card__live"
+                    aria-label="Datos actualizados"
+                  >
+                    Actualizado
+                  </span>
+                </div>
+                <p
+                  class="metric-card__value text-metric text-orange"
+                  data-metric="top-skill"
+                >
+                  —
+                </p>
+                <p
+                  class="metric-card__detail text-body-sm"
+                  data-metric="top-skill-detail"
+                >
+                  Cargando datos...
+                </p>
+              </article>
+
+              <!-- Habilidades rastreadas (slide 2) -->
+              <article
+                class="carousel__slide metric-card surface"
+                data-carousel-slide
+                aria-label="Habilidades rastreadas"
+              >
+                <div class="card-header">
+                  <span class="metric-card__label text-label"
+                    >Habilidades rastreadas</span
+                  >
+                  <span
+                    class="metric-card__live"
+                    aria-label="Datos actualizados"
+                  >
+                    Actualizado
+                  </span>
+                </div>
+                <p
+                  class="metric-card__value text-metric"
+                  data-metric="skills-tracked"
+                >
+                  —
+                </p>
+                <p
+                  class="metric-card__detail text-body-sm"
+                  data-metric="skills-tracked-detail"
+                >
+                  Cargando datos...
+                </p>
+              </article>
+
+              <!-- Vacantes analizadas (slide 3) -->
+              <article
+                class="carousel__slide metric-card surface"
+                data-carousel-slide
+                aria-label="Vacantes analizadas"
+              >
+                <div class="card-header">
+                  <span class="metric-card__label text-label"
+                    >Vacantes analizadas</span
+                  >
+                  <span
+                    class="metric-card__live"
+                    aria-label="Datos actualizados"
+                  >
+                    Actualizado
+                  </span>
+                </div>
+                <p
+                  class="metric-card__value text-metric"
+                  data-metric="total-jobs"
+                >
+                  —
+                </p>
+                <p
+                  class="metric-card__detail text-body-sm"
+                  data-metric="total-jobs-detail"
+                >
+                  Cargando datos...
+                </p>
+              </article>
+            </div>
+
+            <!-- Dots de navegación -->
+            <div
+              class="carousel__dots"
+              role="tablist"
+              aria-label="Navegar entre métricas"
+              data-carousel-dots
+            >
+              <button
+                class="carousel__dot carousel__dot--active"
+                role="tab"
+                aria-selected="true"
+                aria-label="Métrica 1"
+                data-carousel-dot="0"
+                type="button"
+              ></button>
+              <button
+                class="carousel__dot"
+                role="tab"
+                aria-selected="false"
+                aria-label="Métrica 2"
+                data-carousel-dot="1"
+                type="button"
+              ></button>
+              <button
+                class="carousel__dot"
+                role="tab"
+                aria-selected="false"
+                aria-label="Métrica 3"
+                data-carousel-dot="2"
+                type="button"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTAs -->
+      <section class="cta-section" aria-label="Acciones principales">
+        <div class="container">
+          <a href="/views/panorama.html" class="btn btn--primary">
+            Ver el Panorama
+            <i data-lucide="arrow-right" aria-hidden="true"></i>
+          </a>
+          <a href="/views/register.html" class="btn btn--secondary">
+            Iniciar sesión / Crear cuenta
+          </a>
+        </div>
+      </section>
+
+      <!-- Propuesta de valor -->
+      <section class="value-props" aria-labelledby="value-props-heading">
+        <div class="container">
+          <h2 id="value-props-heading" class="sr-only">
+            Por qué usar SkillStat
+          </h2>
+
+          <div class="value-props__grid">
+            <article class="value-card surface">
+              <div class="value-card__icon" aria-hidden="true">
+                <i data-lucide="bar-chart-3"></i>
+              </div>
+              <h3 class="value-card__title text-h3">
+                Demanda de skills en tiempo real
+              </h3>
+              <p class="value-card__desc text-body-sm">
+                Qué tecnologías piden hoy las empresas tech mexicanas.
+              </p>
+            </article>
+
+            <article class="value-card surface">
+              <div class="value-card__icon" aria-hidden="true">
+                <i data-lucide="trending-up"></i>
+              </div>
+              <h3 class="value-card__title text-h3">
+                Benchmarks de salario por rol
+              </h3>
+              <p class="value-card__desc text-body-sm">
+                Rangos por seniority, stack y ciudad, sin adivinanzas.
+              </p>
+            </article>
+
+            <article class="value-card surface">
+              <div class="value-card__icon" aria-hidden="true">
+                <i data-lucide="globe"></i>
+              </div>
+              <h3 class="value-card__title text-h3">
+                Cobertura nacional + remoto
+              </h3>
+              <p class="value-card__desc text-body-sm">
+                CDMX, Guadalajara, Monterrey, Querétaro e híbrido.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Skills mas demandados -->
+      <section
+        class="top-skills-section"
+        aria-labelledby="top-skills-heading"
+        id="top-skills-section"
+      >
+        <div class="container">
+          <p class="top-skills-section__eyebrow text-label">
+            Skills más demandados ahora
+          </p>
+          <h2 id="top-skills-heading">Lo que el mercado pide hoy</h2>
+          <div
+            class="top-skills-section__chips"
+            id="top-skills-chips"
+            role="list"
+            aria-label="Top habilidades demandadas"
+          >
+            <!-- Chips inyectados por JS -->
+          </div>
+          <a href="/views/panorama.html" class="top-skills-section__link"
+            >Ver el Panorama completo →</a
+          >
+        </div>
+      </section>
+
+      <!-- Vista previa del Panorama -->
+      <section class="panorama-preview" aria-labelledby="preview-heading">
+        <div class="container">
+          <p class="panorama-preview__eyebrow text-label">
+            Así se ve tu Panorama
+          </p>
+
+          <div
+            class="browser-chrome surface"
+            role="img"
+            aria-label="Vista previa del dashboard Panorama"
+          >
+            <div class="browser-chrome__bar">
+              <span class="browser-chrome__dot" aria-hidden="true"></span>
+              <span class="browser-chrome__dot" aria-hidden="true"></span>
+              <span class="browser-chrome__dot" aria-hidden="true"></span>
+              <span class="browser-chrome__url text-label"
+                >skillstat.mx / panorama</span
+              >
+            </div>
+            <div class="browser-chrome__content">
+              <div class="card-header">
+                <span class="text-h2">Panorama</span>
+                <span class="panorama-preview__live text-label">
+                  Actualizado
+                </span>
+              </div>
+              <div class="panorama-preview__kpis">
+                <div class="preview-kpi">
+                  <span class="preview-kpi__label text-label">Vacantes</span>
+                  <span
+                    class="preview-kpi__value text-metric-sm"
+                    data-metric="preview-jobs"
+                    >—</span
+                  >
+                </div>
+                <div class="preview-kpi">
+                  <span class="preview-kpi__label text-label">Skill #1</span>
+                  <span
+                    class="preview-kpi__value text-metric-sm text-orange"
+                    data-metric="preview-skill"
+                    >—</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="container">
+        <div class="footer__brand">
+          <a
+            href="/views/index.html"
+            class="navbar__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo.svg"
+              alt="SkillStat"
+              height="28"
+              class="navbar__logo-img"
+            />
+          </a>
+          <p class="footer__tagline text-body-sm">
+            Construido por el equipo de SkillStat en Ciudad Juárez, Chihuahua.
+          </p>
+        </div>
+
+        <nav class="footer__legal" aria-label="Enlaces legales">
+          <a href="#" class="footer__link text-body-sm"
+            >Términos y Condiciones</a
+          >
+          <a href="#" class="footer__link text-body-sm"
+            >Política de Privacidad</a
+          >
+          <a href="/views/cookies.html" class="footer__link text-body-sm"
+            >Aviso de Cookies</a
+          >
+        </nav>
+
+        <p class="footer__copy text-body-sm">
+          © 2026 SkillStat · Todos los derechos reservados.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Cargamos JavaScript (se carga al final del body para no bloquear el render) -->
+    <script src="../assets/js/utils/formatters.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api/client.js"></script>
+    <script src="../assets/js/api/auth.api.js"></script>
+    <script src="../assets/js/api/panorama.api.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/carousel.init.js"></script>
+    <script src="../assets/js/pages/index.js"></script>
+  </body>
+</html>

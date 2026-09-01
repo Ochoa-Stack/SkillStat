@@ -1,0 +1,67 @@
+{"label": "SKILL", "pattern": [{"LOWER": "python"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "javascript"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "typescript"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "java"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "c#"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "c++"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "ruby"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "php"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "go"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "rust"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "swift"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "kotlin"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "react"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "angular"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "vue.js"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "node.js"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "express"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "django"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "flask"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "fastapi"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "spring"}, {"LOWER": "boot"}]}
+{"label": "SKILL", "pattern": [{"LOWER": ".net"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "sql"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "mysql"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "postgresql"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "mongodb"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "sqlite"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "nosql"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "redis"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "cassandra"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "elasticsearch"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "aws"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "azure"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "google"}, {"LOWER": "cloud"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "gcp"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "docker"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "kubernetes"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "terraform"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "jenkins"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "ci/cd"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "linux"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "machine"}, {"LOWER": "learning"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "data"}, {"LOWER": "science"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "artificial"}, {"LOWER": "intelligence"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "nlp"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "deep"}, {"LOWER": "learning"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "tensorflow"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "pytorch"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "pandas"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "numpy"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "scikit-learn"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "git"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "github"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "gitlab"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "bitbucket"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "agile"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "scrum"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "jira"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "figma"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "html"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "css"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "sass"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "tailwind"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "bootstrap"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "graphql"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "rest"}, {"LOWER": "api"}]}
+{"label": "SKILL", "pattern": [{"LOWER": "microservices"}]}

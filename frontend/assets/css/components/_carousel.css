@@ -1,0 +1,46 @@
+/* Mecanica del carrusel. La barra de scroll se oculta visualmente pero el gesto de swipe sigue funcionando para evitar el aspecto inacabado de una scrollbar nativa expuesta en mobile */
+
+.carousel {
+  position: relative;
+}
+
+.scroll-row {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel__slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+.carousel__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.carousel__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-border);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.carousel__dot--active {
+  width: 24px;
+  background-color: var(--color-primary);
+}

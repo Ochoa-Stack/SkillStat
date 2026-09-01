@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Panorama del mercado laboral tecnológico en México: vacantes activas, habilidades más demandadas, salarios por habilidad y empresas contratando, con datos reales."
+    />
+    <title>SkillStat - Panorama</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <button
+          class="navbar__menu-toggle"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          data-nav-drawer-open
+        >
+          <i data-lucide="menu"></i>
+        </button>
+
+        <a
+          href="/views/index.html"
+          class="navbar__logo"
+          aria-label="SkillStat - Inicio"
+        >
+          <img
+            src="../assets/images/brand/skillstat-logo.svg"
+            alt="SkillStat"
+            height="32"
+            class="navbar__logo-img"
+          />
+        </a>
+
+        <ul class="navbar__links" role="list">
+          <li>
+            <a
+              href="/views/panorama.html"
+              class="navbar__link navbar__link--active"
+              aria-current="page"
+              >Panorama</a
+            >
+          </li>
+          <li>
+            <a href="/views/comparar.html" class="navbar__link">Comparar</a>
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="navbar__link"
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="/views/salarios.html" class="navbar__link">Salarios</a>
+          </li>
+          <li>
+            <a href="/views/regiones.html" class="navbar__link">Regiones</a>
+          </li>
+          <li>
+            <a href="/views/reportes.html" class="navbar__link">Reportes</a>
+          </li>
+          <li>
+            <a href="/views/alertas.html" class="navbar__link">Alertas</a>
+          </li>
+        </ul>
+
+        <div class="navbar__actions">
+          <a
+            href="/views/perfil.html"
+            class="navbar__profile-link"
+            aria-label="Mi perfil"
+            hidden
+          >
+            <i data-lucide="user"></i>
+          </a>
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Cambiar tema"
+          >
+            <i
+              data-lucide="sun"
+              class="theme-toggle__icon theme-toggle__icon--sun"
+            ></i>
+            <i
+              data-lucide="moon"
+              class="theme-toggle__icon theme-toggle__icon--moon"
+            ></i>
+          </button>
+          <button
+            class="navbar__logout"
+            type="button"
+            aria-label="Cerrar sesión"
+            data-auth-action="logout"
+            hidden
+          >
+            <i data-lucide="log-out"></i>
+          </button>
+          <a
+            href="/views/register.html"
+            class="navbar__link"
+            data-guest-cta
+            hidden
+            >Iniciar sesión</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <div class="nav-drawer" data-nav-drawer aria-hidden="true">
+      <div class="nav-drawer__backdrop" data-nav-drawer-close></div>
+      <div
+        class="nav-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+      >
+        <div class="nav-drawer__header">
+          <a
+            href="/views/index.html"
+            class="navbar__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo.svg"
+              alt="SkillStat"
+              height="28"
+              class="navbar__logo-img"
+            />
+          </a>
+          <div class="nav-drawer__header-actions">
+            <button
+              class="theme-toggle"
+              type="button"
+              data-theme-toggle
+              aria-label="Cambiar tema"
+            >
+              <i
+                data-lucide="sun"
+                class="theme-toggle__icon theme-toggle__icon--sun"
+              ></i>
+              <i
+                data-lucide="moon"
+                class="theme-toggle__icon theme-toggle__icon--moon"
+              ></i>
+            </button>
+            <button
+              class="nav-drawer__close"
+              type="button"
+              aria-label="Cerrar menú"
+              data-nav-drawer-close
+            >
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav-drawer__links" role="list">
+          <li>
+            <a
+              href="/views/panorama.html"
+              class="nav-drawer__link nav-drawer__link--active"
+              aria-current="page"
+              >Panorama</a
+            >
+          </li>
+          <li>
+            <a href="/views/comparar.html" class="nav-drawer__link">Comparar</a>
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="nav-drawer__link"
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="/views/salarios.html" class="nav-drawer__link">Salarios</a>
+          </li>
+          <li>
+            <a href="/views/regiones.html" class="nav-drawer__link">Regiones</a>
+          </li>
+          <li>
+            <a href="/views/reportes.html" class="nav-drawer__link">Reportes</a>
+          </li>
+          <li>
+            <a href="/views/alertas.html" class="nav-drawer__link">Alertas</a>
+          </li>
+        </ul>
+
+        <button
+          class="nav-drawer__logout"
+          type="button"
+          data-auth-action="logout"
+          hidden
+        >
+          <i data-lucide="log-out"></i>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <main>
+      <section class="panorama-header">
+        <div class="container">
+          <h1>Panorama</h1>
+          <p class="panorama-header__subtitle text-body">
+            Inteligencia de mercado laboral tecnológico · México ·
+            <span class="panorama-header__live">Actualizado</span>
+          </p>
+        </div>
+      </section>
+
+      <section class="panorama-metrics">
+        <div class="container">
+          <div class="panorama-metrics__track scroll-row" data-scroll-row>
+            <article
+              class="metric-card surface panorama-metrics__card"
+              aria-label="Vacantes activas"
+            >
+              <div class="card-header">
+                <span class="metric-card__label text-label"
+                  >Vacantes activas</span
+                >
+                <span class="metric-card__live" aria-label="Datos actualizados"
+                  >Actualizado</span
+                >
+              </div>
+              <p
+                class="metric-card__value text-metric"
+                data-metric="active-jobs"
+              >
+                —
+              </p>
+              <p
+                class="metric-card__detail text-body-sm"
+                data-metric="active-jobs-detail"
+              >
+                Cargando datos...
+              </p>
+            </article>
+
+            <article
+              class="metric-card surface panorama-metrics__card"
+              aria-label="Empresas contratando"
+            >
+              <div class="card-header">
+                <span class="metric-card__label text-label"
+                  >Empresas contratando</span
+                >
+                <span class="metric-card__live" aria-label="Datos actualizados"
+                  >Actualizado</span
+                >
+              </div>
+              <p
+                class="metric-card__value text-metric"
+                data-metric="active-companies"
+              >
+                —
+              </p>
+              <p
+                class="metric-card__detail text-body-sm"
+                data-metric="active-companies-detail"
+              >
+                Cargando datos...
+              </p>
+            </article>
+
+            <article
+              class="metric-card surface panorama-metrics__card"
+              aria-label="Habilidades rastreadas"
+            >
+              <div class="card-header">
+                <span class="metric-card__label text-label"
+                  >Habilidades rastreadas</span
+                >
+                <span class="metric-card__live" aria-label="Datos actualizados"
+                  >Actualizado</span
+                >
+              </div>
+              <p
+                class="metric-card__value text-metric"
+                data-metric="skills-tracked-panorama"
+              >
+                —
+              </p>
+              <p
+                class="metric-card__detail text-body-sm"
+                data-metric="skills-tracked-panorama-detail"
+              >
+                Cargando datos...
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panorama-skills">
+        <div class="container">
+          <div class="panorama-skills__header">
+            <h2>Top skills demandados</h2>
+            <p class="panorama-skills__subtitle text-body-sm">
+              Menciones en vacantes
+            </p>
+          </div>
+
+          <div
+            class="panorama-skills__filters"
+            role="group"
+            aria-label="Cantidad de habilidades a mostrar"
+          >
+            <button
+              class="pill pill--active"
+              type="button"
+              data-skills-limit="5"
+            >
+              Top 5
+            </button>
+            <button class="pill" type="button" data-skills-limit="10">
+              Top 10
+            </button>
+            <button class="pill" type="button" data-skills-limit="15">
+              Top 15
+            </button>
+          </div>
+
+          <div class="skills-chart surface scroll-row" data-skills-chart></div>
+        </div>
+      </section>
+    </main>
+
+    <script src="../assets/js/utils/formatters.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api/client.js"></script>
+    <script src="../assets/js/api/panorama.api.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/navbar-role.js"></script>
+    <script src="../assets/js/components/chart.init.js"></script>
+    <script src="../assets/js/pages/panorama.js"></script>
+  </body>
+</html>

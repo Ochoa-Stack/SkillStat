@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Compara habilidades técnicas del mercado laboral mexicano lado a lado: demanda y salario, con datos reales."
+    />
+    <title>SkillStat - Comparar</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../assets/images/brand/favicon.svg"
+    />
+    <link
+      rel="alternate icon"
+      type="image/x-icon"
+      href="../assets/images/brand/favicon.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;700&family=Bakbak+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <nav class="navbar" role="navigation" aria-label="Navegación principal">
+        <button
+          class="navbar__menu-toggle"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          data-nav-drawer-open
+        >
+          <i data-lucide="menu"></i>
+        </button>
+
+        <a
+          href="/views/index.html"
+          class="navbar__logo"
+          aria-label="SkillStat - Inicio"
+        >
+          <img
+            src="../assets/images/brand/skillstat-logo.svg"
+            alt="SkillStat"
+            height="32"
+            class="navbar__logo-img"
+          />
+        </a>
+
+        <ul class="navbar__links" role="list">
+          <li>
+            <a href="/views/panorama.html" class="navbar__link">Panorama</a>
+          </li>
+          <li>
+            <a
+              href="/views/comparar.html"
+              class="navbar__link navbar__link--active"
+              aria-current="page"
+              >Comparar</a
+            >
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="navbar__link"
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="/views/salarios.html" class="navbar__link">Salarios</a>
+          </li>
+          <li>
+            <a href="/views/regiones.html" class="navbar__link">Regiones</a>
+          </li>
+          <li>
+            <a href="/views/reportes.html" class="navbar__link">Reportes</a>
+          </li>
+          <li>
+            <a href="/views/alertas.html" class="navbar__link">Alertas</a>
+          </li>
+        </ul>
+
+        <div class="navbar__actions">
+          <a
+            href="/views/perfil.html"
+            class="navbar__profile-link"
+            aria-label="Mi perfil"
+            hidden
+          >
+            <i data-lucide="user"></i>
+          </a>
+          <button
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="Cambiar tema"
+          >
+            <i
+              data-lucide="sun"
+              class="theme-toggle__icon theme-toggle__icon--sun"
+            ></i>
+            <i
+              data-lucide="moon"
+              class="theme-toggle__icon theme-toggle__icon--moon"
+            ></i>
+          </button>
+          <button
+            class="navbar__logout"
+            type="button"
+            aria-label="Cerrar sesión"
+            data-auth-action="logout"
+            hidden
+          >
+            <i data-lucide="log-out"></i>
+          </button>
+          <a
+            href="/views/register.html"
+            class="navbar__link"
+            data-guest-cta
+            hidden
+            >Iniciar sesión</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <div class="nav-drawer" data-nav-drawer aria-hidden="true">
+      <div class="nav-drawer__backdrop" data-nav-drawer-close></div>
+      <div
+        class="nav-drawer__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+      >
+        <div class="nav-drawer__header">
+          <a
+            href="/views/index.html"
+            class="navbar__logo"
+            aria-label="SkillStat - Inicio"
+          >
+            <img
+              src="../assets/images/brand/skillstat-logo.svg"
+              alt="SkillStat"
+              height="28"
+              class="navbar__logo-img"
+            />
+          </a>
+          <div class="nav-drawer__header-actions">
+            <button
+              class="theme-toggle"
+              type="button"
+              data-theme-toggle
+              aria-label="Cambiar tema"
+            >
+              <i
+                data-lucide="sun"
+                class="theme-toggle__icon theme-toggle__icon--sun"
+              ></i>
+              <i
+                data-lucide="moon"
+                class="theme-toggle__icon theme-toggle__icon--moon"
+              ></i>
+            </button>
+            <button
+              class="nav-drawer__close"
+              type="button"
+              aria-label="Cerrar menú"
+              data-nav-drawer-close
+            >
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <ul class="nav-drawer__links" role="list">
+          <li>
+            <a href="/views/panorama.html" class="nav-drawer__link">Panorama</a>
+          </li>
+          <li>
+            <a
+              href="/views/comparar.html"
+              class="nav-drawer__link nav-drawer__link--active"
+              aria-current="page"
+              >Comparar</a
+            >
+          </li>
+          <li>
+            <a href="/views/habilidades.html" class="nav-drawer__link"
+              >Habilidades</a
+            >
+          </li>
+          <li>
+            <a href="/views/salarios.html" class="nav-drawer__link">Salarios</a>
+          </li>
+          <li>
+            <a href="/views/regiones.html" class="nav-drawer__link">Regiones</a>
+          </li>
+          <li>
+            <a href="/views/reportes.html" class="nav-drawer__link">Reportes</a>
+          </li>
+          <li>
+            <a href="/views/alertas.html" class="nav-drawer__link">Alertas</a>
+          </li>
+        </ul>
+
+        <button
+          class="nav-drawer__logout"
+          type="button"
+          data-auth-action="logout"
+          hidden
+        >
+          <i data-lucide="log-out"></i>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <main>
+      <section class="comparar-header">
+        <div class="container">
+          <h1>Comparar habilidades</h1>
+          <p class="comparar-header__subtitle text-body">
+            Selecciona entre 2 y 5 habilidades para comparar su demanda y
+            salario.
+          </p>
+        </div>
+      </section>
+
+      <section class="comparar-selector">
+        <div class="container">
+          <div
+            class="comparar-selector__chips scroll-row"
+            data-skill-chips
+          ></div>
+          <div class="comparar-selector__footer">
+            <span
+              class="comparar-selector__count text-body-sm"
+              data-selected-count
+            >
+              0 de 5 seleccionadas
+            </span>
+            <button
+              class="btn btn--primary"
+              type="button"
+              disabled
+              data-compare-button
+            >
+              Comparar
+            </button>
+          </div>
+          <p class="comparar-error" data-comparar-error role="alert" hidden>
+            No se pudo completar la comparación. Intenta de nuevo.
+          </p>
+        </div>
+      </section>
+
+      <section class="comparar-results" data-comparar-results hidden>
+        <div class="container"></div>
+      </section>
+    </main>
+
+    <script src="../assets/js/utils/formatters.js"></script>
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/api/client.js"></script>
+    <script src="../assets/js/api/panorama.api.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../assets/js/components/icons.init.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/navbar-role.js"></script>
+    <script src="../assets/js/pages/comparar.js"></script>
+  </body>
+</html>

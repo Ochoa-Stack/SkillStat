@@ -1,0 +1,96 @@
+// Controla el toggle de tema claro/oscuro y persiste la eleccion del usuario en localStorage. La persistencia importa porque el tema por defecto del sistema es light, y forzar al usuario a re-elegir dark en cada visita seria una mala experiencia.
+(function () {
+  const STORAGE_KEY = "skillstat-theme";
+  const root = document.documentElement;
+  const toggleButtons = document.querySelectorAll("[data-theme-toggle]");
+
+  function applyTheme(theme) {
+    root.setAttribute("data-theme", theme);
+  }
+
+  const storedTheme = localStorage.getItem(STORAGE_KEY);
+  if (storedTheme) {
+    applyTheme(storedTheme);
+  }
+
+  toggleButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      const current = root.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      applyTheme(next);
+      localStorage.setItem(STORAGE_KEY, next);
+
+      // Si esta pagina tiene el boton de Google renderizado, lo volvemos a dibujar con el tema correcto, la libreria de Google no sincroniza su propio tema automaticamente con el nuestro.
+      if (typeof window.refreshGoogleButtonTheme === "function") {
+        window.refreshGoogleButtonTheme();
+      }
+    });
+  });
+})();
+
+// Controla el drawer de navegacion en mobile. Usamos una clase en vez de display:none directo para poder animar la entrada y salida con CSS.
+(function () {
+  const drawer = document.querySelector("[data-nav-drawer]");
+  const openButton = document.querySelector("[data-nav-drawer-open]");
+  const closeTriggers = document.querySelectorAll("[data-nav-drawer-close]");
+
+  if (!drawer || !openButton) return;
+
+  function openDrawer() {
+    drawer.classList.add("nav-drawer--open");
+    drawer.setAttribute("aria-hidden", "false");
+    openButton.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove("nav-drawer--open");
+    drawer.setAttribute("aria-hidden", "true");
+    openButton.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+    openButton.focus();
+  }
+
+  openButton.addEventListener("click", openDrawer);
+
+  closeTriggers.forEach(function (trigger) {
+    trigger.addEventListener("click", closeDrawer);
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (
+      event.key === "Escape" &&
+      drawer.classList.contains("nav-drawer--open")
+    ) {
+      closeDrawer();
+    }
+  });
+})();
+
+// Cierra la sesion real contra el backend y limpia la cookie httpOnly antes de regresar al usuario a la pagina publica. Centralizado aqui porque el boton de logout vive en el navbar compartido entre las vistas autenticadas, no en cada pagina por separado.
+(function () {
+  const logoutButtons = document.querySelectorAll(
+    '[data-auth-action="logout"]',
+  );
+  if (logoutButtons.length === 0) return;
+
+  async function handleLogout() {
+    try {
+      await apiPost("/auth/logout", {});
+    } catch (error) {
+      console.error("No se pudo cerrar la sesión en el servidor:", error);
+    } finally {
+      sessionStorage.removeItem("csrf_token");
+      // Aunque la peticion falle, regresamos a index.html; desde la perspectiva del usuario, salir debe funcionar siempre.
+      const logoLink = document.querySelector(".navbar__logo");
+      const indexHref = logoLink
+        ? logoLink.getAttribute("href")
+        : "../views/index.html";
+      window.location.href = indexHref;
+    }
+  }
+
+  logoutButtons.forEach(function (button) {
+    button.addEventListener("click", handleLogout);
+  });
+})();

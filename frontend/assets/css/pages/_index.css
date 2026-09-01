@@ -1,0 +1,144 @@
+/* Espaciado y composicion especifica de la landing page. Los componentes (cards, botones, carousel) ya tienen su propio padding interno; este archivo controla el ritmo vertical entre secciones y el ancho de lectura del contenido textual */
+
+.hero {
+  padding-block: var(--space-12) var(--space-8);
+  text-align: center;
+}
+
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-6);
+}
+
+.hero__heading {
+  max-width: 720px;
+  margin-inline: auto;
+  margin-bottom: var(--space-6);
+}
+
+.hero__subheading {
+  max-width: 560px;
+  margin-inline: auto;
+}
+
+.carousel-section,
+.cta-section {
+  padding-block: var(--space-8);
+}
+
+.carousel-section .carousel {
+  max-width: 480px;
+  margin-inline: auto;
+}
+
+.cta-section .container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+  max-width: 480px;
+  margin-inline: auto;
+}
+
+.cta-section .btn {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .cta-section .container {
+    flex-direction: row;
+    justify-content: center;
+    max-width: none;
+  }
+  .cta-section .btn {
+    width: auto;
+  }
+  .carousel-section .carousel {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .carousel-section .carousel {
+    max-width: 100%;
+  }
+  .panorama-preview .browser-chrome {
+    max-width: 860px;
+  }
+  .hero__heading {
+    max-width: 900px;
+  }
+  .hero__subheading {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .panorama-preview .browser-chrome {
+    max-width: 1000px;
+  }
+}
+
+.value-props {
+  padding-block: var(--space-12);
+}
+
+.panorama-preview {
+  padding-block: var(--space-8) var(--space-16);
+  text-align: center;
+}
+
+.panorama-preview__eyebrow {
+  margin-bottom: var(--space-6);
+}
+
+.panorama-preview .browser-chrome {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: left;
+}
+
+/* Top skills landing section */
+.top-skills-section {
+  padding-block: var(--space-12);
+  text-align: center;
+}
+
+.top-skills-section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-6);
+}
+
+.top-skills-section h2 {
+  margin-bottom: var(--space-8);
+}
+
+.top-skills-section__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.top-skills-section__link {
+  display: inline-block;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.top-skills-section__link:hover {
+  text-decoration: underline;
+}
+
